@@ -38,7 +38,32 @@ def labs():
         LabProgress, (Lab.id == LabProgress.lab_id) & (LabProgress.user_id == user_id)
     ).all()
     
-    labs_list = [{'id': l.id, 'name': l.name, 'topic': l.topic, 'difficulty': l.difficulty, 'status': l.status} for l in labs_data]
+    lab_meta = {
+        'lab6': {
+            'description': 'A simulated enterprise AI-blockchain breach investigation at Nexora Intelligence Systems. Uncover unauthorized fund transfers, investigate poisoned AI context, trace compromised RBAC permissions, and contain a sophisticated cross-chain adversary.',
+            'xp': 250,
+            'case_id': 'NEX-042',
+            'pro_num': 'PRO 01'
+        },
+        'lab7': {
+            'description': 'An impossible block exposes a hidden attack on blockchain consensus. Trace poisoned oracle data, corrupted AI signals, and a silent validator divergence before the network loses agreement.',
+            'xp': 300,
+            'case_id': 'NEX-071',
+            'pro_num': 'PRO 02'
+        }
+    }
+
+    labs_list = [{
+        'id': l.id,
+        'name': l.name,
+        'topic': l.topic,
+        'difficulty': l.difficulty,
+        'status': l.status,
+        'description': lab_meta.get(l.id, {}).get('description', 'A challenging interactive lab environment.'),
+        'xp': lab_meta.get(l.id, {}).get('xp', 250),
+        'case_id': lab_meta.get(l.id, {}).get('case_id', ''),
+        'pro_num': lab_meta.get(l.id, {}).get('pro_num', '')
+    } for l in labs_data]
     
     return render_template('labs.html', labs=labs_list)
 
@@ -260,6 +285,159 @@ def ghost_ledger_post_investigation():
                            evidence_collected=evidence_collected,
                            all_completed=all_completed,
                            lab_completed=lab_completed)
+
+
+# =========================================================================
+# PRO Lab 02 — The Vanishing Consensus (Custom Workstation)
+# =========================================================================
+
+@labs_bp.route('/lab/lab7/investigation')
+@labs_bp.route('/lab/vanishing-consensus')
+def vanishing_consensus_workstation():
+    """Custom investigation workstation for PRO Lab 02 (Case NEX-071)."""
+    if 'user_id' not in session:
+        return redirect(url_for('auth.login'))
+    user_id = session['user_id']
+    lab_id = 'lab7'
+
+    from services.progress_service import update_unlocks
+    update_unlocks(user_id)
+    db.session.commit()
+
+    # Ensure LabProgress exists
+    lp = LabProgress.query.filter_by(user_id=user_id, lab_id=lab_id).first()
+    if not lp:
+        lp = LabProgress(user_id=user_id, lab_id=lab_id, status='AVAILABLE')
+        db.session.add(lp)
+    elif lp.status == 'LOCKED':
+        lp.status = 'AVAILABLE'
+    db.session.commit()
+
+    # Ensure all 5 missions exist in MissionProgress
+    lab_missions = Mission.query.filter_by(lab_id=lab_id).order_by(Mission.mission_number.asc()).all()
+    for idx, m in enumerate(lab_missions):
+        mp = MissionProgress.query.filter_by(user_id=user_id, mission_id=m.id).first()
+        if not mp:
+            init_status = 'AVAILABLE' if idx == 0 else 'LOCKED'
+            mp = MissionProgress(user_id=user_id, lab_id=lab_id, mission_id=m.id, status=init_status)
+            db.session.add(mp)
+        elif idx == 0 and mp.status == 'LOCKED':
+            mp.status = 'AVAILABLE'
+    db.session.commit()
+
+    # Re-run unlock evaluation in case missions were freshly created
+    update_unlocks(user_id)
+    db.session.commit()
+
+    from models import QuizAttempt
+
+    # Get missions for lab7
+    missions_data = db.session.query(
+        Mission.id, Mission.mission_number, Mission.title, Mission.description, MissionProgress.status
+    ).join(
+        MissionProgress, Mission.id == MissionProgress.mission_id
+    ).filter(
+        Mission.lab_id == lab_id,
+        MissionProgress.user_id == user_id
+    ).order_by(Mission.mission_number.asc()).all()
+
+    missions = []
+    for m in missions_data:
+        quizzes = MissionQuiz.query.filter_by(mission_id=m.id).order_by(MissionQuiz.id.asc()).all()
+        quiz_ids = [q.id for q in quizzes]
+        solved_ids = set()
+        if quiz_ids:
+            solved_attempts = QuizAttempt.query.filter(
+                QuizAttempt.user_id == user_id,
+                QuizAttempt.mission_id.in_(quiz_ids),
+                QuizAttempt.correct == True
+            ).all()
+            solved_ids = {a.mission_id for a in solved_attempts}
+
+        quizzes_list = []
+        for idx, q in enumerate(quizzes):
+            quizzes_list.append({
+                'id': q.id,
+                'index': idx + 1,
+                'question': q.question,
+                'xp_reward': q.xp_reward,
+                'explanation': q.explanation,
+                'is_solved': q.id in solved_ids or m.status == 'COMPLETED'
+            })
+
+        missions.append({
+            'id': m.id,
+            'mission_number': m.mission_number,
+            'title': m.title,
+            'description': m.description,
+            'status': m.status,
+            'quizzes': quizzes_list,
+            'total_quizzes': len(quizzes_list),
+            'solved_quizzes_count': len([q for q in quizzes_list if q['is_solved']])
+        })
+
+    # Get active mission
+    active_mission = None
+    for m in missions:
+        if m['status'] in ('AVAILABLE', 'IN PROGRESS'):
+            active_mission = m
+            break
+
+    # Get evidence collected
+    evidence_collected = db.session.query(EvidenceProgress).join(Evidence).filter(
+        EvidenceProgress.user_id == user_id,
+        Evidence.lab_id == lab_id,
+        EvidenceProgress.collected == True
+    ).count()
+
+    ch5_completed = len(missions) >= 5 and missions[4]['status'] == 'COMPLETED'
+    all_completed = len(missions) == 5 and all(m['status'] == 'COMPLETED' for m in missions)
+    lab_completed = (lp and lp.status == 'COMPLETED')
+
+    return render_template('vanishing_consensus_workstation.html',
+                           lab_id=lab_id,
+                           missions=missions,
+                           active_mission=active_mission,
+                           evidence_collected=evidence_collected,
+                           ch5_completed=ch5_completed,
+                           all_completed=all_completed,
+                           lab_completed=lab_completed)
+
+
+@labs_bp.route('/lab/lab7/post-investigation')
+@labs_bp.route('/lab/vanishing-consensus/case-file')
+def vanishing_consensus_post_investigation():
+    """Cinematic post-investigation experience for PRO Lab 02 (Case NEX-071)."""
+    if 'user_id' not in session:
+        return redirect(url_for('auth.login'))
+    user_id = session['user_id']
+    lab_id = 'lab7'
+
+    lp = LabProgress.query.filter_by(user_id=user_id, lab_id=lab_id).first()
+    evidence_collected = db.session.query(EvidenceProgress).join(Evidence).filter(
+        EvidenceProgress.user_id == user_id,
+        Evidence.lab_id == lab_id,
+        EvidenceProgress.collected == True
+    ).count()
+
+    missions_data = db.session.query(
+        Mission.id, Mission.mission_number, Mission.title, MissionProgress.status
+    ).join(
+        MissionProgress, Mission.id == MissionProgress.mission_id
+    ).filter(
+        Mission.lab_id == lab_id,
+        MissionProgress.user_id == user_id
+    ).order_by(Mission.mission_number.asc()).all()
+
+    all_completed = len(missions_data) == 5 and all(m.status == 'COMPLETED' for m in missions_data)
+    lab_completed = (lp and lp.status == 'COMPLETED')
+
+    return render_template('vanishing_consensus_post_investigation.html',
+                           lab_id=lab_id,
+                           evidence_collected=evidence_collected,
+                           all_completed=all_completed,
+                           lab_completed=lab_completed)
+
 
 
 

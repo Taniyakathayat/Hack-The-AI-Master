@@ -38,7 +38,7 @@
             <p>{{ lab.description | default('A challenging interactive lab environment.') }}</p>
             
             <div class="lab-meta">
-                <span><span class="text-accent">⚡</span> 250 XP</span>
+                <span><span class="text-accent">⚡</span> {{ lab.xp | default(250) }} XP</span>
                 <span>5 Missions</span>
             </div>
             

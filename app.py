@@ -138,6 +138,11 @@ def init_db():
         import seed_ghost_ledger
         seed_ghost_ledger.seed_ghost_ledger()
 
+        # Seed PRO Lab 02: The Vanishing Consensus
+        import seed_vanishing_consensus
+        seed_vanishing_consensus.seed_vanishing_consensus()
+
+
     # Ensure upload directories exist
     upload_dir = app.config.get('LAB_UPLOAD_DIR', os.path.join(os.path.dirname(__file__), 'data', 'uploaded_labs'))
     os.makedirs(upload_dir, exist_ok=True)

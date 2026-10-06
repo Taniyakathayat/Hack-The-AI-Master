@@ -63,7 +63,31 @@ def evaluate_quiz(user_id, lab_id, mission_id, answer, question_id=None):
             correct = True
         elif 'liquidity' in target_clean and 'pool' in target_clean and ('liquidity' in user_clean or 'pool' in user_clean):
             correct = True
-        elif 'poisoned' in target_clean and 'intel' in target_clean and ('poison' in user_clean or 'intel' in user_clean or 'nif' in user_clean):
+        elif 'oracle' in target_clean and 'poison' in target_clean and ('oracle' in user_clean or 'poison' in user_clean):
+            correct = True
+        elif 'relayer' in target_clean and '09' in target_clean and ('relayer' in user_clean and '09' in user_clean):
+            correct = True
+        elif 'legitimate' in target_clean and 'inflow' in target_clean and ('inflow' in user_clean or 'legitimate' in user_clean):
+            correct = True
+        elif 'validator' in target_clean and 'v05' in target_clean and ('v05' in user_clean or 'validator' in user_clean):
+            correct = True
+        elif 'validator' in target_clean and 'v03' in target_clean and ('v03' in user_clean or 'validator' in user_clean):
+            correct = True
+        elif 'emb' in target_clean and '9041' in target_clean and ('9041' in user_clean):
+            correct = True
+        elif 'gov' in target_clean and '071' in target_clean and ('gov' in user_clean and '071' in user_clean):
+            correct = True
+        elif '4820' in target_clean and ('4820' in user_clean or '4,820' in user_clean):
+            correct = True
+        elif '142' in target_clean and ('142' in user_clean or '142.10' in user_clean):
+            correct = True
+        elif '2500000' in target_clean and ('2500000' in user_clean or '2.5m' in user_clean or '2,500,000' in user_clean):
+            correct = True
+        elif '0x4f8e' in target_clean and ('4f8e' in user_clean):
+            correct = True
+        elif '0x98a2' in target_clean and ('98a2' in user_clean):
+            correct = True
+        elif 'bft' in target_clean and ('bft' in user_clean or 'pos' in user_clean):
             correct = True
             
     # Record attempt using quiz.id as identifier in the attempt log
@@ -118,7 +142,7 @@ def evaluate_quiz(user_id, lab_id, mission_id, answer, question_id=None):
         _collect_evidence_for_mission(user_id, lab_id, mission_id)
             
         db.session.commit()
-        return True, "🎉 All 5 investigation objectives verified for this chapter! Evidence secured.", xp, {
+        return True, f"🎉 All {len(all_mission_quizzes)} investigation objectives verified for this chapter! Evidence secured.", xp, {
             'quiz_id': quiz.id,
             'mission_completed': True,
             'solved_count': len(solved_quiz_ids),
@@ -127,7 +151,7 @@ def evaluate_quiz(user_id, lab_id, mission_id, answer, question_id=None):
         }
     
     db.session.commit()
-    return True, f"✓ Objective verified! ({len(solved_quiz_ids)}/5 complete)", xp, {
+    return True, f"✓ Objective verified! ({len(solved_quiz_ids)}/{len(all_mission_quizzes)} complete)", xp, {
         'quiz_id': quiz.id,
         'mission_completed': False,
         'solved_count': len(solved_quiz_ids),
@@ -156,13 +180,18 @@ def _unlock_next_mission(user_id, lab_id, mission_id):
 
 
 def _collect_evidence_for_mission(user_id, lab_id, mission_id):
-    """Auto-collects cryptographic evidence for lab6 chapters."""
+    """Auto-collects cryptographic evidence for lab6 and lab7 chapters."""
     evidence_map = {
         'lab6_m1': 'e_l6_01',
         'lab6_m2': 'e_l6_02',
         'lab6_m3': 'e_l6_03',
         'lab6_m4': 'e_l6_04',
-        'lab6_m5': 'e_l6_05'
+        'lab6_m5': 'e_l6_05',
+        'lab7_m1': 'e_l7_01',
+        'lab7_m2': 'e_l7_02',
+        'lab7_m3': 'e_l7_03',
+        'lab7_m4': 'e_l7_04',
+        'lab7_m5': 'e_l7_05',
     }
     ev_id = evidence_map.get(mission_id)
     if ev_id:
@@ -173,3 +202,4 @@ def _collect_evidence_for_mission(user_id, lab_id, mission_id):
         elif not ep.collected:
             ep.collected = True
             db.session.add(ep)
+

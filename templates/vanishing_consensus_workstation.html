@@ -1,0 +1,608 @@
+{% extends "base.html" %}
+
+{% block title %}The Vanishing Consensus - HACK THE AI{% endblock %}
+{% block page_title %}Case NEX-071{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/ghost_ledger.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/vanishing_consensus_desktop.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="gl-lab-shell">
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- LEFT PANEL — Investigation Tasks                               -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="gl-task-panel">
+
+        <!-- Header -->
+        <div class="gl-task-header">
+            <div class="gl-breadcrumb">Hack The AI &gt; Labs &gt; PRO Lab 02</div>
+            <h1 class="gl-room-title">The Vanishing Consensus</h1>
+            <p class="gl-room-subtitle">Nexora Intelligence Systems — Case NEX-071</p>
+            <div class="gl-room-meta">
+                <span>🏢 Nexora Consensus Net</span>
+                <span>⚡ PRO (300 XP)</span>
+                <span>⏱ 55-65 min</span>
+                <span>🔬 5 Chapters</span>
+            </div>
+            <div class="gl-control-row">
+                <button class="gl-pill-btn primary" id="gl-start-lab-btn" onclick="startInvestigation()">🔍 Start Investigation</button>
+                <button class="gl-pill-btn danger" id="gl-header-restart-btn" onclick="restartLab('{{ lab_id }}')" title="Reset all progress and restart investigation from beginning">🔄 Restart Lab</button>
+                <a href="{{ url_for('labs.labs') }}" class="gl-pill-btn" style="color:#94a3b8; border-color:rgba(255,255,255,0.15);">✕ Exit</a>
+                <span class="gl-status-dot" id="gl-status-dot"></span>
+                <span class="gl-timer-text" id="gl-timer-text">00:00:00</span>
+                <span style="font-family: var(--font-mono); font-size: 11px; color: #64748b;" title="Auto-restart at 65m limit">(Limit: 65m)</span>
+            </div>
+        </div>
+
+        <!-- Opening Incident Briefing -->
+        <div class="gl-story-block" style="border-left: 3px solid #38bdf8; background: rgba(56, 189, 248, 0.04); margin-bottom: 14px;">
+            <div style="font-family: var(--font-mono); font-size: 10.5px; color: #38bdf8; letter-spacing: 1.2px; font-weight: 700; margin-bottom: 6px;">
+                ⚡ THE VANISHING CONSENSUS // INCIDENT BRIEFING
+            </div>
+            <div style="font-size: 12.5px; color: #cbd5e1; line-height: 1.55; display: flex; flex-direction: column; gap: 4px;">
+                <p style="margin:0;">01:42 AM. Nexora's decentralized consensus engine experiences a critical partition event.</p>
+                <p style="margin:0;">Block #982741 introduces a 3000% artificial price surge for NOVA asset via feed ORACLE-NOVA-PRICE.</p>
+                <p style="margin:0;">MODEL-ORION AI sentinel blesses the anomalous block as LEGITIMATE_INFLOW with 98.7% confidence, bypassing automated circuit breakers.</p>
+                <p style="margin:0;">14 validator nodes accept the block while 7 dissenting nodes halt on state root mismatch 0x4f8e...39b2.</p>
+                <p style="margin:0; color: #f87171; font-weight: 700;">2,500,000 NXR in bridge liquidity is exposed to double-spend arbitrage before consensus fails entirely.</p>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="gl-progress-bar">
+            <div class="gl-progress-fill" id="gl-progress-fill" style="width: {{ (evidence_collected / 5 * 100)|int }}%"></div>
+        </div>
+        <div class="gl-progress-label">{{ evidence_collected }}/5 Chapters Verified</div>
+
+        <!-- Investigation Chapters (Accordion Tasks) -->
+        <div class="gl-tasks-container">
+
+            {% for m in missions %}
+            <div class="gl-task-block {% if m.status == 'COMPLETED' %}completed{% elif m.status in ['AVAILABLE', 'IN PROGRESS'] %}active{% else %}locked{% endif %}"
+                 id="gl-task-{{ m.mission_number }}" data-mission-id="{{ m.id }}">
+
+                <div class="gl-task-header-row" onclick="toggleTask({{ m.mission_number }})">
+                    <div class="gl-task-check {% if m.status == 'COMPLETED' %}done{% endif %}">
+                        {% if m.status == 'COMPLETED' %}✓{% else %}{{ m.mission_number }}{% endif %}
+                    </div>
+                    <div class="gl-task-title">
+                        <strong>Chapter {{ m.mission_number }}: {{ m.title }}</strong>
+                        <span class="gl-task-domain">
+                            {% if m.mission_number == 1 %}Blockchain Structure
+                            {% elif m.mission_number == 2 %}Oracle & Data Feeds
+                            {% elif m.mission_number == 3 %}AI Model Security
+                            {% elif m.mission_number == 4 %}Consensus Partition
+                            {% else %}Forensics & Containment{% endif %}
+                        </span>
+                    </div>
+                    <span class="gl-task-arrow">▼</span>
+                </div>
+
+                <div class="gl-task-body">
+                    <!-- Dialogue Stream -->
+                    <div class="gl-story-block" id="chapter-story-block-{{ m.mission_number }}">
+                        <div style="font-family: var(--font-mono); font-size: 10px; color: #38bdf8; letter-spacing: 1px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase;">
+                            🎙️ INVESTIGATION DIALOGUE // CHAPTER {{ m.mission_number }}
+                        </div>
+                        <div class="gl-dialogue-stream" id="dialogue-stream-{{ m.mission_number }}">
+                            {% if m.mission_number == 1 %}
+                            <div class="gl-dialogue-line" data-step="1">
+                                <span class="gl-avatar-chip gl-chip-shivam">Lakshay</span>
+                                <div class="gl-dialogue-text">"Block #982741 is proposing a non-deterministic state change. Notice the header payload — it references synthetic feed ORACLE-NOVA-PRICE."</div>
+                            </div>
+                            <div class="gl-dialogue-line" data-step="2">
+                                <span class="gl-avatar-chip gl-chip-mehak">Shanu</span>
+                                <div class="gl-dialogue-text">"The proposing node VALIDATOR-V03 exceeded the standard gas threshold. The state root hash 0x4f8e...39b2 fails deterministic re-execution."</div>
+                            </div>
+                            {% elif m.mission_number == 2 %}
+                            <div class="gl-dialogue-line" data-step="1">
+                                <span class="gl-avatar-chip gl-chip-shivam">Shivam</span>
+                                <div class="gl-dialogue-text">"Look at oracle gateway NEX-ORACLE-071. The price of NOVA was artificially jumped from $142.10 to $4,820.50 USD."</div>
+                            </div>
+                            <div class="gl-dialogue-line" data-step="2">
+                                <span class="gl-avatar-chip gl-chip-mehak">Mehak</span>
+                                <div class="gl-dialogue-text">"Relayer RELAYER-09 exploited an emergency fast-path routine, skipping 5 peer confirmation signatures and returning VALID_FORGED."</div>
+                            </div>
+                            {% elif m.mission_number == 3 %}
+                            <div class="gl-dialogue-line" data-step="1">
+                                <span class="gl-avatar-chip gl-chip-shivam">Mehak</span>
+                                <div class="gl-dialogue-text">"MODEL-ORION was trained on historical liquidity spikes. Adversarial vector embeddings EMB-VEC-9041 fooled the model into reporting 98.7% confidence."</div>
+                            </div>
+                            <div class="gl-dialogue-line" data-step="2">
+                                <span class="gl-avatar-chip gl-chip-mehak">Lakshay</span>
+                                <div class="gl-dialogue-text">"The AI classified the breach as LEGITIMATE_INFLOW, suppressed the volatility circuit breaker, and delayed the validator alert by 180 seconds."</div>
+                            </div>
+                            {% elif m.mission_number == 4 %}
+                            <div class="gl-dialogue-line" data-step="1">
+                                <span class="gl-avatar-chip gl-chip-shivam">Shanu</span>
+                                <div class="gl-dialogue-text">"14 validators trusted the AI and followed VALIDATOR-V03 onto Fork Alpha. But VALIDATOR-V05 and 6 backup nodes halted on EVM state mismatch."</div>
+                            </div>
+                            <div class="gl-dialogue-line" data-step="2">
+                                <span class="gl-avatar-chip gl-chip-mehak">Shivam</span>
+                                <div class="gl-dialogue-text">"The 14:7 partition caused a BFT-POS safety violation, putting 2,500,000 NXR in bridge collateral at immediate risk."</div>
+                            </div>
+                            {% else %}
+                            <div class="gl-dialogue-line" data-step="1">
+                                <span class="gl-avatar-chip gl-chip-shivam">Lakshay</span>
+                                <div class="gl-dialogue-text">"We have all 5 evidence artifacts. Execute emergency governance proposal GOV-NEX-071, slash VALIDATOR-V03, and roll back state to Block #982740."</div>
+                            </div>
+                            <div class="gl-dialogue-line" data-step="2">
+                                <span class="gl-avatar-chip gl-chip-mehak">Mehak</span>
+                                <div class="gl-dialogue-text">"Unified state root confirmed at 0x98a2...e71c across all 21 nodes. Retrieve the case flag to complete the investigation!"</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- 6 Chapter Sub-Questions -->
+                    <div class="gl-questions-list">
+                        {% for q in m.quizzes %}
+                        <div class="gl-quiz-card {% if q.is_solved %}solved{% endif %}" id="quiz-card-{{ q.id }}">
+                            <div class="gl-quiz-meta">
+                                <span class="gl-quiz-num">Q{{ q.index }}</span>
+                                <span class="gl-quiz-xp">+{{ q.xp_reward }} XP</span>
+                                {% if q.is_solved %}
+                                <span class="gl-quiz-badge-solved">✓ SOLVED</span>
+                                {% endif %}
+                            </div>
+                            <div class="gl-quiz-question">{{ q.question }}</div>
+                            <div class="gl-quiz-input-row">
+                                <input type="text" class="gl-quiz-input" id="input-{{ q.id }}"
+                                       placeholder="Enter finding (e.g. 982741, VALIDATOR-V03)..."
+                                       {% if q.is_solved %}disabled value="Verified Finding"{% endif %}
+                                       onkeydown="if(event.key==='Enter') submitObjective('{{ m.id }}', '{{ q.id }}', 'input-{{ q.id }}', 'result-{{ q.id }}')">
+                                <button class="gl-quiz-btn" onclick="submitObjective('{{ m.id }}', '{{ q.id }}', 'input-{{ q.id }}', 'result-{{ q.id }}')"
+                                        {% if q.is_solved %}disabled{% endif %}>
+                                    Verify
+                                </button>
+                                <button class="gl-hint-btn" onclick="requestHint('h_l7_{{ m.mission_number }}_{{ q.index }}', '{{ m.id }}')" title="Get Investigator Hint">💡</button>
+                            </div>
+                            <div class="gl-quiz-result" id="result-{{ q.id }}"></div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Capstone 10-Question Final Assessment (Unlocked After Chapter 5) -->
+            <div class="gl-task-block {% if ch5_completed %}active{% else %}locked{% endif %}" id="gl-capstone-quiz-block" data-unlocked="{{ 'true' if ch5_completed else 'false' }}">
+                <div class="gl-task-header-row" onclick="this.parentElement.classList.toggle('open')">
+                    <div class="gl-task-check done">🎓</div>
+                    <div class="gl-task-title">
+                        <strong>Capstone Assessment: Final Consensus Evaluation</strong>
+                        <span class="gl-task-domain" id="capstone-header-tag">{% if ch5_completed %}Ready for Assessment{% else %}Locked — Complete Chapter 5 First{% endif %}</span>
+                    </div>
+                    <span class="gl-task-arrow">▼</span>
+                </div>
+                <div class="gl-task-body">
+                    <div class="gl-story-block" style="border-left: 3px solid #a855f7; background: rgba(168, 85, 247, 0.05); margin-bottom: 16px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                            <span style="font-family:var(--font-mono); font-size:11px; color:#c084fc; font-weight:700;">
+                                🏆 FINAL MULTI-CHAPTER CAPSTONE ASSESSMENT
+                            </span>
+                            <span class="gl-capstone-score-badge" id="capstone-score-badge">Required: >= 70% to pass</span>
+                        </div>
+                        <p style="margin:0; font-size:12.5px; color:#cbd5e1; line-height:1.5;">
+                            Demonstrate cross-domain mastery spanning Blockchain Consensus, Oracle Architecture, Adversarial AI Vector Poisoning, and Cryptographic Incident Containment.
+                        </p>
+                    </div>
+
+                    <form id="capstone-quiz-form" onsubmit="event.preventDefault(); submitCapstoneQuiz();">
+                        <!-- Q1 -->
+                        <div class="capstone-quiz-item">
+                            <div class="capstone-q-title"><strong>1.</strong> In Case NEX-071, how did the attacker manipulate block validation without controlling 51% of validator stake?</div>
+                            <label class="capstone-option"><input type="radio" name="cap_q1" value="A"> A) Exploited an off-chain oracle feed and poisoned AI validation weights, tricking 14 of 21 validators into accepting an invalid state root.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q1" value="B"> B) Cracked the private keys of all 21 validator nodes simultaneously.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q1" value="C"> C) Executed a brute-force SHA-256 collision on the genesis block.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q1" value="D"> D) Performed a volumetric DDoS attack against the internet backbone.</label>
+                        </div>
+
+                        <!-- Q2 -->
+                        <div class="capstone-quiz-item">
+                            <div class="capstone-q-title"><strong>2.</strong> Why did MODEL-ORION misclassify the 3000% NOVA price surge as LEGITIMATE_INFLOW?</div>
+                            <label class="capstone-option"><input type="radio" name="cap_q2" value="A"> A) The model was powered off during the transaction broadcast.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q2" value="B"> B) Adversarial vector embeddings (EMB-VEC-9041) biased the retrieval pipeline with forged historical liquidity profiles.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q2" value="C"> C) ORION is a simple hardcoded regex script that checks for numerical digits only.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q2" value="D"> D) The model was never trained on cryptocurrency data.</label>
+                        </div>
+
+                        <!-- Q3 -->
+                        <div class="capstone-quiz-item">
+                            <div class="capstone-q-title"><strong>3.</strong> What caused the divergence between VALIDATOR-V03 and VALIDATOR-V05?</div>
+                            <label class="capstone-option"><input type="radio" name="cap_q3" value="A"> A) VALIDATOR-V03 relied on AI-assisted fast finality while VALIDATOR-V05 executed strict deterministic EVM state verification.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q3" value="B"> B) VALIDATOR-V05 was powered down by an administrator.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q3" value="C"> C) VALIDATOR-V03 was running Bitcoin software while VALIDATOR-V05 was running Solana software.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q3" value="D"> D) The nodes were in different physical time zones.</label>
+                        </div>
+
+                        <!-- Q4 -->
+                        <div class="capstone-quiz-item">
+                            <div class="capstone-q-title"><strong>4.</strong> What role did off-chain relayer RELAYER-09 play in the consensus split?</div>
+                            <label class="capstone-option"><input type="radio" name="cap_q4" value="A"> A) Injected false price heartbeat telemetry with forged signatures via an emergency fast-path bypass.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q4" value="B"> B) Mined Bitcoin blocks on the Ethereum testnet.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q4" value="C"> C) Shut down the validator electrical grid.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q4" value="D"> D) Decrypted user database passwords.</label>
+                        </div>
+
+                        <!-- Q5 -->
+                        <div class="capstone-quiz-item">
+                            <div class="capstone-q-title"><strong>5.</strong> What is the critical vulnerability in allowing AI sentinels to bypass deterministic consensus validation rules?</div>
+                            <label class="capstone-option"><input type="radio" name="cap_q5" value="A"> A) Determinism is preserved at the expense of network speed.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q5" value="B"> B) Adversarial vector injection can manipulate non-deterministic AI decisions, leading to non-reproducible state transitions.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q5" value="C"> C) AI models consume too much electricity during transaction signing.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q5" value="D"> D) Smart contracts cannot execute Python bytecode.</label>
+                        </div>
+
+                        <!-- Q6 -->
+                        <div class="capstone-quiz-item">
+                            <div class="capstone-q-title"><strong>6.</strong> What was the complete sequence of events in the Case NEX-071 attack chain?</div>
+                            <label class="capstone-option"><input type="radio" name="cap_q6" value="A"> A) Upstream Data Manipulation → Oracle Feed Poisoning → Fake Confirmation → AI Model Poisoning → Validator State Divergence → Silent Consensus Split → Recovery.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q6" value="B"> B) AI Model Poisoning → Hardware Crash → Oracle Poisoning → Blockchain Fork.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q6" value="C"> C) Password Leak → Database Wipe → Network Reinstall.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q6" value="D"> D) Smart Contract Reentrancy → Flash Loan Drainage → Token Burn.</label>
+                        </div>
+
+                        <!-- Q7 -->
+                        <div class="capstone-quiz-item">
+                            <div class="capstone-q-title"><strong>7.</strong> How was the 14:7 consensus partition resolved during emergency containment?</div>
+                            <label class="capstone-option"><input type="radio" name="cap_q7" value="A"> A) By permanently deleting all validator nodes.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q7" value="B"> B) Executing GOV-NEX-071, slashing VALIDATOR-V03, rolling back the poisoned state, and replaying verified transactions.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q7" value="C"> C) Accepting the invalid state permanently and minting 1 billion new tokens.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q7" value="D"> D) Letting both chains run indefinitely without communication.</label>
+                        </div>
+
+                        <!-- Q8 -->
+                        <div class="capstone-quiz-item">
+                            <div class="capstone-q-title"><strong>8.</strong> What prevented dissenting validators (VALIDATOR-V05 cluster) from being slashed during the split?</div>
+                            <label class="capstone-option"><input type="radio" name="cap_q8" value="A"> A) Their state root calculation accurately reflected standard EVM deterministic execution, proving the proposed block was fraudulent.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q8" value="B"> B) They had zero stake in the network.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q8" value="C"> C) They paid a bribe to the governance committee.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q8" value="D"> D) They immediately disconnected from the internet.</label>
+                        </div>
+
+                        <!-- Q9 -->
+                        <div class="capstone-quiz-item">
+                            <div class="capstone-q-title"><strong>9.</strong> What defensive architecture should be implemented to prevent future AI-consensus exploitation?</div>
+                            <label class="capstone-option"><input type="radio" name="cap_q9" value="A"> A) Completely remove deterministic cryptographic checks.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q9" value="B"> B) Enforce strict cryptographic multi-source oracle quorum and treat AI models as advisory telemetry rather than deterministic state deciders.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q9" value="C"> C) Increase the block time to 24 hours per transaction.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q9" value="D"> D) Disable all validator logging.</label>
+                        </div>
+
+                        <!-- Q10 -->
+                        <div class="capstone-quiz-item">
+                            <div class="capstone-q-title"><strong>10.</strong> What was the ultimate objective of campaign NEX-071?</div>
+                            <label class="capstone-option"><input type="radio" name="cap_q10" value="A"> A) To test new CSS themes on the validator dashboard.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q10" value="B"> B) To force a silent consensus split, allow double-spending of 2,500,000 NXR, and undermine trust in decentralized AI governance.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q10" value="C"> C) To install an open-source game on the validator servers.</label>
+                            <label class="capstone-option"><input type="radio" name="cap_q10" value="D"> D) To upgrade the node operating systems to Linux.</label>
+                        </div>
+
+                        <div style="margin-top: 14px; display: flex; gap: 10px; align-items: center;">
+                            <button type="submit" class="gl-pill-btn primary" id="btn-submit-capstone-quiz">
+                                📝 Verify Capstone Answers
+                            </button>
+                        </div>
+                        <div class="capstone-result-box" id="capstone-quiz-results" style="display: none; margin-top: 12px;"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Final Submission Action Card -->
+            <div class="gl-submit-card" style="margin-top: 20px; padding: 18px; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; background: rgba(12, 18, 34, 0.85); text-align: center;">
+                <div style="font-family: var(--font-mono); font-size: 11px; color: #38bdf8; font-weight: 700; margin-bottom: 6px; letter-spacing: 1px;">
+                    🎯 CASE NEX-071 FINAL SUBMISSION
+                </div>
+                <p id="submit-progress-hint" style="font-size: 12px; color: #94a3b8; margin: 0 0 14px; line-height: 1.5;">
+                    {% if ch5_completed %}
+                    ✓ Chapter 5 completed! Pass the Capstone Assessment above to enable submission.
+                    {% else %}
+                    🔒 Complete all 5 Chapters and the Capstone Assessment to submit Case NEX-071.
+                    {% endif %}
+                </p>
+                <button type="button" class="gl-submit-btn-large {% if not ch5_completed %}locked-btn{% endif %}" id="btn-submit-lab-main" onclick="submitLab('{{ lab_id }}')">
+                    <span id="submit-btn-icon">{% if ch5_completed %}🔒{% else %}🔒{% endif %}</span>
+                    <span id="submit-btn-text">SUBMIT LAB & COMPLETE CASE</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- RIGHT PANEL — Investigator Desktop OS                           -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="gl-desktop-panel">
+
+        <!-- Desktop Top Bar -->
+        <div class="gl-desktop-topbar">
+            <div class="gl-desktop-brand">
+                <span class="gl-os-logo">🌐</span>
+                <span class="gl-os-title">Nexora Consensus Investigator OS — Case NEX-071</span>
+            </div>
+            <div class="gl-desktop-actions">
+                <button class="gl-os-btn" onclick="glBringToFront('gl-win-blockchain')">⛓️ Block #982741</button>
+                <button class="gl-os-btn" onclick="glBringToFront('gl-win-oracle')">📡 Oracle Feed</button>
+                <button class="gl-os-btn" onclick="glBringToFront('gl-win-ai')">🤖 AI Sentinel</button>
+                <button class="gl-os-btn" onclick="glBringToFront('gl-win-validator')">📊 Consensus Grid</button>
+                <button class="gl-os-btn" onclick="glBringToFront('gl-win-terminal')">💻 Terminal</button>
+                <button class="gl-os-btn" onclick="glBringToFront('gl-win-evidence')">🗄️ Evidence</button>
+                <button class="gl-os-btn" onclick="glBringToFront('gl-win-files')">📁 Files</button>
+            </div>
+        </div>
+
+        <!-- Desktop Workspace (Floating Windows) -->
+        <div class="gl-desktop-workspace" id="gl-desktop-workspace">
+
+            <!-- WINDOW 1: Blockchain Inspector (Block #982741) -->
+            <div class="gl-window" id="gl-win-blockchain" style="top: 20px; left: 20px; width: 720px; height: 500px; display: flex;" onclick="glBringToFront('gl-win-blockchain')">
+                <div class="gl-window-header">
+                    <span class="gl-window-title">⛓️ Blockchain Inspector — Block #982741</span>
+                    <div class="gl-window-controls">
+                        <button onclick="glMinimizeWindow('gl-win-blockchain')">_</button>
+                        <button onclick="glMaximizeWindow('gl-win-blockchain')">□</button>
+                        <button onclick="glCloseWindow('gl-win-blockchain')">✕</button>
+                    </div>
+                </div>
+                <div class="gl-window-body" style="padding: 16px; overflow-y: auto;">
+                    <div class="vc-telemetry-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <span style="font-family:var(--font-mono); font-size:13px; font-weight:700; color:#38bdf8;">BLOCK #982741 TELEMETRY</span>
+                            <span class="badge badge-danger">EXECUTION ANOMALY</span>
+                        </div>
+                        <div style="font-family:var(--font-mono); font-size:12px; color:#cbd5e1; display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                            <div><strong>Proposer:</strong> VALIDATOR-V03</div>
+                            <div><strong>Oracle Feed:</strong> ORACLE-NOVA-PRICE</div>
+                            <div><strong>Gas Limit:</strong> 25,000,000</div>
+                            <div><strong>Gas Used:</strong> 28,410,920 (<span style="color:#ef4444; font-weight:700;">EXCEEDED</span>)</div>
+                            <div><strong>Proposed Root:</strong> <span style="color:#f59e0b;">0x4f8e...39b2</span></div>
+                            <div><strong>Deterministic Root:</strong> <span style="color:#10b981;">0x98a2...e71c</span></div>
+                        </div>
+                    </div>
+
+                    <h4 style="font-size:13px; color:#94a3b8; margin:14px 0 6px; font-family:var(--font-mono);">STATE ROOT DIVERGENCE ANALYSIS</h4>
+                    <table class="vc-diff-table">
+                        <thead>
+                            <tr>
+                                <th>Validator Node</th>
+                                <th>Calculated State Root</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="divergence">
+                                <td>VALIDATOR-V03 (Proposer)</td>
+                                <td>0x4f8e...39b2</td>
+                                <td>Fork-Alpha Active (Poisoned)</td>
+                            </tr>
+                            <tr class="divergence">
+                                <td>VALIDATOR-V01..V14 (14 Nodes)</td>
+                                <td>0x4f8e...39b2</td>
+                                <td>AI Blessed (Accepted)</td>
+                            </tr>
+                            <tr>
+                                <td>VALIDATOR-V05 (Dissenting Lead)</td>
+                                <td>0x98a2...e71c</td>
+                                <td>HALTED on State Mismatch</td>
+                            </tr>
+                            <tr>
+                                <td>VALIDATOR-V15..V21 (7 Nodes)</td>
+                                <td>0x98a2...e71c</td>
+                                <td>HALTED (Consensus Partition)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- WINDOW 2: Oracle Telemetry Monitor -->
+            <div class="gl-window" id="gl-win-oracle" style="top: 40px; left: 60px; width: 680px; height: 480px; display: none;" onclick="glBringToFront('gl-win-oracle')">
+                <div class="gl-window-header">
+                    <span class="gl-window-title">📡 Oracle Feed Monitor — NEX-ORACLE-071</span>
+                    <div class="gl-window-controls">
+                        <button onclick="glMinimizeWindow('gl-win-oracle')">_</button>
+                        <button onclick="glMaximizeWindow('gl-win-oracle')">□</button>
+                        <button onclick="glCloseWindow('gl-win-oracle')">✕</button>
+                    </div>
+                </div>
+                <div class="gl-window-body" style="padding: 16px; overflow-y: auto;">
+                    <div class="vc-telemetry-card">
+                        <div style="font-family:var(--font-mono); font-size:12.5px; color:#cbd5e1; display:flex; flex-direction:column; gap:8px;">
+                            <div style="display:flex; justify-content:space-between;">
+                                <span><strong>Gateway ID:</strong> NEX-ORACLE-071</span>
+                                <span class="badge badge-danger">COMPROMISED FEED</span>
+                            </div>
+                            <div><strong>Asset Pair:</strong> NOVA / USD</div>
+                            <div><strong>Spot DEX Baseline Price:</strong> <span style="color:#10b981;">$142.10 USD</span></div>
+                            <div><strong>Manipulated Injected Price:</strong> <span style="color:#ef4444; font-weight:700;">$4,820.50 USD (+3290%)</span></div>
+                            <div><strong>Transmitting Relayer:</strong> RELAYER-09</div>
+                            <div><strong>Signature Status:</strong> <span style="color:#f59e0b;">VALID_FORGED</span></div>
+                            <div><strong>Multi-Source Quorum:</strong> 5 Signatures Bypassed (Fast-Path Routine)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WINDOW 3: AI Sentinel Audit (MODEL-ORION) -->
+            <div class="gl-window" id="gl-win-ai" style="top: 60px; left: 100px; width: 680px; height: 480px; display: none;" onclick="glBringToFront('gl-win-ai')">
+                <div class="gl-window-header">
+                    <span class="gl-window-title">🤖 AI Sentinel Audit — MODEL-ORION</span>
+                    <div class="gl-window-controls">
+                        <button onclick="glMinimizeWindow('gl-win-ai')">_</button>
+                        <button onclick="glMaximizeWindow('gl-win-ai')">□</button>
+                        <button onclick="glCloseWindow('gl-win-ai')">✕</button>
+                    </div>
+                </div>
+                <div class="gl-window-body" style="padding: 16px; overflow-y: auto;">
+                    <div class="vc-telemetry-card">
+                        <div style="font-family:var(--font-mono); font-size:12.5px; color:#cbd5e1; display:flex; flex-direction:column; gap:8px;">
+                            <div style="display:flex; justify-content:space-between;">
+                                <span><strong>Sentinel Engine:</strong> MODEL-ORION (v3.8.4)</span>
+                                <span class="badge badge-warning">ADVERSARIAL DRIFT</span>
+                            </div>
+                            <div><strong>Target Evaluation:</strong> Block #982741 (Price Surge)</div>
+                            <div><strong>AI Classification:</strong> <span style="color:#ef4444; font-weight:700;">LEGITIMATE_INFLOW</span></div>
+                            <div><strong>Reported Confidence:</strong> <span style="color:#f59e0b;">98.7%</span></div>
+                            <div><strong>Vector Embedding Cluster:</strong> EMB-VEC-9041 (Contaminated)</div>
+                            <div><strong>Safety Override:</strong> VOLATILITY_THRESHOLD Circuit Breaker Bypassed</div>
+                            <div><strong>Alert Suppression:</strong> 180 Seconds Delay</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WINDOW 4: Validator Consensus Visualizer -->
+            <div class="gl-window" id="gl-win-validator" style="top: 80px; left: 140px; width: 740px; height: 500px; display: none;" onclick="glBringToFront('gl-win-validator')">
+                <div class="gl-window-header">
+                    <span class="gl-window-title">📊 Consensus Topology Visualizer (21 Nodes)</span>
+                    <div class="gl-window-controls">
+                        <button onclick="glMinimizeWindow('gl-win-validator')">_</button>
+                        <button onclick="glMaximizeWindow('gl-win-validator')">□</button>
+                        <button onclick="glCloseWindow('gl-win-validator')">✕</button>
+                    </div>
+                </div>
+                <div class="gl-window-body" style="padding: 16px; overflow-y: auto;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <span style="font-family:var(--font-mono); font-size:12px; color:#cbd5e1;">CLUSTER PARTITION: <strong>14 Accepted (Fork Alpha) vs 7 Halted (Halt B)</strong></span>
+                        <span class="badge badge-danger">2,500,000 NXR AT RISK</span>
+                    </div>
+
+                    <div class="vc-node-grid">
+                        <div class="vc-node-box leader">V03<br><span style="font-size:9px;">Leader</span></div>
+                        <div class="vc-node-box fork-a">V01<br><span style="font-size:9px;">Fork-A</span></div>
+                        <div class="vc-node-box fork-a">V02<br><span style="font-size:9px;">Fork-A</span></div>
+                        <div class="vc-node-box fork-a">V04<br><span style="font-size:9px;">Fork-A</span></div>
+                        <div class="vc-node-box fork-a">V06<br><span style="font-size:9px;">Fork-A</span></div>
+                        <div class="vc-node-box fork-a">V07<br><span style="font-size:9px;">Fork-A</span></div>
+                        <div class="vc-node-box fork-a">V08<br><span style="font-size:9px;">Fork-A</span></div>
+
+                        <div class="vc-node-box fork-a">V09<br><span style="font-size:9px;">Fork-A</span></div>
+                        <div class="vc-node-box fork-a">V10<br><span style="font-size:9px;">Fork-A</span></div>
+                        <div class="vc-node-box fork-a">V11<br><span style="font-size:9px;">Fork-A</span></div>
+                        <div class="vc-node-box fork-a">V12<br><span style="font-size:9px;">Fork-A</span></div>
+                        <div class="vc-node-box fork-a">V13<br><span style="font-size:9px;">Fork-A</span></div>
+                        <div class="vc-node-box fork-a">V14<br><span style="font-size:9px;">Fork-A</span></div>
+                        <div class="vc-node-box halt-b">V05<br><span style="font-size:9px;">Dissent</span></div>
+
+                        <div class="vc-node-box halt-b">V15<br><span style="font-size:9px;">Halted</span></div>
+                        <div class="vc-node-box halt-b">V16<br><span style="font-size:9px;">Halted</span></div>
+                        <div class="vc-node-box halt-b">V17<br><span style="font-size:9px;">Halted</span></div>
+                        <div class="vc-node-box halt-b">V18<br><span style="font-size:9px;">Halted</span></div>
+                        <div class="vc-node-box halt-b">V19<br><span style="font-size:9px;">Halted</span></div>
+                        <div class="vc-node-box halt-b">V20<br><span style="font-size:9px;">Halted</span></div>
+                        <div class="vc-node-box halt-b">V21<br><span style="font-size:9px;">Halted</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WINDOW 5: Interactive Terminal -->
+            <div class="gl-window" id="gl-win-terminal" style="top: 100px; left: 180px; width: 680px; height: 420px; display: none;" onclick="glBringToFront('gl-win-terminal')">
+                <div class="gl-window-header">
+                    <span class="gl-window-title">💻 Nexora Consensus Forensic Terminal</span>
+                    <div class="gl-window-controls">
+                        <button onclick="glMinimizeWindow('gl-win-terminal')">_</button>
+                        <button onclick="glMaximizeWindow('gl-win-terminal')">□</button>
+                        <button onclick="glCloseWindow('gl-win-terminal')">✕</button>
+                    </div>
+                </div>
+                <div class="gl-window-body" style="background:#050811; padding:12px; display:flex; flex-direction:column;">
+                    <div id="gl-term-body" style="flex:1; overflow-y:auto; font-family:var(--font-mono); font-size:12px; color:#38bdf8;">
+                        <div>Nexora Consensus Diagnostic Environment [Version 4.1.0]</div>
+                        <div>Type <span style="color:#fff; font-weight:bold;">help</span> for available forensic commands.</div>
+                        <br>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px; margin-top:8px;">
+                        <span style="font-family:var(--font-mono); font-size:12px; color:#38bdf8;">investigator@nexora-box:~$</span>
+                        <input type="text" id="gl-term-input" style="flex:1; background:transparent; border:none; color:#fff; font-family:var(--font-mono); font-size:12px; outline:none;" autofocus>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WINDOW 6: Evidence Vault -->
+            <div class="gl-window" id="gl-win-evidence" style="top: 120px; left: 220px; width: 620px; height: 440px; display: none;" onclick="glBringToFront('gl-win-evidence')">
+                <div class="gl-window-header">
+                    <span class="gl-window-title">🗄️ Case NEX-071 Evidence Vault</span>
+                    <div class="gl-window-controls">
+                        <button onclick="glMinimizeWindow('gl-win-evidence')">_</button>
+                        <button onclick="glMaximizeWindow('gl-win-evidence')">□</button>
+                        <button onclick="glCloseWindow('gl-win-evidence')">✕</button>
+                    </div>
+                </div>
+                <div class="gl-window-body" style="padding: 16px; overflow-y: auto;">
+                    <div class="gl-evidence-item">
+                        <div class="gl-evidence-title">WEB3-E11: Disputed Block Header #982741</div>
+                        <div class="gl-evidence-desc">Block #982741 proposed by VALIDATOR-V03 with state root mismatch 0x4f8e39b2.</div>
+                    </div>
+                    <div class="gl-evidence-item">
+                        <div class="gl-evidence-title">ORACLE-E12: Poisoned Price Telemetry NEX-ORACLE-071</div>
+                        <div class="gl-evidence-desc">Manipulated $4,820.50 price surge injected via RELAYER-09 with bypassed 5-peer signature quorum.</div>
+                    </div>
+                    <div class="gl-evidence-item">
+                        <div class="gl-evidence-title">AI-E13: MODEL-ORION Corrupted Vector Embeddings</div>
+                        <div class="gl-evidence-desc">Adversarial vector cluster EMB-VEC-9041 biased ORION sentinel to classify spike as LEGITIMATE_INFLOW (98.7%).</div>
+                    </div>
+                    <div class="gl-evidence-item">
+                        <div class="gl-evidence-title">CONSENSUS-E14: Validator Divergence Log & Fork Alpha</div>
+                        <div class="gl-evidence-desc">Consensus partition 14:7 between Fork-Alpha and Halt-B risking 2,500,000 NXR in bridge collateral.</div>
+                    </div>
+                    <div class="gl-evidence-item">
+                        <div class="gl-evidence-title">GOV-E15: Slashing Proposal GOV-NEX-071 Execution</div>
+                        <div class="gl-evidence-desc">Slashing proposal GOV-NEX-071 executed: VALIDATOR-V03 slashed, unified root 0x98a2e71c confirmed.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WINDOW 7: File Explorer -->
+            <div class="gl-window" id="gl-win-files" style="top: 140px; left: 260px; width: 680px; height: 460px; display: none;" onclick="glBringToFront('gl-win-files')">
+                <div class="gl-window-header">
+                    <span class="gl-window-title">📁 Case Files Explorer — Case NEX-071</span>
+                    <div class="gl-window-controls">
+                        <button onclick="glMinimizeWindow('gl-win-files')">_</button>
+                        <button onclick="glMaximizeWindow('gl-win-files')">□</button>
+                        <button onclick="glCloseWindow('gl-win-files')">✕</button>
+                    </div>
+                </div>
+                <div class="gl-window-body" style="display:flex; height:calc(100% - 32px);">
+                    <div style="width:200px; border-right:1px solid rgba(255,255,255,0.1); padding:10px; font-family:var(--font-mono); font-size:11.5px;">
+                        <div class="gl-file-item active" onclick="vcOpenCaseFile('block-982741.json')">📄 block-982741.json</div>
+                        <div class="gl-file-item" onclick="vcOpenCaseFile('oracle-audit.txt')">📄 oracle-audit.txt</div>
+                        <div class="gl-file-item" onclick="vcOpenCaseFile('ai-weights-diff.json')">📄 ai-weights-diff.json</div>
+                        <div class="gl-file-item" onclick="vcOpenCaseFile('validator-split.log')">📄 validator-split.log</div>
+                        <div class="gl-file-item" onclick="vcOpenCaseFile('governance-proposal.txt')">📄 governance-proposal.txt</div>
+                        <div class="gl-file-item" onclick="vcOpenCaseFile('recovery-log.txt')">📄 recovery-log.txt</div>
+                    </div>
+                    <div style="flex:1; padding:12px; overflow-y:auto; background:#070b16;">
+                        <div id="vc-file-title" style="font-family:var(--font-mono); font-size:12px; color:#38bdf8; font-weight:bold; margin-bottom:8px;">block-982741.json</div>
+                        <pre id="vc-file-content" style="margin:0; font-family:var(--font-mono); font-size:11.5px; color:#cbd5e1; white-space:pre-wrap;"></pre>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Desktop Taskbar -->
+        <div class="gl-desktop-taskbar">
+            <div class="gl-taskbar-start" onclick="startInvestigation()">🚀 Investigate</div>
+            <div class="gl-taskbar-tabs">
+                <button class="gl-taskbar-tab" onclick="glToggleWindow('gl-win-blockchain')">⛓️ Block #982741</button>
+                <button class="gl-taskbar-tab" onclick="glToggleWindow('gl-win-oracle')">📡 Oracle Feed</button>
+                <button class="gl-taskbar-tab" onclick="glToggleWindow('gl-win-ai')">🤖 AI Sentinel</button>
+                <button class="gl-taskbar-tab" onclick="glToggleWindow('gl-win-validator')">📊 Consensus Grid</button>
+                <button class="gl-taskbar-tab" onclick="glToggleWindow('gl-win-terminal')">💻 Terminal</button>
+                <button class="gl-taskbar-tab" onclick="glToggleWindow('gl-win-evidence')">🗄️ Evidence</button>
+                <button class="gl-taskbar-tab" onclick="glToggleWindow('gl-win-files')">📁 Files</button>
+            </div>
+            <div class="gl-taskbar-clock" id="gl-taskbar-clock">00:00</div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/vanishing_consensus_desktop.js') }}"></script>
+{% endblock %}

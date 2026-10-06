@@ -1,0 +1,123 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   PRO LAB 02 — THE VANISHING CONSENSUS — DESKTOP ENVIRONMENT CSS
+   Case NEX-071 — TryHackMe-style split layout with Blockchain Investigator OS
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@import url('ghost_ledger_desktop.css');
+
+/* Lab 2 Specific Theme Accents: Cyan & Electric Violet & Emerald */
+:root {
+  --vc-accent: #38bdf8;
+  --vc-secondary: #a855f7;
+  --vc-warning: #f59e0b;
+  --vc-danger: #ef4444;
+  --vc-success: #10b981;
+  --vc-dark-bg: #060913;
+  --vc-panel-bg: #0c1222;
+  --vc-card-bg: rgba(15, 23, 42, 0.75);
+}
+
+/* Consensus Topology Visualizer */
+.vc-node-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.vc-node-box {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 8px 4px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  transition: all 0.2s;
+}
+
+.vc-node-box.leader {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.25);
+}
+
+.vc-node-box.fork-a {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.12);
+  color: #fde68a;
+}
+
+.vc-node-box.halt-b {
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  color: #bae6fd;
+}
+
+.vc-node-box.recovered {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+}
+
+/* Block Inspector Cards */
+.vc-telemetry-card {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+}
+
+.vc-diff-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  margin: 10px 0;
+}
+
+.vc-diff-table th {
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.vc-diff-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+}
+
+.vc-diff-table tr.divergence {
+  background: rgba(239, 68, 68, 0.1);
+  color: #fca5a5;
+}
+
+/* Attack Graph Nodes */
+.vc-attack-step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px;
+  background: rgba(15, 23, 42, 0.6);
+  border-left: 3px solid #38bdf8;
+  border-radius: 0 6px 6px 0;
+  margin-bottom: 10px;
+}
+
+.vc-attack-step.critical {
+  border-left-color: #ef4444;
+}
+
+.vc-attack-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
