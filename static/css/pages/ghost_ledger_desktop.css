@@ -840,25 +840,38 @@
 .gl-submit-lab-action-btn {
   width: 100%;
   padding: 12px 18px;
-  background: linear-gradient(135deg, #00f0ff 0%, #00ff88 50%, #38bdf8 100%);
-  color: #030712;
   font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 800;
-  border: none;
   border-radius: 6px;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: 0 0 25px rgba(0, 240, 255, 0.45);
   transition: all 0.2s ease;
 }
-.gl-submit-lab-action-btn:hover {
+.gl-submit-lab-action-btn.unlocked-btn {
+  background: linear-gradient(135deg, #00f0ff 0%, #00ff88 50%, #38bdf8 100%);
+  color: #030712;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.45);
+}
+.gl-submit-lab-action-btn.unlocked-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 0 35px rgba(0, 255, 136, 0.6);
   filter: brightness(1.1);
+}
+.gl-submit-lab-action-btn.locked-btn {
+  background: rgba(20, 30, 50, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #64748b;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.gl-submit-lab-action-btn.locked-btn:hover {
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #94a3b8;
 }
 .gl-subtle-restart-btn {
   background: transparent;

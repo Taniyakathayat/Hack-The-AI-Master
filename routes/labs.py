@@ -213,6 +213,7 @@ def ghost_ledger_workstation():
         EvidenceProgress.collected == True
     ).count()
 
+    ch5_completed = len(missions) >= 5 and missions[4]['status'] == 'COMPLETED'
     all_completed = len(missions) == 5 and all(m['status'] == 'COMPLETED' for m in missions)
     lab_completed = (lp and lp.status == 'COMPLETED')
 
@@ -221,6 +222,7 @@ def ghost_ledger_workstation():
                            missions=missions,
                            active_mission=active_mission,
                            evidence_collected=evidence_collected,
+                           ch5_completed=ch5_completed,
                            all_completed=all_completed,
                            lab_completed=lab_completed)
 

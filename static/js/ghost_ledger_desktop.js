@@ -73,8 +73,29 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial default case file preview
     glOpenCaseFile('wallet-report.txt');
 
-    // ── Dialogue Stepping Setup ────────────────────────────────────────
-    initChapterDialogues();
+    // ── Restore Capstone Quiz & Submit state if previously passed ──────
+    if (sessionStorage.getItem('nexora_lab6_capstone_passed') === 'true') {
+        const submitBtn = document.getElementById('btn-submit-lab-main');
+        const submitIcon = document.getElementById('submit-btn-icon');
+        const submitText = document.getElementById('submit-btn-text');
+        const submitHint = document.getElementById('submit-progress-hint');
+        const capstoneBadge = document.getElementById('capstone-score-badge');
+        const capstoneTag = document.getElementById('capstone-header-tag');
+        const capstoneBlock = document.getElementById('gl-capstone-quiz-block');
+        
+        if (submitBtn && capstoneBlock && capstoneBlock.dataset.unlocked === 'true') {
+            submitBtn.classList.remove('locked-btn');
+            submitBtn.classList.add('unlocked-btn');
+            if (submitIcon) submitIcon.textContent = '🚀';
+            if (submitText) submitText.textContent = 'SUBMIT LAB & COMPLETE CASE';
+            if (submitHint) {
+                submitHint.style.color = '#4ade80';
+                submitHint.textContent = '✓ All Chapters and Capstone Quiz verified! Ready for final submission.';
+            }
+            if (capstoneBadge) capstoneBadge.textContent = '✓ VERIFIED (+250 XP)';
+            if (capstoneTag) capstoneTag.textContent = '✓ CAPSTONE VERIFIED';
+        }
+    }
 
     // ── Terminal Setup ─────────────────────────────────────────────────
     initTerminal();
@@ -1313,6 +1334,12 @@ function toggleCapstoneQuiz() {
     const arrow = document.getElementById('capstone-arrow');
     if (!block || !body) return;
     
+    // Check if locked
+    if (block.classList.contains('locked') || block.dataset.unlocked !== 'true') {
+        glShowToast('🔒 Complete all tasks in Chapter 5 to unlock the Capstone Quiz.');
+        return;
+    }
+    
     if (body.style.display === 'none') {
         body.style.display = 'block';
         block.classList.add('open');
@@ -1355,12 +1382,35 @@ function checkCapstoneQuiz() {
 
     const overallFb = document.getElementById('capstone-overall-feedback');
     const badge = document.getElementById('capstone-score-badge');
+    const headerTag = document.getElementById('capstone-header-tag');
+    
     if (overallFb) {
         if (allCorrect) {
             overallFb.style.color = '#4ade80';
-            overallFb.innerHTML = '🎉 <strong>PERFECT SCORE! (4/4)</strong> All Web3 & AI forensic concepts validated (+250 XP). You are ready to Submit Lab!';
-            if (badge) badge.textContent = '✓ VERIFIED';
+            overallFb.innerHTML = '🎉 <strong>PERFECT SCORE! (4/4)</strong> All Web3 & AI forensic concepts validated (+250 XP). Lab Submission is now UNLOCKED!';
+            if (badge) badge.textContent = '✓ VERIFIED (+250 XP)';
+            if (headerTag) headerTag.textContent = '✓ CAPSTONE VERIFIED';
+            sessionStorage.setItem('nexora_lab6_capstone_passed', 'true');
             collectEvidence('lab6', 'lab6_m5');
+            
+            // Unlock the Submit Lab button
+            const submitBtn = document.getElementById('btn-submit-lab-main');
+            const submitIcon = document.getElementById('submit-btn-icon');
+            const submitText = document.getElementById('submit-btn-text');
+            const submitHint = document.getElementById('submit-progress-hint');
+            
+            if (submitBtn) {
+                submitBtn.classList.remove('locked-btn');
+                submitBtn.classList.add('unlocked-btn');
+                if (submitIcon) submitIcon.textContent = '🚀';
+                if (submitText) submitText.textContent = 'SUBMIT LAB & COMPLETE CASE';
+                if (submitHint) {
+                    submitHint.style.color = '#4ade80';
+                    submitHint.textContent = '✓ All Chapters and Capstone Quiz verified! Ready for final submission.';
+                }
+            }
+            
+            glShowToast('🎉 Capstone Quiz Passed! Lab Submission is now UNLOCKED!');
         } else {
             overallFb.style.color = '#f87171';
             overallFb.innerHTML = `⚠️ Score: ${score}/4. Review the highlighted answers and try again.`;
@@ -1371,6 +1421,14 @@ function checkCapstoneQuiz() {
 // ── Final Lab Submission & Celebration ─────────────────────────────────
 async function submitFinalLab(labId) {
     const btn = document.getElementById('btn-submit-lab-main');
+    
+    // Check locked state
+    if (btn && btn.classList.contains('locked-btn')) {
+        alert('⚠️ Submission Locked: Please complete all 5 Chapters and successfully verify the Capstone Quiz before submitting the lab.');
+        glShowToast('🔒 Complete all 5 Chapters & Capstone Quiz first!');
+        return;
+    }
+    
     if (btn) {
         btn.disabled = true;
         btn.innerHTML = '<span>⏳</span> Submitting Investigation...';
@@ -1390,7 +1448,7 @@ async function submitFinalLab(labId) {
             alert(data.message || 'Error submitting lab. Please ensure tasks are completed.');
             if (btn) {
                 btn.disabled = false;
-                btn.innerHTML = '<span>🚀</span> SUBMIT LAB &amp; COMPLETE CASE';
+                btn.innerHTML = '<span style="font-size: 1.3rem;">🚀</span> <span>SUBMIT LAB &amp; COMPLETE CASE</span>';
             }
         }
     } catch (err) {

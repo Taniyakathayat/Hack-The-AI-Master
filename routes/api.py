@@ -138,6 +138,17 @@ def submit_lab():
     data = request.get_json() or {}
     lab_id = data.get('lab_id', 'lab6')
     
+    # Verify all missions are completed before allowing final submission
+    lab_missions = Mission.query.filter_by(lab_id=lab_id).all()
+    user_mps = MissionProgress.query.filter_by(user_id=user_id, lab_id=lab_id).all()
+    completed_m_ids = {mp.mission_id for mp in user_mps if mp.status == 'COMPLETED'}
+    
+    if lab_missions and not all(m.id in completed_m_ids for m in lab_missions):
+        return jsonify({
+            'success': False,
+            'message': 'Please complete all 5 investigation chapters and verify the Capstone Quiz before submitting the lab.'
+        }), 400
+        
     # Update LabProgress
     lp = LabProgress.query.filter_by(user_id=user_id, lab_id=lab_id).first()
     if not lp:

@@ -504,84 +504,98 @@
             <!-- ═══════════════════════════════════════════════════════════ -->
             <!-- POST-CHAPTER 5: CAPSTONE WEB3 & AI ASSESSMENT QUIZ          -->
             <!-- ═══════════════════════════════════════════════════════════ -->
-            <div class="gl-task-block gl-capstone-quiz-block" id="gl-capstone-quiz-block">
+            <div class="gl-task-block gl-capstone-quiz-block {% if not ch5_completed and not all_completed %}locked{% endif %}" id="gl-capstone-quiz-block" data-unlocked="{% if ch5_completed or all_completed %}true{% else %}false{% endif %}">
                 <div class="gl-task-header-row" onclick="toggleCapstoneQuiz()">
-                    <div class="gl-task-check done" style="border-color: #a855f7; color: #a855f7; background: rgba(168,85,247,0.1);">
-                        <span>⚡</span>
+                    <div class="gl-task-check {% if ch5_completed or all_completed %}done{% endif %}" style="border-color: #a855f7; color: #a855f7; background: rgba(168,85,247,0.1);">
+                        <span id="capstone-header-icon">{% if ch5_completed or all_completed %}⚡{% else %}🔒{% endif %}</span>
                     </div>
                     <div class="gl-task-title-area">
-                        <div class="gl-task-tag" style="background: rgba(168,85,247,0.15); color: #c084fc; border-color: rgba(168,85,247,0.3);">CAPSTONE KNOWLEDGE CHECK</div>
+                        <div class="gl-task-tag" id="capstone-header-tag" style="background: rgba(168,85,247,0.15); color: #c084fc; border-color: rgba(168,85,247,0.3);">
+                            {% if ch5_completed or all_completed %}CAPSTONE KNOWLEDGE CHECK{% else %}🔒 LOCKED // PREREQUISITE: CHAPTER 5{% endif %}
+                        </div>
                         <div class="gl-task-name">Web3, Blockchain &amp; AI Security Assessment</div>
                     </div>
-                    <div class="gl-task-badge" id="capstone-score-badge" style="background: rgba(168,85,247,0.15); color: #c084fc; font-weight:700;">+250 XP</div>
-                    <div class="gl-task-arrow" id="capstone-arrow">&#9660;</div>
+                    <div class="gl-task-badge" id="capstone-score-badge" style="background: rgba(168,85,247,0.15); color: #c084fc; font-weight:700;">
+                        {% if ch5_completed or all_completed %}+250 XP{% else %}🔒 LOCKED{% endif %}
+                    </div>
+                    <div class="gl-task-arrow" id="capstone-arrow">{% if ch5_completed or all_completed %}&#9660;{% else %}&#9654;{% endif %}</div>
                 </div>
 
-                <div class="gl-task-body" id="capstone-quiz-body" style="padding: 16px; display: block; border-top: 1px solid rgba(168,85,247,0.2); background: rgba(15, 23, 42, 0.75);">
-                    <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 14px; line-height: 1.5;">
-                        🧠 <strong>Forensic Validation:</strong> Test your core comprehension of how Web3, Blockchain smart contracts, and AI systems interact under adversarial attack conditions.
-                    </p>
-
-                    <!-- Capstone Question 1 -->
-                    <div class="gl-capstone-q-card" style="margin-bottom: 14px; padding: 12px; border-radius: 6px; background: rgba(20,30,50,0.6); border: 1px solid rgba(0,240,255,0.15);">
-                        <div style="font-size: 11px; color: var(--accent); font-family: var(--font-mono); font-weight: 700; margin-bottom: 4px;">Q1 // BLOCKCHAIN &amp; SMART CONTRACTS</div>
-                        <div style="font-size: 13px; color: #fff; font-weight: 600; margin-bottom: 8px;">
-                            Why did transaction TX-NEX-7741 succeed on-chain even though the recipient wallet had zero legitimate history with Nexora?
-                        </div>
-                        <div class="gl-capstone-options" data-qid="cq1">
-                            <label class="gl-cap-opt"><input type="radio" name="cq1" value="A"> A. The ECDSA cryptographic signature was forged using a zero-day elliptic curve break.</label>
-                            <label class="gl-cap-opt"><input type="radio" name="cq1" value="B"> B. The automated signer possessed valid keys and relied solely on the AI trust score without on-chain allowlisting.</label>
-                            <label class="gl-cap-opt"><input type="radio" name="cq1" value="C"> C. The Ethereum blockchain reorganized 100 blocks back to insert the transaction.</label>
-                        </div>
-                        <div class="gl-cap-feedback" id="cq1-feedback"></div>
+                <div class="gl-task-body" id="capstone-quiz-body" style="padding: 16px; display: {% if ch5_completed or all_completed %}block{% else %}none{% endif %}; border-top: 1px solid rgba(168,85,247,0.2); background: rgba(15, 23, 42, 0.75);">
+                    {% if not ch5_completed and not all_completed %}
+                    <div id="capstone-locked-msg" style="padding: 18px; text-align: center; color: #94a3b8; font-family: var(--font-mono); font-size: 13px;">
+                        <div style="font-size: 28px; margin-bottom: 8px;">🔒</div>
+                        <div style="color: #c084fc; font-weight: 700; margin-bottom: 4px;">CAPSTONE QUIZ LOCKED</div>
+                        <div>Complete and verify all tasks in <strong>Chapter 5: The Ghost in the Ledger</strong> to unlock this Web3 &amp; AI assessment.</div>
                     </div>
+                    {% endif %}
 
-                    <!-- Capstone Question 2 -->
-                    <div class="gl-capstone-q-card" style="margin-bottom: 14px; padding: 12px; border-radius: 6px; background: rgba(20,30,50,0.6); border: 1px solid rgba(0,240,255,0.15);">
-                        <div style="font-size: 11px; color: var(--accent); font-family: var(--font-mono); font-weight: 700; margin-bottom: 4px;">Q2 // AI CONTEXT POISONING</div>
-                        <div style="font-size: 13px; color: #fff; font-weight: 600; margin-bottom: 8px;">
-                            How was ORION AI tricked into classifying an unknown attacker wallet as TRUSTED with 99.2% confidence?
+                    <div id="capstone-interactive-content" style="{% if not ch5_completed and not all_completed %}display:none;{% endif %}">
+                        <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 14px; line-height: 1.5;">
+                            🧠 <strong>Forensic Validation:</strong> Test your core comprehension of how Web3, Blockchain smart contracts, and AI systems interact under adversarial attack conditions.
+                        </p>
+
+                        <!-- Capstone Question 1 -->
+                        <div class="gl-capstone-q-card" style="margin-bottom: 14px; padding: 12px; border-radius: 6px; background: rgba(20,30,50,0.6); border: 1px solid rgba(0,240,255,0.15);">
+                            <div style="font-size: 11px; color: var(--accent); font-family: var(--font-mono); font-weight: 700; margin-bottom: 4px;">Q1 // BLOCKCHAIN &amp; SMART CONTRACTS</div>
+                            <div style="font-size: 13px; color: #fff; font-weight: 600; margin-bottom: 8px;">
+                                Why did transaction TX-NEX-7741 succeed on-chain even though the recipient wallet had zero legitimate history with Nexora?
+                            </div>
+                            <div class="gl-capstone-options" data-qid="cq1">
+                                <label class="gl-cap-opt"><input type="radio" name="cq1" value="A"> A. The ECDSA cryptographic signature was forged using a zero-day elliptic curve break.</label>
+                                <label class="gl-cap-opt"><input type="radio" name="cq1" value="B"> B. The automated signer possessed valid keys and relied solely on the AI trust score without on-chain allowlisting.</label>
+                                <label class="gl-cap-opt"><input type="radio" name="cq1" value="C"> C. The Ethereum blockchain reorganized 100 blocks back to insert the transaction.</label>
+                            </div>
+                            <div class="gl-cap-feedback" id="cq1-feedback"></div>
                         </div>
-                        <div class="gl-capstone-options" data-qid="cq2">
-                            <label class="gl-cap-opt"><input type="radio" name="cq2" value="A"> A. The attacker trained a whole new LLM and swapped the PyTorch weights on disk.</label>
-                            <label class="gl-cap-opt"><input type="radio" name="cq2" value="B"> B. Unauthenticated feed NIF-2038 injected poisoned threat-intel context via the unverified ingestion gateway.</label>
-                            <label class="gl-cap-opt"><input type="radio" name="cq2" value="C"> C. The AI model's temperature parameter was set to 0.0.</label>
+
+                        <!-- Capstone Question 2 -->
+                        <div class="gl-capstone-q-card" style="margin-bottom: 14px; padding: 12px; border-radius: 6px; background: rgba(20,30,50,0.6); border: 1px solid rgba(0,240,255,0.15);">
+                            <div style="font-size: 11px; color: var(--accent); font-family: var(--font-mono); font-weight: 700; margin-bottom: 4px;">Q2 // AI CONTEXT POISONING</div>
+                            <div style="font-size: 13px; color: #fff; font-weight: 600; margin-bottom: 8px;">
+                                How was ORION AI tricked into classifying an unknown attacker wallet as TRUSTED with 99.2% confidence?
+                            </div>
+                            <div class="gl-capstone-options" data-qid="cq2">
+                                <label class="gl-cap-opt"><input type="radio" name="cq2" value="A"> A. The attacker trained a whole new LLM and swapped the PyTorch weights on disk.</label>
+                                <label class="gl-cap-opt"><input type="radio" name="cq2" value="B"> B. Unauthenticated feed NIF-2038 injected poisoned threat-intel context via the unverified ingestion gateway.</label>
+                                <label class="gl-cap-opt"><input type="radio" name="cq2" value="C"> C. The AI model's temperature parameter was set to 0.0.</label>
+                            </div>
+                            <div class="gl-cap-feedback" id="cq2-feedback"></div>
                         </div>
-                        <div class="gl-cap-feedback" id="cq2-feedback"></div>
+
+                        <!-- Capstone Question 3 -->
+                        <div class="gl-capstone-q-card" style="margin-bottom: 14px; padding: 12px; border-radius: 6px; background: rgba(20,30,50,0.6); border: 1px solid rgba(0,240,255,0.15);">
+                            <div style="font-size: 11px; color: var(--accent); font-family: var(--font-mono); font-weight: 700; margin-bottom: 4px;">Q3 // WEB3 TREASURY DEFENSE</div>
+                            <div style="font-size: 13px; color: #fff; font-weight: 600; margin-bottom: 8px;">
+                                What is the most effective Web3 architecture control to prevent high-volume automated treasury drain attacks?
+                            </div>
+                            <div class="gl-capstone-options" data-qid="cq3">
+                                <label class="gl-cap-opt"><input type="radio" name="cq3" value="A"> A. Multi-Signature (MPC) threshold governance, rate-limiting circuit breakers, and mandatory address allowlisting.</label>
+                                <label class="gl-cap-opt"><input type="radio" name="cq3" value="B"> B. Increasing blockchain transaction gas fees so attackers cannot afford transfers.</label>
+                                <label class="gl-cap-opt"><input type="radio" name="cq3" value="C"> C. Disabling all HTTPS encryption across the corporate network.</label>
+                            </div>
+                            <div class="gl-cap-feedback" id="cq3-feedback"></div>
+                        </div>
+
+                        <!-- Capstone Question 4 -->
+                        <div class="gl-capstone-q-card" style="margin-bottom: 14px; padding: 12px; border-radius: 6px; background: rgba(20,30,50,0.6); border: 1px solid rgba(0,240,255,0.15);">
+                            <div style="font-size: 11px; color: var(--accent); font-family: var(--font-mono); font-weight: 700; margin-bottom: 4px;">Q4 // AI GOVERNANCE &amp; ZERO-TRUST</div>
+                            <div style="font-size: 13px; color: #fff; font-weight: 600; margin-bottom: 8px;">
+                                Why should AI models in financial/cyber pipelines remain advisory rather than autonomous transaction signers?
+                            </div>
+                            <div class="gl-capstone-options" data-qid="cq4">
+                                <label class="gl-cap-opt"><input type="radio" name="cq4" value="A"> A. Because AI models are too fast for human monitors to watch.</label>
+                                <label class="gl-cap-opt"><input type="radio" name="cq4" value="B"> B. AI outputs are probabilistic and vulnerable to input poisoning; signing keys must require deterministic policy enforcement.</label>
+                                <label class="gl-cap-opt"><input type="radio" name="cq4" value="C"> C. Because smart contracts can only be written in Python.</label>
+                            </div>
+                            <div class="gl-cap-feedback" id="cq4-feedback"></div>
+                        </div>
+
+                        <button class="gl-pill-btn primary" onclick="checkCapstoneQuiz()" style="width: 100%; justify-content: center; margin-top: 6px; padding: 10px; font-weight: 700;">
+                            <span>✓</span> VERIFY CAPSTONE ANSWERS
+                        </button>
+                        <div id="capstone-overall-feedback" style="margin-top: 10px; font-size: 12px; font-family: var(--font-mono); text-align: center;"></div>
                     </div>
-
-                    <!-- Capstone Question 3 -->
-                    <div class="gl-capstone-q-card" style="margin-bottom: 14px; padding: 12px; border-radius: 6px; background: rgba(20,30,50,0.6); border: 1px solid rgba(0,240,255,0.15);">
-                        <div style="font-size: 11px; color: var(--accent); font-family: var(--font-mono); font-weight: 700; margin-bottom: 4px;">Q3 // WEB3 TREASURY DEFENSE</div>
-                        <div style="font-size: 13px; color: #fff; font-weight: 600; margin-bottom: 8px;">
-                            What is the most effective Web3 architecture control to prevent high-volume automated treasury drain attacks?
-                        </div>
-                        <div class="gl-capstone-options" data-qid="cq3">
-                            <label class="gl-cap-opt"><input type="radio" name="cq3" value="A"> A. Multi-Signature (MPC) threshold governance, rate-limiting circuit breakers, and mandatory address allowlisting.</label>
-                            <label class="gl-cap-opt"><input type="radio" name="cq3" value="B"> B. Increasing blockchain transaction gas fees so attackers cannot afford transfers.</label>
-                            <label class="gl-cap-opt"><input type="radio" name="cq3" value="C"> C. Disabling all HTTPS encryption across the corporate network.</label>
-                        </div>
-                        <div class="gl-cap-feedback" id="cq3-feedback"></div>
-                    </div>
-
-                    <!-- Capstone Question 4 -->
-                    <div class="gl-capstone-q-card" style="margin-bottom: 14px; padding: 12px; border-radius: 6px; background: rgba(20,30,50,0.6); border: 1px solid rgba(0,240,255,0.15);">
-                        <div style="font-size: 11px; color: var(--accent); font-family: var(--font-mono); font-weight: 700; margin-bottom: 4px;">Q4 // AI GOVERNANCE &amp; ZERO-TRUST</div>
-                        <div style="font-size: 13px; color: #fff; font-weight: 600; margin-bottom: 8px;">
-                            Why should AI models in financial/cyber pipelines remain advisory rather than autonomous transaction signers?
-                        </div>
-                        <div class="gl-capstone-options" data-qid="cq4">
-                            <label class="gl-cap-opt"><input type="radio" name="cq4" value="A"> A. Because AI models are too fast for human monitors to watch.</label>
-                            <label class="gl-cap-opt"><input type="radio" name="cq4" value="B"> B. AI outputs are probabilistic and vulnerable to input poisoning; signing keys must require deterministic policy enforcement.</label>
-                            <label class="gl-cap-opt"><input type="radio" name="cq4" value="C"> C. Because smart contracts can only be written in Python.</label>
-                        </div>
-                        <div class="gl-cap-feedback" id="cq4-feedback"></div>
-                    </div>
-
-                    <button class="gl-pill-btn primary" onclick="checkCapstoneQuiz()" style="width: 100%; justify-content: center; margin-top: 6px; padding: 10px; font-weight: 700;">
-                        <span>✓</span> VERIFY CAPSTONE ANSWERS
-                    </button>
-                    <div id="capstone-overall-feedback" style="margin-top: 10px; font-size: 12px; font-family: var(--font-mono); text-align: center;"></div>
                 </div>
             </div>
 
@@ -602,13 +616,18 @@
             {% endif %}
 
             <!-- ═══════════════════════════════════════════════════════════ -->
-            <!-- SUBMIT LAB ACTION CONTAINER (Replaces restart button)       -->
+            <!-- SUBMIT LAB ACTION CONTAINER (Locked until complete)         -->
             <!-- ═══════════════════════════════════════════════════════════ -->
             <div class="gl-sidebar-submit-container" style="margin-top:1.5rem; padding-top:1.25rem; border-top: 1px solid rgba(0,240,255,0.25); text-align:center;">
-                <button class="gl-submit-lab-action-btn" id="btn-submit-lab-main" onclick="submitFinalLab('{{ lab_id }}')">
-                    <span style="font-size: 1.3rem;">🚀</span>
-                    <span style="letter-spacing: 1px; font-weight: 800;">SUBMIT LAB &amp; COMPLETE CASE</span>
+                <button class="gl-submit-lab-action-btn {% if not all_completed %}locked-btn{% else %}unlocked-btn{% endif %}" id="btn-submit-lab-main" onclick="submitFinalLab('{{ lab_id }}')">
+                    <span id="submit-btn-icon" style="font-size: 1.3rem;">{% if all_completed %}🚀{% else %}🔒{% endif %}</span>
+                    <span id="submit-btn-text" style="letter-spacing: 1px; font-weight: 800;">
+                        {% if all_completed %}SUBMIT LAB &amp; COMPLETE CASE{% else %}SUBMIT LAB (LOCKED){% endif %}
+                    </span>
                 </button>
+                <div id="submit-progress-hint" style="margin-top: 6px; font-size: 11px; font-family: var(--font-mono); color: #64748b;">
+                    {% if all_completed %}✓ All Chapters verified &bull; Ready for final submission{% else %}🔒 Complete all 5 Chapters &amp; Capstone Quiz to unlock submission{% endif %}
+                </div>
                 <div style="margin-top: 0.85rem; display:flex; justify-content:center; gap:12px; align-items:center;">
                     <button class="gl-subtle-restart-btn" onclick="restartLab('{{ lab_id }}')">
                         🔄 Restart Lab
