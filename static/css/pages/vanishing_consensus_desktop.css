@@ -17,6 +17,19 @@
   --vc-card-bg: rgba(15, 23, 42, 0.75);
 }
 
+/* GPU Hardware Acceleration & Smooth Scrolling */
+.vc-tab-page, .vc-telemetry-card, .vc-diff-table, .vc-node-grid, .vc-attack-step {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.gl-task-panel, .gl-browser-content, #gl-term-body, #vc-file-content {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
 /* Mobile Mode Switcher (Hidden on Desktop >= 1025px) */
 .vc-mobile-mode-switcher {
   display: none;

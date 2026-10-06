@@ -3,13 +3,23 @@
    TryHackMe-style split layout with simulated desktop
    ═══════════════════════════════════════════════════════════════════════ */
 
-/* ── Shell Layout ────────────────────────────────────────────────────── */
+/* ── Shell Layout & Hardware Acceleration ────────────────────────────── */
 .gl-lab-shell {
   display: flex;
   height: calc(100vh - var(--header-height));
   width: 100%;
   overflow: hidden;
   background: #0a0f1d;
+  contain: layout style;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.gl-window, .gl-task-panel, .gl-desktop-pane, .gl-window-body {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 /* ── LEFT PANEL: Tasks ───────────────────────────────────────────────── */

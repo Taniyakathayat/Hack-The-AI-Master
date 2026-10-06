@@ -14,7 +14,7 @@ from models import (
 
 def seed_ghost_ledger():
     """Insert or update lab6 and all 25 questions across 5 chapters."""
-    lab = Lab.query.get('lab6')
+    lab = db.session.get(Lab, 'lab6')
     if not lab:
         lab = Lab(
             id='lab6',
@@ -40,7 +40,7 @@ def seed_ghost_ledger():
     ]
 
     for m_id, num, title, desc in missions_data:
-        m = Mission.query.get(m_id)
+        m = db.session.get(Mission, m_id)
         if not m:
             m = Mission(id=m_id, lab_id='lab6', mission_number=num, title=title, description=desc)
             db.session.add(m)

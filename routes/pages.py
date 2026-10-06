@@ -33,6 +33,11 @@ def _cyberlab_launch_urls():
     }
 
 
+@pages_bp.route('/')
+def index():
+    return render_template('landing.html')
+
+
 @pages_bp.route('/challenges')
 def challenges():
     challenges_list = Challenge.query.all()

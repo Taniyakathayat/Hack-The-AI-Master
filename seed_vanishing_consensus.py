@@ -18,7 +18,7 @@ from models import (
 
 def seed_vanishing_consensus():
     """Insert or update lab7 and all 30 questions across 5 chapters."""
-    lab = Lab.query.get('lab7')
+    lab = db.session.get(Lab, 'lab7')
     if not lab:
         lab = Lab(
             id='lab7',
@@ -49,7 +49,7 @@ def seed_vanishing_consensus():
     ]
 
     for m_id, num, title, desc in missions_data:
-        m = Mission.query.get(m_id)
+        m = db.session.get(Mission, m_id)
         if not m:
             m = Mission(id=m_id, lab_id='lab7', mission_number=num, title=title, description=desc)
             db.session.add(m)
@@ -283,7 +283,7 @@ def seed_vanishing_consensus():
     ]
 
     for q in all_quizzes:
-        existing_q = MissionQuiz.query.get(q.id)
+        existing_q = db.session.get(MissionQuiz, q.id)
         if not existing_q:
             db.session.add(q)
         else:
@@ -303,7 +303,7 @@ def seed_vanishing_consensus():
     ]
 
     for i, (h_id, m_id, content) in enumerate(hints_data, 1):
-        h = Hint.query.get(h_id)
+        h = db.session.get(Hint, h_id)
         if not h:
             h = Hint(id=h_id, mission_id=m_id, hint_text=content, xp_cost=0, sort_order=i)
             db.session.add(h)
@@ -323,7 +323,7 @@ def seed_vanishing_consensus():
     ]
 
     for ev_id, l_id, title, desc in evidence_data:
-        ev = Evidence.query.get(ev_id)
+        ev = db.session.get(Evidence, ev_id)
         if not ev:
             ev = Evidence(id=ev_id, lab_id=l_id, name=title, description=desc)
             db.session.add(ev)

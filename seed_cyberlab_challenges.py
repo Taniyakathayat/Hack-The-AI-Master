@@ -72,7 +72,7 @@ def seed_cyberlab_challenges():
     with app.app_context():
         added = 0
         for data in CYBERLAB_CHALLENGES:
-            if Challenge.query.get(data['id']):
+            if db.session.get(Challenge, data['id']):
                 continue
             db.session.add(Challenge(**data))
             added += 1
