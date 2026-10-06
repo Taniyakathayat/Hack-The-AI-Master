@@ -11,10 +11,21 @@
 {% block content %}
 <div class="gl-lab-shell">
 
+    <!-- Mobile View Mode Switcher (Visible on mobile/tablet <= 1024px) -->
+    <div class="vc-mobile-mode-switcher">
+        <button type="button" class="vc-mobile-tab-btn active" id="vc-btn-mobile-tasks" onclick="vcSwitchMobileView('tasks')">
+            📋 Investigation Tasks
+        </button>
+        <button type="button" class="vc-mobile-tab-btn" id="vc-btn-mobile-desktop" onclick="vcSwitchMobileView('desktop')">
+            💻 Consensus Desktop
+        </button>
+    </div>
+
     <!-- ═══════════════════════════════════════════════════════════════ -->
     <!-- LEFT PANEL — Investigation Tasks                               -->
     <!-- ═══════════════════════════════════════════════════════════════ -->
     <div class="gl-task-panel">
+
 
         <!-- Header -->
         <div class="gl-task-header">

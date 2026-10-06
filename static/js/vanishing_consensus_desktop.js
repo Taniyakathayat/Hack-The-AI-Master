@@ -56,6 +56,20 @@ document.addEventListener('DOMContentLoaded', () => {
     updateClock();
     setInterval(updateClock, 30000);
 
+    // Auto-detect window resize for responsive mobile/desktop panel resets
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 1024) {
+            const tasksPanel = document.querySelector('.gl-task-panel');
+            const desktopPane = document.getElementById('gl-desktop-pane');
+            if (tasksPanel) tasksPanel.classList.remove('vc-mobile-hidden');
+            if (desktopPane) {
+                desktopPane.classList.remove('vc-mobile-hidden');
+                desktopPane.style.display = 'flex';
+            }
+        }
+    });
+
+
     // ── Auto-open active task or first available task ─────────────────
     const activeTask = document.querySelector('.gl-task-block.active');
     if (activeTask) {
@@ -164,6 +178,30 @@ function glCloseEvidenceViewer() { glCloseWindow('gl-evidence-window'); }
 
 function glOpenNotes() { glBringToFront('gl-notes-window'); }
 function glCloseNotes() { glCloseWindow('gl-notes-window'); }
+
+function vcSwitchMobileView(mode) {
+    const tasksPanel = document.querySelector('.gl-task-panel');
+    const desktopPane = document.getElementById('gl-desktop-pane');
+    const tasksBtn = document.getElementById('vc-btn-mobile-tasks');
+    const desktopBtn = document.getElementById('vc-btn-mobile-desktop');
+
+    if (mode === 'tasks') {
+        if (tasksPanel) tasksPanel.classList.remove('vc-mobile-hidden');
+        if (desktopPane) desktopPane.classList.add('vc-mobile-hidden');
+        if (tasksBtn) tasksBtn.classList.add('active');
+        if (desktopBtn) desktopBtn.classList.remove('active');
+    } else {
+        if (tasksPanel) tasksPanel.classList.add('vc-mobile-hidden');
+        if (desktopPane) {
+            desktopPane.classList.remove('vc-mobile-hidden');
+            desktopPane.style.display = 'flex';
+        }
+        if (tasksBtn) tasksBtn.classList.remove('active');
+        if (desktopBtn) desktopBtn.classList.add('active');
+        glOpenBrowser();
+    }
+}
+
 
 function updateTaskbarTabs() {
     const wins = [

@@ -1548,4 +1548,36 @@ function stopCelebrationConfetti() {
     }
 }
 
+// ── Mobile / Desktop Responsive View Mode Switcher ───────────────────────
+function glSwitchMobileView(mode) {
+    const taskPanel = document.querySelector('.gl-task-panel');
+    const desktopPane = document.querySelector('.gl-desktop-pane');
+    const btnTasks = document.getElementById('gl-btn-mobile-tasks');
+    const btnDesktop = document.getElementById('gl-btn-mobile-desktop');
+
+    if (!taskPanel || !desktopPane) return;
+
+    if (mode === 'tasks') {
+        taskPanel.classList.remove('gl-mobile-hidden');
+        desktopPane.classList.add('gl-mobile-hidden');
+        if (btnTasks) btnTasks.classList.add('active');
+        if (btnDesktop) btnDesktop.classList.remove('active');
+    } else {
+        taskPanel.classList.add('gl-mobile-hidden');
+        desktopPane.classList.remove('gl-mobile-hidden');
+        if (btnTasks) btnTasks.classList.remove('active');
+        if (btnDesktop) btnDesktop.classList.add('active');
+    }
+}
+
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 1024) {
+        const taskPanel = document.querySelector('.gl-task-panel');
+        const desktopPane = document.querySelector('.gl-desktop-pane');
+        if (taskPanel) taskPanel.classList.remove('gl-mobile-hidden');
+        if (desktopPane) desktopPane.classList.remove('gl-mobile-hidden');
+    }
+});
+
+
 

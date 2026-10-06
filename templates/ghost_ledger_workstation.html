@@ -10,6 +10,16 @@
 {% block content %}
 <div class="gl-lab-shell">
 
+    <!-- Mobile View Mode Switcher (Visible on mobile/tablet <= 1024px) -->
+    <div class="gl-mobile-mode-switcher">
+        <button type="button" class="gl-mobile-tab-btn active" id="gl-btn-mobile-tasks" onclick="glSwitchMobileView('tasks')">
+            📋 Investigation Tasks
+        </button>
+        <button type="button" class="gl-mobile-tab-btn" id="gl-btn-mobile-desktop" onclick="glSwitchMobileView('desktop')">
+            💻 Investigation Desktop
+        </button>
+    </div>
+
     <!-- ═══════════════════════════════════════════════════════════════ -->
     <!-- LEFT PANEL — Investigation Tasks                               -->
     <!-- ═══════════════════════════════════════════════════════════════ -->
