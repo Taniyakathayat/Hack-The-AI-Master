@@ -390,12 +390,15 @@
                 </div>
 
                 <!-- Action buttons -->
-                <div class="gl-action-row" style="justify-content: center; margin-top: 2rem;">
-                    <button class="gl-btn-secondary" onclick="restartQuiz()">
-                        🔄 Retake SOC Assessment
+                <div class="gl-action-row" style="justify-content: center; margin-top: 2rem; gap: 12px; flex-wrap: wrap;">
+                    <button class="gl-btn-primary" onclick="submitFinalLabFromPost()" style="background: linear-gradient(135deg, #00f0ff 0%, #00ff88 100%); color: #000; font-weight: 800; box-shadow: 0 0 25px rgba(0,240,255,0.4);">
+                        🚀 SUBMIT LAB &amp; COMPLETE CASE
                     </button>
                     <button class="gl-btn-primary" onclick="showSection('reveal')">
                         ⚡ Reveal Campaign Intelligence &amp; Cliffhanger &rarr;
+                    </button>
+                    <button class="gl-btn-secondary" onclick="restartQuiz()">
+                        🔄 Retake SOC Assessment
                     </button>
                 </div>
             </div>
@@ -487,6 +490,78 @@
             </div>
         </section>
 
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CONGRATULATIONS CELEBRATION MODAL                           -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="gl-celebration-overlay" id="gl-post-celebration-modal" style="display:none;">
+    <canvas id="post-celebration-confetti-canvas" class="gl-confetti-canvas"></canvas>
+    
+    <div class="gl-celebration-card">
+        <!-- Floating Celebration Emojis Header -->
+        <div class="gl-celebration-emojis-row">
+            <span class="gl-cel-emoji bounce-1">🎉</span>
+            <span class="gl-cel-emoji bounce-2">⚡</span>
+            <span class="gl-cel-emoji bounce-3">🤖</span>
+            <span class="gl-cel-emoji bounce-4">⛓️</span>
+            <span class="gl-cel-emoji bounce-5">🛡️</span>
+            <span class="gl-cel-emoji bounce-6">💎</span>
+            <span class="gl-cel-emoji bounce-7">🥳</span>
+        </div>
+
+        <!-- Trophy Glow Badge -->
+        <div class="gl-celebration-badge-glow">
+            <div class="gl-celebration-trophy">🏆</div>
+        </div>
+
+        <h1 class="gl-celebration-title">CONGRATULATIONS, INVESTIGATOR!</h1>
+        <p class="gl-celebration-subtitle">
+            You have successfully completed the full forensic assessment for <strong>Case NEX-042</strong> and contained the multi-layered ORION-NEXUS threat!
+        </p>
+
+        <!-- Stats Grid -->
+        <div class="gl-celebration-stats-grid">
+            <div class="gl-cel-stat-box">
+                <div class="gl-cel-stat-lbl">TOTAL XP AWARDED</div>
+                <div class="gl-cel-stat-val gl-gold-text">+1,500 XP</div>
+            </div>
+            <div class="gl-cel-stat-box">
+                <div class="gl-cel-stat-lbl">INVESTIGATION STATUS</div>
+                <div class="gl-cel-stat-val gl-cyan-text">CONTAINED 🏁</div>
+            </div>
+            <div class="gl-cel-stat-box">
+                <div class="gl-cel-stat-lbl">QUIZ ACCURACY</div>
+                <div class="gl-cel-stat-val gl-green-text" id="modal-accuracy-val">100%</div>
+            </div>
+            <div class="gl-cel-stat-box">
+                <div class="gl-cel-stat-lbl">EVIDENCE VAULT</div>
+                <div class="gl-cel-stat-val gl-cyan-text">5 / 5 VERIFIED</div>
+            </div>
+        </div>
+
+        <!-- Rank Hero Box -->
+        <div class="gl-celebration-rank-card">
+            <div class="gl-cel-rank-tag">SECURITY CLEARANCE LEVEL 5 // ACCREDITED</div>
+            <div class="gl-cel-rank-title" id="modal-rank-title">🛡️ CERTIFIED WEB3 &amp; AI THREAT HUNTER ⭐⭐⭐⭐⭐</div>
+            <div class="gl-cel-rank-desc" id="modal-rank-desc">
+                Demonstrated superior threat hunting acumen across blockchain transactions, AI context provenance, and Zero-Trust defense.
+            </div>
+        </div>
+
+        <!-- Celebration Action Buttons -->
+        <div class="gl-celebration-actions">
+            <a href="{{ url_for('labs.labs') }}" class="gl-cel-btn primary">
+                <span>🏠</span> Return to Mission Dashboard
+            </a>
+            <button class="gl-cel-btn secondary" onclick="closePostCelebrationModal(); showSection('reveal');">
+                <span>🔴</span> Reveal Campaign Intelligence &rarr;
+            </button>
+            <button class="gl-cel-btn outline" onclick="closePostCelebrationModal()">
+                <span>🔍</span> Review Score Card
+            </button>
+        </div>
     </div>
 </div>
 {% endblock %}

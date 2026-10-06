@@ -152,6 +152,8 @@ def ghost_ledger_workstation():
     update_unlocks(user_id)
     db.session.commit()
 
+    from models import QuizAttempt
+
     # Get missions for lab6
     missions_data = db.session.query(
         Mission.id, Mission.mission_number, Mission.title, Mission.description, MissionProgress.status
@@ -164,14 +166,37 @@ def ghost_ledger_workstation():
 
     missions = []
     for m in missions_data:
-        quiz = MissionQuiz.query.filter_by(mission_id=m.id).first()
+        quizzes = MissionQuiz.query.filter_by(mission_id=m.id).order_by(MissionQuiz.id.asc()).all()
+        quiz_ids = [q.id for q in quizzes]
+        solved_ids = set()
+        if quiz_ids:
+            solved_attempts = QuizAttempt.query.filter(
+                QuizAttempt.user_id == user_id,
+                QuizAttempt.mission_id.in_(quiz_ids),
+                QuizAttempt.correct == True
+            ).all()
+            solved_ids = {a.mission_id for a in solved_attempts}
+
+        quizzes_list = []
+        for idx, q in enumerate(quizzes):
+            quizzes_list.append({
+                'id': q.id,
+                'index': idx + 1,
+                'question': q.question,
+                'xp_reward': q.xp_reward,
+                'explanation': q.explanation,
+                'is_solved': q.id in solved_ids or m.status == 'COMPLETED'
+            })
+
         missions.append({
             'id': m.id,
             'mission_number': m.mission_number,
             'title': m.title,
             'description': m.description,
             'status': m.status,
-            'question': quiz.question if quiz else ''
+            'quizzes': quizzes_list,
+            'total_quizzes': len(quizzes_list),
+            'solved_quizzes_count': len([q for q in quizzes_list if q['is_solved']])
         })
 
     # Get active mission

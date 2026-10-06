@@ -1,7 +1,7 @@
 from flask import Blueprint, request, session, jsonify
 import secrets
 from extensions import limiter, db
-from models import EvidenceProgress, LabProgress, Flag, ManualLabFlag, ManualLabProgress, User, Challenge, ChallengeProgress
+from models import EvidenceProgress, LabProgress, Flag, ManualLabFlag, ManualLabProgress, User, Challenge, ChallengeProgress, Mission, MissionProgress, MissionQuiz, QuizAttempt
 from services.progress_service import update_unlocks
 from services.quiz_service import evaluate_quiz
 from services.hint_service import get_hint
@@ -19,23 +19,24 @@ def submit_quiz():
     user_id = session['user_id']
     data = request.get_json()
     
-    if not data or not all(k in data for k in ("lab_id", "mission_id", "answer")):
-        return jsonify({'success': False, 'message': 'Invalid input'}), 400
-        
-    lab_id = data.get('lab_id')
-    mission_id = data.get('mission_id')
-    answer = data.get('answer', '')
+    question_id = data.get('question_id')
 
-    success, message, xp = evaluate_quiz(user_id, lab_id, mission_id, answer)
+    success, message, xp, extra_data = evaluate_quiz(user_id, lab_id, mission_id, answer, question_id=question_id)
     
     if success:
-        log_action(user_id, 'QUIZ_SUCCESS', f"Mission: {mission_id}")
+        log_action(user_id, 'QUIZ_SUCCESS', f"Mission: {mission_id} Quiz: {question_id or 'default'}")
         update_unlocks(user_id)
         db.session.commit()
-        return jsonify({'success': True, 'message': message})
+        resp = {'success': True, 'message': message, 'xp': xp}
+        if extra_data:
+            resp.update(extra_data)
+        return jsonify(resp)
         
-    log_action(user_id, 'QUIZ_FAILED', f"Mission: {mission_id}")
-    return jsonify({'success': False, 'message': message})
+    log_action(user_id, 'QUIZ_FAILED', f"Mission: {mission_id} Quiz: {question_id or 'default'}")
+    resp = {'success': False, 'message': message}
+    if extra_data:
+        resp.update(extra_data)
+    return jsonify(resp)
 
 @api_bp.route('/hint', methods=['POST'])
 @limiter.limit("20 per minute")
@@ -127,6 +128,62 @@ def submit_flag():
     
     log_action(user_id, 'FLAG_FAILED', f"Lab: {lab_id}")
     return jsonify({'success': False, 'message': 'Incorrect flag.'})
+
+@api_bp.route('/lab/submit', methods=['POST'])
+@limiter.limit("10 per minute")
+def submit_lab():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    user_id = session['user_id']
+    data = request.get_json() or {}
+    lab_id = data.get('lab_id', 'lab6')
+    
+    # Update LabProgress
+    lp = LabProgress.query.filter_by(user_id=user_id, lab_id=lab_id).first()
+    if not lp:
+        lp = LabProgress(user_id=user_id, lab_id=lab_id, status='COMPLETED', score=500, percentage=100)
+        db.session.add(lp)
+    else:
+        lp.status = 'COMPLETED'
+        lp.score = max(lp.score or 0, 500)
+        lp.percentage = 100
+        db.session.add(lp)
+        
+    # Mark all missions for this lab as completed
+    lab_missions = Mission.query.filter_by(lab_id=lab_id).all()
+    for m in lab_missions:
+        mp = MissionProgress.query.filter_by(user_id=user_id, mission_id=m.id).first()
+        if mp:
+            mp.status = 'COMPLETED'
+            db.session.add(mp)
+        else:
+            mp = MissionProgress(user_id=user_id, lab_id=lab_id, mission_id=m.id, status='COMPLETED')
+            db.session.add(mp)
+            
+    # Mark all evidence as collected
+    from models import Evidence
+    evidences = Evidence.query.filter_by(lab_id=lab_id).all()
+    for ev in evidences:
+        ep = EvidenceProgress.query.filter_by(user_id=user_id, evidence_id=ev.id).first()
+        if ep:
+            ep.collected = True
+            db.session.add(ep)
+        else:
+            ep = EvidenceProgress(user_id=user_id, evidence_id=ev.id, collected=True)
+            db.session.add(ep)
+            
+    update_unlocks(user_id)
+    log_action(user_id, 'LAB_SUBMITTED', f"Lab: {lab_id}")
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'message': 'Congratulations! Lab submitted successfully and threat contained!',
+        'xp': 1500,
+        'rank': 'CERTIFIED WEB3 & AI THREAT HUNTER',
+        'score': 100,
+        'chapters_completed': 5
+    })
 
 @api_bp.route('/lab6/post-investigation-result', methods=['POST'])
 @limiter.limit("20 per minute")
@@ -887,11 +944,14 @@ def restart_lab():
                                      status='AVAILABLE' if idx == 0 else 'LOCKED')
                 db.session.add(mp)
 
-        # 3. Delete quiz attempts for this lab's missions
+        # 3. Delete quiz attempts for this lab's missions (both mission_id and subtask quiz_id)
         if mission_ids:
+            from models import MissionQuiz
+            quiz_ids = [q.id for q in MissionQuiz.query.filter(MissionQuiz.mission_id.in_(mission_ids)).all()]
+            all_target_ids = list(set(mission_ids + quiz_ids))
             QuizAttempt.query.filter(
                 QuizAttempt.user_id == user_id,
-                QuizAttempt.mission_id.in_(mission_ids)
+                QuizAttempt.mission_id.in_(all_target_ids)
             ).delete(synchronize_session='fetch')
 
         # 4. Delete hint usage for this lab's missions

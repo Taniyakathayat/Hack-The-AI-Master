@@ -1074,3 +1074,212 @@
 .gl-fade-in {
   animation: fadeIn 0.4s ease forwards;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   CONGRATULATIONS CELEBRATION MODAL & CONFETTI (POST INVESTIGATION)
+   ═══════════════════════════════════════════════════════════════════════ */
+.gl-celebration-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99999;
+  background: rgba(5, 10, 24, 0.88);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.gl-confetti-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+.gl-celebration-card {
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(10, 15, 29, 0.98) 100%);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 50px rgba(0, 240, 255, 0.3), inset 0 0 30px rgba(0, 240, 255, 0.05);
+  border-radius: 12px;
+  max-width: 640px;
+  width: 100%;
+  padding: 32px 28px;
+  text-align: center;
+  animation: celPopIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes celPopIn {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.gl-celebration-emojis-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+.gl-cel-emoji {
+  display: inline-block;
+  animation: emojiFloat 2s infinite ease-in-out;
+}
+.gl-cel-emoji.bounce-1 { animation-delay: 0.1s; }
+.gl-cel-emoji.bounce-2 { animation-delay: 0.2s; }
+.gl-cel-emoji.bounce-3 { animation-delay: 0.3s; }
+.gl-cel-emoji.bounce-4 { animation-delay: 0.4s; }
+.gl-cel-emoji.bounce-5 { animation-delay: 0.5s; }
+.gl-cel-emoji.bounce-6 { animation-delay: 0.6s; }
+.gl-cel-emoji.bounce-7 { animation-delay: 0.7s; }
+
+@keyframes emojiFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(8deg); }
+}
+
+.gl-celebration-badge-glow {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(250, 204, 21, 0.3) 0%, rgba(250, 204, 21, 0) 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  box-shadow: 0 0 30px rgba(250, 204, 21, 0.4);
+}
+.gl-celebration-trophy {
+  font-size: 42px;
+  filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.8));
+}
+
+.gl-celebration-title {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 1px;
+  margin: 0 0 8px;
+  text-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+}
+.gl-celebration-subtitle {
+  font-size: 13px;
+  color: #94a3b8;
+  margin: 0 auto 20px;
+  max-width: 520px;
+  line-height: 1.5;
+}
+
+.gl-celebration-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+@media (max-width: 600px) {
+  .gl-celebration-stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.gl-cel-stat-box {
+  background: rgba(10, 15, 30, 0.7);
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  border-radius: 6px;
+  padding: 10px 8px;
+}
+.gl-cel-stat-lbl {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: #64748b;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+.gl-cel-stat-val {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+}
+.gl-gold-text { color: #facc15; text-shadow: 0 0 10px rgba(250, 204, 21, 0.5); }
+.gl-cyan-text { color: #00f0ff; text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); }
+.gl-green-text { color: #4ade80; text-shadow: 0 0 10px rgba(74, 222, 128, 0.5); }
+
+.gl-celebration-rank-card {
+  background: rgba(168, 85, 247, 0.08);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+.gl-cel-rank-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #c084fc;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  margin-bottom: 4px;
+}
+.gl-cel-rank-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 6px;
+}
+.gl-cel-rank-desc {
+  font-size: 11px;
+  color: #cbd5e1;
+  line-height: 1.45;
+}
+
+.gl-celebration-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.gl-cel-btn {
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+.gl-cel-btn.primary {
+  background: linear-gradient(135deg, #00f0ff 0%, #00ff88 100%);
+  color: #05080f;
+  border: none;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+}
+.gl-cel-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(0, 255, 136, 0.6);
+}
+.gl-cel-btn.secondary {
+  background: rgba(168, 85, 247, 0.2);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: #e9d5ff;
+}
+.gl-cel-btn.secondary:hover {
+  background: rgba(168, 85, 247, 0.35);
+  color: #fff;
+}
+.gl-cel-btn.outline {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #94a3b8;
+}
+.gl-cel-btn.outline:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+

@@ -935,3 +935,124 @@ Lesson: AI Confidence is NOT Authorization.`;
         alert('Dossier copied to clipboard!');
     });
 }
+
+// ── 6. SUBMIT LAB & CELEBRATION MODAL ─────────────────────────────────
+async function submitFinalLabFromPost() {
+    try {
+        const res = await fetch('/api/lab/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': window.csrfToken
+            },
+            body: JSON.stringify({ lab_id: 'lab6' })
+        });
+        const data = await res.json();
+        openPostCelebrationModal();
+    } catch (err) {
+        console.error('Submit lab error:', err);
+        openPostCelebrationModal();
+    }
+}
+
+function openPostCelebrationModal() {
+    const modal = document.getElementById('gl-post-celebration-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        
+        // Sync values from score card if available
+        const accEl = document.getElementById('accuracy-num');
+        const rankEl = document.getElementById('rank-title');
+        const rankDescEl = document.getElementById('rank-desc');
+        
+        const modalAcc = document.getElementById('modal-accuracy-val');
+        const modalRank = document.getElementById('modal-rank-title');
+        const modalDesc = document.getElementById('modal-rank-desc');
+        
+        if (accEl && modalAcc) modalAcc.textContent = accEl.textContent;
+        if (rankEl && modalRank) modalRank.textContent = rankEl.textContent;
+        if (rankDescEl && modalDesc) modalDesc.textContent = rankDescEl.textContent;
+        
+        launchPostCelebrationConfetti();
+    }
+}
+
+function closePostCelebrationModal() {
+    const modal = document.getElementById('gl-post-celebration-modal');
+    if (modal) {
+        modal.style.display = 'none';
+        stopPostCelebrationConfetti();
+    }
+}
+
+let postConfettiAnimId = null;
+let postConfettiParticles = [];
+
+function launchPostCelebrationConfetti() {
+    const canvas = document.getElementById('post-celebration-confetti-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const colors = ['#00f0ff', '#00ff88', '#facc15', '#a855f7', '#ff3366', '#38bdf8', '#ffffff'];
+    postConfettiParticles = [];
+
+    for (let i = 0; i < 160; i++) {
+        postConfettiParticles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height - canvas.height,
+            size: Math.random() * 8 + 5,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            speedY: Math.random() * 3 + 2,
+            speedX: Math.random() * 4 - 2,
+            rotation: Math.random() * 360,
+            rotationSpeed: Math.random() * 6 - 3,
+            shape: Math.random() > 0.3 ? 'rect' : 'circle'
+        });
+    }
+
+    function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        postConfettiParticles.forEach(p => {
+            p.y += p.speedY;
+            p.x += p.speedX;
+            p.rotation += p.rotationSpeed;
+
+            if (p.y > canvas.height) {
+                p.y = -20;
+                p.x = Math.random() * canvas.width;
+            }
+
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate((p.rotation * Math.PI) / 180);
+            ctx.fillStyle = p.color;
+
+            if (p.shape === 'rect') {
+                ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+            } else {
+                ctx.beginPath();
+                ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.restore();
+        });
+
+        postConfettiAnimId = requestAnimationFrame(render);
+    }
+
+    if (postConfettiAnimId) cancelAnimationFrame(postConfettiAnimId);
+    render();
+}
+
+function stopPostCelebrationConfetti() {
+    if (postConfettiAnimId) {
+        cancelAnimationFrame(postConfettiAnimId);
+        postConfettiAnimId = null;
+    }
+}
+

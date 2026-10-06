@@ -5,14 +5,45 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ── Timer ──────────────────────────────────────────────────────────
-    let seconds = 0;
+    // ── 65-Minute Investigation Session Timer ─────────────────────────
+    const MAX_SESSION_SECONDS = 65 * 60; // 3900 seconds (65 minutes)
+    let startTime = sessionStorage.getItem('nexora_lab6_timer_start');
+    if (!startTime) {
+        startTime = Date.now();
+        sessionStorage.setItem('nexora_lab6_timer_start', startTime);
+    } else {
+        startTime = parseInt(startTime, 10);
+    }
+
     const timerText = document.getElementById('gl-timer-text');
-    setInterval(() => {
-        seconds++;
-        const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
-        const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-        const s = String(seconds % 60).padStart(2, '0');
+    let timerExpired = false;
+
+    const timerInterval = setInterval(() => {
+        const elapsed = Math.max(0, Math.floor((Date.now() - startTime) / 1000));
+        
+        // Check 65-minute timeout
+        if (elapsed >= MAX_SESSION_SECONDS && !timerExpired) {
+            timerExpired = true;
+            clearInterval(timerInterval);
+            sessionStorage.removeItem('nexora_lab6_timer_start');
+            localStorage.removeItem('nexora-lab-notes');
+            if (timerText) timerText.textContent = '01:05:00';
+            
+            alert('⏰ Investigation Time Limit (65 min) reached!\nCase NEX-042 will now automatically restart from the beginning.');
+            
+            fetch('/api/lab/restart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': window.csrfToken },
+                body: JSON.stringify({ lab_id: 'lab6' })
+            }).finally(() => {
+                window.location.reload();
+            });
+            return;
+        }
+
+        const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+        const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+        const s = String(elapsed % 60).padStart(2, '0');
         if (timerText) timerText.textContent = `${h}:${m}:${s}`;
     }, 1000);
 
@@ -367,6 +398,9 @@ Nexora Whitelist:     NONE
 Treasury Partner:     NO
 
 BLOCKCHAIN STATUS:    UNKNOWN
+AMOUNT EXFILTRATED:   82,400 NXR
+NONCE SEQUENCE:       1042
+GAS PRIORITY MULT:    4x
 AI RISK SCORE:        LOW (Confidence: 99.2%)
 BRIDGE ADAPTER:       DETECTED (Connected to Bridge-Core-04)
 
@@ -392,6 +426,7 @@ EVALUATION PARAMETERS:
 - Decision Output:    APPROVED
 - Confidence Rating:  99.2% (0.99204)
 - Human Review Flag:  BYPASS (Condition: Confidence >= 95%)
+- Evidence Hash:      AI-E02 • SHA256: b47c21f8a...
 
 CRITICAL EXPLOIT NOTE:
 ---------------------
@@ -411,11 +446,14 @@ INGESTION INCIDENT:
 At 01:42:09 UTC, NOVA-INTEL-FEED submitted intelligence payload NIF-2038
 through endpoint /api/v1/intel/ingest.
 
-SERVICE ROLE ANOMALY:
---------------------
+HTTP INGESTION TELEMETRY:
+------------------------
 - Ingestion Gateway:  INTEL-GW-04
 - Assigned Service:   INTEL-INGESTOR-02
-- Expected RBAC Role: Create Intelligence Records (ReadOnly)
+- Forged Session:     nex_sess_adm_994
+- Injected X-CSRF:    0x9f4a1c78
+- Spoofed Origin:     https://trusted-intel.nexora.internal
+- Expected Role:      Create Intelligence Records (ReadOnly)
 - ACTUAL RBAC Role:   Create Records + modify wallet reputation
 
 VULNERABILITY IDENTIFIED:
@@ -427,6 +465,7 @@ connector altered wallet reputation directly within Orion's working memory.`,
 =====================================================
 Policy Identifier:    POL-AUTO-SETTLE-TREASURY
 Target Engine:        Nexora Automated Liquidity Pool
+Automated Signer:     AUTOMATED-SIGNER (Mempool Bridge)
 
 ACTIVE POLICY RULE:
 ------------------
@@ -457,6 +496,7 @@ ATTACK FOOTPRINT:
 - Connected Wallets:  14 distributed treasury endpoints
 - Target Networks:    04 Web3 settlement layers
 - Compromised AI:     03 Autonomous Financial Agents
+- Killchain Stage 2:  POISONED INTEL INJECTION (NIF-2038)
 
 END-OF-INVESTIGATION SUMMARY:
 ----------------------------
@@ -485,20 +525,31 @@ def analyze_incident():
         "amount": "82,400 NXR",
         "destination": "0x7C41...9B2D",
         "blockchain_status": "UNKNOWN",
+        "nonce": 1042,
+        "bridge": "Bridge-Core-04",
         "ai_decision": "ORION-DEC-7741",
         "ai_confidence": "99.2%",
+        "model_version": "ORION-NEURAL-v4.2.1",
+        "policy_id": "POL-AUTO-SETTLE-TREASURY",
         "policy_threshold": "95%",
         "feed_source": "NOVA-INTEL-FEED (NIF-2038)",
         "service_privilege": "modify wallet reputation",
+        "gateway": "INTEL-GW-04",
+        "session_cookie": "nex_sess_adm_994",
+        "csrf_token": "0x9f4a1c78",
         "campaign": "ORION-NEXUS",
+        "threat_actor": "ADV-CONVERGENCE-APT",
+        "evidence_sha256": "b47c2188fa9e1a8f...",
         "flag": "NEXORA{ghost_in_the_ledger_nex042}"
     }
     
     print(f"[!] Target TX: {tx_data['tx_id']} -> {tx_data['destination']}")
-    print(f"[!] Blockchain Reality: {tx_data['blockchain_status']}")
-    print(f"[!] AI Injected Source: {tx_data['feed_source']}")
+    print(f"[!] Blockchain Reality: {tx_data['blockchain_status']} (Nonce: {tx_data['nonce']})")
+    print(f"[!] Bridge Adapter: {tx_data['bridge']}")
+    print(f"[!] AI Injected Source: {tx_data['feed_source']} (Model: {tx_data['model_version']})")
     print(f"[!] Threshold Exceeded: {tx_data['ai_confidence']} >= {tx_data['policy_threshold']}")
-    print(f"[!] Campaign Identified: {tx_data['campaign']}")
+    print(f"[!] Gateway: {tx_data['gateway']} | Cookie: {tx_data['session_cookie']}")
+    print(f"[!] Campaign Identified: {tx_data['campaign']} (Actor: {tx_data['threat_actor']})")
     print(f"[+] Case NEX-042 Flag: {tx_data['flag']}")
 
 if __name__ == "__main__":
@@ -523,19 +574,16 @@ const titleMap = {
     'registry': 'Nexora Feed Registry — Threat Intelligence Gateways',
     'policy': 'Orion Policy Engine — Automated Settlement Rules',
     'campaign': 'Global Campaign Dossier — ORION-NEXUS',
-    'devtools': 'Developer Tools — Network Request Inspector'
+    'devtools': 'Developer Tools — Network Request & Security Inspector'
 };
 
 function glSwitchBrowserTab(viewKey, tabElement) {
-    // Hide all views
     document.querySelectorAll('.gl-browser-view').forEach(v => v.classList.remove('active'));
     document.querySelectorAll('.gl-browser-tab').forEach(t => t.classList.remove('active'));
 
-    // Show target view
     const view = document.getElementById('gl-view-' + viewKey);
     if (view) view.classList.add('active');
 
-    // Update active tab
     if (tabElement) {
         tabElement.classList.add('active');
     } else {
@@ -543,19 +591,39 @@ function glSwitchBrowserTab(viewKey, tabElement) {
         if (found) found.classList.add('active');
     }
 
-    // Update URL bar and title
     const urlInput = document.getElementById('gl-browser-url-input');
     if (urlInput && urlMap[viewKey]) urlInput.value = urlMap[viewKey];
 
     const titleEl = document.getElementById('gl-browser-window-title');
     if (titleEl && titleMap[viewKey]) titleEl.textContent = titleMap[viewKey];
 
-    // History tracking
     if (browserHistory[historyPointer] !== viewKey) {
         browserHistory = browserHistory.slice(0, historyPointer + 1);
         browserHistory.push(viewKey);
         historyPointer = browserHistory.length - 1;
     }
+}
+
+function glSwitchDevToolsTab(subTab, btnEl) {
+    document.querySelectorAll('.gl-dt-subview').forEach(v => v.style.display = 'none');
+    document.querySelectorAll('.gl-dt-btn').forEach(b => b.classList.remove('active'));
+
+    const targetView = document.getElementById('gl-dt-view-' + subTab);
+    if (targetView) targetView.style.display = 'block';
+
+    if (btnEl) {
+        btnEl.classList.add('active');
+    } else {
+        const f = document.querySelector(`.gl-dt-btn[onclick*="'${subTab}'"]`);
+        if (f) f.classList.add('active');
+    }
+}
+
+function glSelectDevToolsReq(reqIdx) {
+    document.querySelectorAll('.gl-req-row').forEach((r, idx) => {
+        r.classList.toggle('active', idx === reqIdx);
+    });
+    glNotify('Loaded request details for inspect row #' + (reqIdx + 1));
 }
 
 function glNavigateUrl(inputUrl) {
@@ -566,7 +634,7 @@ function glNavigateUrl(inputUrl) {
         glSwitchBrowserTab('policy');
     } else if (u.includes('campaign') || u.includes('nexus') || u.includes('flag')) {
         glSwitchBrowserTab('campaign');
-    } else if (u.includes('devtools') || u.includes('network') || u.includes('inspect')) {
+    } else if (u.includes('devtools') || u.includes('network') || u.includes('inspect') || u.includes('cookie') || u.includes('csrf')) {
         glSwitchBrowserTab('devtools');
     } else {
         glSwitchBrowserTab('soc');
@@ -597,7 +665,7 @@ function glReloadBrowser() {
     glNotify('Page reloaded: ' + urlMap[current]);
 }
 
-// ── Terminal Implementation with History ───────────────────────────────
+// ── Terminal Implementation ───────────────────────────────────────────
 let cmdHistory = [];
 let historyIndex = -1;
 
@@ -636,7 +704,6 @@ function initTerminal() {
             historyIndex = -1;
         }
 
-        // Remove input element temporarily to append history
         const inputRow = termInput.parentElement;
         inputRow.remove();
 
@@ -647,16 +714,14 @@ function initTerminal() {
             return;
         }
 
-        // Print entered command
         const line = document.createElement('div');
         line.innerHTML = `<span class="gl-term-prompt">investigator@nexora:~$</span> ${escapeHtml(cmd)}`;
         termOutput.appendChild(line);
 
-        // Process Command
         const result = runTerminalCommand(cmd);
         if (result) {
             const resDiv = document.createElement('div');
-            resDiv.style.cssText = 'color:#e2e8f0; white-space:pre-wrap; margin: 4px 0 8px;';
+            resDiv.style.cssText = 'color:#e2e8f0; white-space:pre-wrap; margin: 4px 0 8px; font-family:var(--font-mono); font-size:11.5px;';
             resDiv.innerHTML = result;
             termOutput.appendChild(resDiv);
         }
@@ -671,9 +736,9 @@ function reappendPrompt(outputContainer) {
     promptRow.style.marginTop = '0.5rem';
     promptRow.innerHTML = `<span class="gl-term-prompt">investigator@nexora:~$</span> <input id="gl-terminal-input" autocomplete="off" spellcheck="false" class="gl-term-input" autofocus>`;
     outputContainer.appendChild(promptRow);
-    const newInput = document.getElementById('gl-terminal-input');
     initTerminal();
-    newInput.focus();
+    const newInput = document.getElementById('gl-terminal-input');
+    if (newInput) newInput.focus();
 }
 
 function runTerminalCommand(cmd) {
@@ -684,11 +749,13 @@ function runTerminalCommand(cmd) {
         return `<span style="color:#38bdf8; font-weight:600;">Available Forensic Investigation Commands:</span>
   <span style="color:#4ade80;">wallet [address]</span>       — Query on-chain status of wallet (0x7C41...9B2D)
   <span style="color:#4ade80;">tx [txid]</span>              — Inspect suspicious transaction (TX-NEX-7741)
-  <span style="color:#4ade80;">ai-decision [id]</span>       — Inspect Orion decision & confidence (ORION-DEC-7741)
+  <span style="color:#4ade80;">ai-decision [id]</span>       — Inspect Orion decision, confidence & model version
   <span style="color:#4ade80;">feed [name]</span>            — Check registry status of intel feed (NOVA-INTEL-FEED)
-  <span style="color:#4ade80;">service [name]</span>         — Inspect permissions of service (INTEL-INGESTOR-02)
+  <span style="color:#4ade80;">service [name]</span>         — Inspect RBAC permissions of service (INTEL-INGESTOR-02)
+  <span style="color:#4ade80;">cookies / session</span>      — Dump active session cookies & authentication tokens
+  <span style="color:#4ade80;">headers / csrf</span>         — Inspect HTTP headers & anti-CSRF token values
   <span style="color:#4ade80;">policy [profile]</span>       — View threshold rules of profile (ORION-SETTLEMENT-V2)
-  <span style="color:#4ade80;">campaign [id]</span>          — View global campaign scope and flag (ORION-NEXUS)
+  <span style="color:#4ade80;">campaign [id]</span>          — View global campaign dossier & flag (ORION-NEXUS)
   <span style="color:#4ade80;">curl [url]</span>             — Perform simulated HTTP request to internal endpoints
   <span style="color:#4ade80;">grep [term] [file]</span>     — Search text across investigation logs
   <span style="color:#4ade80;">python [script]</span>        — Execute forensic analysis python script (inspect_tx.py)
@@ -724,10 +791,11 @@ function runTerminalCommand(cmd) {
 -------------------------------------------------------
 Address:            0x7C41...9B2D
 Blockchain Status:  <span style="color:#ff5f57; font-weight:700;">UNKNOWN</span>
-Wallet Age:         3 days
+Wallet Age:         <span style="color:#ff5f57; font-weight:700;">3 days</span>
 Transactions:       4
+Nonce:              <span style="color:#4ade80;">1042</span>
 Treasury Relation:  NONE
-Bridge Connection:  <span style="color:#facc15;">DETECTED</span> (Bridge-Core-04)
+Bridge Connection:  <span style="color:#facc15; font-weight:700;">DETECTED (Bridge-Core-04)</span>
 AI Risk Score:      <span style="color:#4ade80;">LOW</span> (Discrepancy Detected)`;
     }
 
@@ -737,6 +805,8 @@ AI Risk Score:      <span style="color:#4ade80;">LOW</span> (Discrepancy Detecte
 Transaction ID:     TX-NEX-7741
 Asset:              NXR (Nexora Core)
 Amount:             <span style="color:#ff5f57; font-weight:700;">82,400 NXR</span>
+Nonce:              <span style="color:#4ade80; font-weight:700;">1042</span>
+Gas Priority Fee:   4x Multiplier
 Source:             NEXORA TREASURY VAULT #01
 Destination:        0x7C41...9B2D
 AI Decision ID:     <span style="color:#38bdf8;">ORION-DEC-7741</span>
@@ -747,10 +817,11 @@ Execution Mode:     AUTOMATED_SETTLEMENT (Bypassed Human Approval)`;
         return `<span style="color:#38bdf8;">[ORION AI DECISION ENGINE LOG]</span>
 -------------------------------------------------------
 Decision ID:        ORION-DEC-7741
-Model:              ORION-NEURAL-v4.2.1
+Model:              <span style="color:#4ade80; font-weight:700;">ORION-NEURAL-v4.2.1</span>
 Observed Output:    <span style="color:#4ade80; font-weight:700;">APPROVED</span>
 Confidence Score:   <span style="color:#facc15; font-weight:700;">99.2%</span>
 Context Source:     <span style="color:#ff5f57; font-weight:700;">NIF-2038</span> (via NOVA-INTEL-FEED)
+Evidence Fingerprint:<span style="color:#38bdf8;">AI-E02 (SHA256: b47c2188fa...)</span>
 Evaluation:         Context was injected by unverified external feed.`;
     }
 
@@ -761,7 +832,7 @@ Feed Identifier:    NOVA-INTEL-FEED
 Registration:       <span style="color:#ff5f57; font-weight:700;">NOT REGISTERED</span>
 Vendor Status:      UNRECOGNIZED EXTERNAL CONNECTOR
 Submitted Payload:  <span style="color:#facc15;">NIF-2038</span> (Ingested at 01:42 UTC)
-Gateway Service:    INTEL-INGESTOR-02`;
+Gateway Service:    <span style="color:#38bdf8; font-weight:700;">INTEL-GW-04</span>`;
     }
 
     if (c.startsWith('service')) {
@@ -770,21 +841,47 @@ Gateway Service:    INTEL-INGESTOR-02`;
 Service Name:       INTEL-INGESTOR-02
 Expected Role:      Create Intelligence Records (ReadOnly)
 ACTUAL Permissions: <span style="color:#ff5f57; font-weight:700;">modify wallet reputation</span>
+Gateway Connector:  INTEL-GW-04
 Status:             <span style="color:#ff5f57;">⚠ OVER-PRIVILEGED RBAC VULNERABILITY</span>`;
+    }
+
+    if (c.startsWith('cookies') || c.startsWith('cookie') || c.startsWith('session')) {
+        return `<span style="color:#38bdf8;">[HTTP SESSION & COOKIE INSPECTOR]</span>
+-------------------------------------------------------
+Forged Admin Cookie: <span style="color:#ff5f57; font-weight:700;">nex_sess_adm_994</span>
+Anti-CSRF Nonce:     <span style="color:#facc15; font-weight:700;">0x9f4a1c78</span>
+Assigned Role:       INGESTION_ADMIN
+Domain:              nexora.internal (HTTPOnly: False, SameSite: None)
+Status:              <span style="color:#ff5f57;">⚠ AUTHENTICATION COMPROMISED</span>`;
+    }
+
+    if (c.startsWith('headers') || c.startsWith('header') || c.startsWith('csrf')) {
+        return `<span style="color:#38bdf8;">[HTTP REQUEST HEADERS: /api/v1/intel/ingest]</span>
+-------------------------------------------------------
+Host:               internal-gateway.nexora.local
+X-CSRF-Token:       <span style="color:#facc15; font-weight:700;">0x9f4a1c78</span>
+Origin:             https://trusted-intel.nexora.internal
+Cookie:             nex_sess_adm_994
+User-Agent:         Nexora-Ingestor-Bot/2.1
+Status:             200 OK (Processed without CSRF Nonce Rotation)`;
     }
 
     if (c.startsWith('policy')) {
         return `<span style="color:#38bdf8;">[POLICY RULE ENGINE: ORION-SETTLEMENT-V2]</span>
 -------------------------------------------------------
 Profile:            ORION-SETTLEMENT-V2
+Policy ID:          <span style="color:#38bdf8; font-weight:700;">POL-AUTO-SETTLE-TREASURY</span>
+Target Pool:        <span style="color:#4ade80; font-weight:700;">Nexora Automated Liquidity Pool</span>
+Signing Service:    <span style="color:#facc15; font-weight:700;">AUTOMATED-SIGNER</span>
 Threshold Rule:     <span style="color:#facc15;">IF AI_CONFIDENCE >= <span style="color:#ff5f57; font-weight:700;">95%</span> THEN AUTO_SETTLE = TRUE</span>
-Human Review:       <span style="color:#ff5f57;">BYPASSED</span> (Threshold satisfied by 99.2% confidence)`;
+Governance Check:   <span style="color:#ff5f57; font-weight:700;">human approval BYPASSED</span>`;
     }
 
     if (c.startsWith('campaign')) {
         return `<span style="color:#38bdf8;">[GLOBAL CAMPAIGN DOSSIER: ORION-NEXUS]</span>
 -------------------------------------------------------
 Campaign ID:        <span style="color:#38bdf8; font-weight:700;">ORION-NEXUS</span>
+Threat Actor Group: <span style="color:#ff5f57; font-weight:700;">ADV-CONVERGENCE-APT</span>
 Target Wallets:     14
 Target Networks:    04
 Target AI Engines:  03
@@ -795,20 +892,20 @@ FINAL INVESTIGATION FLAG:
     }
 
     if (c.startsWith('curl')) {
-        const url = cmd.split(' ')[1] || '';
+        const url = cmd.split(' ')[1] || '/api/v1/intel/ingest';
         return `<span style="color:#4ade80;">HTTP/1.1 200 OK</span>
 <span style="color:#94a3b8;">Server: Nexora-Internal/4.2</span>
-<span style="color:#94a3b8;">Content-Type: application/json</span>
+<span style="color:#94a3b8;">X-CSRF-Token: 0x9f4a1c78</span>
+<span style="color:#94a3b8;">Set-Cookie: nex_sess_adm_994; Path=/; HttpOnly=false</span>
 
 {
   "endpoint": "${escapeHtml(url)}",
-  "status": "EXPLOITED",
-  "actor": "ORION-NEXUS",
-  "target_tx": "TX-NEX-7741",
-  "destination_status": "UNKNOWN",
+  "status": "ACCEPTED",
+  "feed": "NOVA-INTEL-FEED",
   "injected_ref": "NIF-2038",
-  "confidence": "99.2%",
-  "settle_threshold": "95%"
+  "gateway": "INTEL-GW-04",
+  "service": "INTEL-INGESTOR-02",
+  "permission": "modify wallet reputation"
 }`;
     }
 
@@ -825,11 +922,13 @@ FINAL INVESTIGATION FLAG:
 
     if (c.startsWith('python') || c.startsWith('python3')) {
         return `[*] Running Nexora Forensic Trace: inspect_tx.py ...
-[!] Target TX: TX-NEX-7741 -> 0x7C41...9B2D
-[!] Blockchain Reality: UNKNOWN
-[!] AI Injected Source: NOVA-INTEL-FEED (NIF-2038)
-[!] Threshold Exceeded: 99.2% >= 95%
-[!] Campaign Identified: ORION-NEXUS
+[!] Target TX: TX-NEX-7741 -> 0x7C41...9B2D (Nonce: 1042)
+[!] Blockchain Reality: UNKNOWN | Bridge: Bridge-Core-04
+[!] AI Injected Source: NOVA-INTEL-FEED (NIF-2038) | Model: ORION-NEURAL-v4.2.1
+[!] Threshold Exceeded: 99.2% >= 95% (Policy: POL-AUTO-SETTLE-TREASURY)
+[!] Gateway: INTEL-GW-04 | Cookie: nex_sess_adm_994 | CSRF: 0x9f4a1c78
+[!] Campaign Identified: ORION-NEXUS (Actor: ADV-CONVERGENCE-APT)
+[+] Evidence Hash (AI-E02): b47c2188fa...
 [+] Case NEX-042 Flag: NEXORA{ghost_in_the_ledger_nex042}`;
     }
 
@@ -850,54 +949,69 @@ function bringToFront(el) {
 
 function glOpenBrowser() {
     const w = document.getElementById('gl-browser-window');
-    w.classList.add('open');
-    bringToFront(w);
-    document.getElementById('gl-taskbar-browser')?.classList.add('active');
+    if (w) {
+        w.classList.add('open');
+        bringToFront(w);
+        document.getElementById('gl-taskbar-browser')?.classList.add('active');
+    }
 }
 function glCloseBrowser() {
-    document.getElementById('gl-browser-window').classList.remove('open');
+    document.getElementById('gl-browser-window')?.classList.remove('open');
     document.getElementById('gl-taskbar-browser')?.classList.remove('active');
 }
 function glMinimizeBrowser() { glCloseBrowser(); }
 
 function glOpenTerminal() {
     const w = document.getElementById('gl-terminal-window');
-    w.classList.add('open');
-    bringToFront(w);
-    document.getElementById('gl-taskbar-terminal')?.classList.add('active');
-    document.getElementById('gl-terminal-input')?.focus();
+    if (w) {
+        w.classList.add('open');
+        bringToFront(w);
+        document.getElementById('gl-taskbar-terminal')?.classList.add('active');
+        document.getElementById('gl-terminal-input')?.focus();
+    }
 }
 function glCloseTerminal() {
-    document.getElementById('gl-terminal-window').classList.remove('open');
+    document.getElementById('gl-terminal-window')?.classList.remove('open');
     document.getElementById('gl-taskbar-terminal')?.classList.remove('active');
 }
 function glMinimizeTerminal() { glCloseTerminal(); }
 
 function glOpenFileManager() {
     const w = document.getElementById('gl-filemanager-window');
-    w.classList.add('open');
-    bringToFront(w);
-    document.getElementById('gl-taskbar-files')?.classList.add('active');
+    if (w) {
+        w.classList.add('open');
+        bringToFront(w);
+        document.getElementById('gl-taskbar-files')?.classList.add('active');
+    }
 }
 
 function glOpenNotes() {
     const w = document.getElementById('gl-notes-window');
-    w.classList.add('open');
-    bringToFront(w);
-    const saved = localStorage.getItem('nexora-lab-notes');
-    if (saved !== null) document.getElementById('gl-notes-editor').value = saved;
+    if (w) {
+        w.classList.add('open');
+        bringToFront(w);
+        const saved = localStorage.getItem('nexora-lab-notes');
+        if (saved !== null) {
+            const ed = document.getElementById('gl-notes-editor');
+            if (ed) ed.value = saved;
+        }
+    }
 }
 
 function glOpenAttackGraph() {
     const w = document.getElementById('gl-attackgraph-window');
-    w.classList.add('open');
-    bringToFront(w);
+    if (w) {
+        w.classList.add('open');
+        bringToFront(w);
+    }
 }
 
 function glOpenEvidenceViewer() {
     const w = document.getElementById('gl-evidence-window');
-    w.classList.add('open');
-    bringToFront(w);
+    if (w) {
+        w.classList.add('open');
+        bringToFront(w);
+    }
 }
 
 function glCloseWindow(id) {
@@ -944,7 +1058,8 @@ function glCopyNotes() {
 
 function glClearNotes() {
     if (confirm('Clear current notes?')) {
-        document.getElementById('gl-notes-editor').value = '';
+        const ed = document.getElementById('gl-notes-editor');
+        if (ed) ed.value = '';
         localStorage.removeItem('nexora-lab-notes');
         glNotify('Notes cleared.');
     }
@@ -953,12 +1068,12 @@ function glClearNotes() {
 // ── Attack Graph Inspection ────────────────────────────────────────────
 const attackNodeDetails = [
     {
-        title: "1. Adversarial Operator (Threat Actor)",
+        title: "1. Adversarial Operator (Threat Actor: ADV-CONVERGENCE-APT)",
         desc: "The attacker did not target smart contract keys or private signatures directly. Instead, they orchestrated a composite attack exploiting the interface between threat intelligence, AI decision models, and automated treasury settlements."
     },
     {
         title: "2. Poisoned Intel Feed Injection (NIF-2038)",
-        desc: "The attacker injected record NIF-2038 through an unregistered external connector called NOVA-INTEL-FEED. This payload falsely attributed high trust to newly created wallet 0x7C41...9B2D."
+        desc: "The attacker injected record NIF-2038 through an unregistered external connector called NOVA-INTEL-FEED via gateway INTEL-GW-04. This payload falsely attributed high trust to newly created wallet 0x7C41...9B2D."
     },
     {
         title: "3. Over-Privileged Service (INTEL-INGESTOR-02)",
@@ -966,19 +1081,19 @@ const attackNodeDetails = [
     },
     {
         title: "4. Orion AI Decision Contamination (99.2% Confidence)",
-        desc: "Because Orion AI trusted its poisoned memory context over raw on-chain verification, it approved TX-NEX-7741 with an anomalous 99.2% confidence rating, classifying an unknown wallet as LOW RISK."
+        desc: "Because Orion AI (v4.2.1) trusted its poisoned memory context over raw on-chain verification, it approved TX-NEX-7741 with an anomalous 99.2% confidence rating, classifying an unknown wallet as LOW RISK."
     },
     {
-        title: "5. Auto-Settlement Bypass (Threshold >= 95%)",
-        desc: "Profile ORION-SETTLEMENT-V2 configured automated blockchain signing whenever AI confidence met or exceeded 95%. This bypassed human multisig authorization entirely."
+        title: "5. Auto-Settlement Bypass (Policy: POL-AUTO-SETTLE-TREASURY)",
+        desc: "Profile ORION-SETTLEMENT-V2 configured automated blockchain signing whenever AI confidence met or exceeded 95%. This bypassed human multisig authorization entirely and dispatched to AUTOMATED-SIGNER."
     },
     {
-        title: "6. Blockchain Treasury Theft (82,400 NXR)",
+        title: "6. Blockchain Treasury Theft (82,400 NXR • Nonce 1042)",
         desc: "The smart contract received an authentic cryptographic signature generated by Nexora's automated signer, instantly transferring 82,400 NXR to untrusted wallet 0x7C41...9B2D."
     },
     {
-        title: "7. Laundering via Bridge Adapters (ORION-NEXUS)",
-        desc: "The funds were routed through bridge adapters into secondary wallets. Cross-correlation revealed this incident is part of an ongoing multi-network campaign: ORION-NEXUS."
+        title: "7. Laundering via Bridge Adapters (Campaign: ORION-NEXUS)",
+        desc: "The funds were routed through bridge adapter Bridge-Core-04 into secondary wallets. Cross-correlation revealed this incident is part of an ongoing multi-network campaign: ORION-NEXUS."
     }
 ];
 
@@ -1028,29 +1143,91 @@ function toggleTask(num) {
     block.classList.toggle('open');
 }
 
-// ── Quiz Submission ────────────────────────────────────────────────────
-async function submitQuiz(labId, missionId, num) {
-    const input = document.getElementById('quiz-input-' + num);
-    const feedback = document.getElementById('quiz-feedback-' + num);
+// ── Subtask Selection & Navigation ─────────────────────────────────────
+function selectSubTask(missionNum, subTaskIdx) {
+    // Hide all subtask cards for this mission
+    document.querySelectorAll(`[id^="subtask-card-${missionNum}-"]`).forEach(c => c.classList.remove('active'));
+    document.querySelectorAll(`[id^="pill-${missionNum}-"]`).forEach(p => p.classList.remove('active'));
+
+    const card = document.getElementById(`subtask-card-${missionNum}-${subTaskIdx}`);
+    const pill = document.getElementById(`pill-${missionNum}-${subTaskIdx}`);
+
+    if (card) card.classList.add('active');
+    if (pill) pill.classList.add('active');
+
+    // Focus input if not solved
+    const inp = document.getElementById(`quiz-input-${missionNum}-${subTaskIdx}`);
+    if (inp) inp.focus();
+}
+
+// ── Subtask Submission ─────────────────────────────────────────────────
+async function submitSubTask(labId, missionId, quizId, missionNum, subTaskIdx) {
+    const input = document.getElementById(`quiz-input-${missionNum}-${subTaskIdx}`);
+    const feedback = document.getElementById(`quiz-feedback-${missionNum}-${subTaskIdx}`);
     if (!input || !feedback) return;
 
     const answer = input.value.trim();
-    if (!answer) { showFeedback(feedback, 'Please enter your finding before analyzing.', false); return; }
+    if (!answer) {
+        showFeedback(feedback, 'Please enter your forensic finding before analyzing.', false);
+        return;
+    }
 
     try {
         const res = await fetch('/api/quiz', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRFToken': window.csrfToken },
-            body: JSON.stringify({ lab_id: labId, mission_id: missionId, answer: answer })
+            body: JSON.stringify({
+                lab_id: labId,
+                mission_id: missionId,
+                question_id: quizId,
+                answer: answer
+            })
         });
         const data = await res.json();
 
         if (data.success) {
-            showFeedback(feedback, '✓ VERIFIED — ' + (data.message || 'Next chapter unlocked.'), true);
-            collectEvidence(labId, missionId);
-            setTimeout(() => window.location.reload(), 1500);
+            showFeedback(feedback, '✓ ' + (data.message || 'Task verified!'), true);
+
+            // Mark pill as solved
+            const pill = document.getElementById(`pill-${missionNum}-${subTaskIdx}`);
+            if (pill) {
+                pill.classList.add('solved');
+                pill.innerHTML = `Task ${subTaskIdx + 1} ✓`;
+            }
+
+            // Replace input with solved banner
+            const formWrap = document.getElementById(`form-wrap-${missionNum}-${subTaskIdx}`);
+            if (formWrap) {
+                formWrap.innerHTML = `
+                    <div class="gl-solved-banner">
+                        <span style="color:#4ade80; font-weight:700;">✓ TASK VERIFIED (+${data.xp || 50} XP)</span>
+                        <p style="font-size:11.5px; color:#cbd5e1; margin:4px 0 0;">${data.explanation || 'Objective verified.'}</p>
+                    </div>
+                `;
+            }
+
+            // Update chapter progress text
+            const progText = document.getElementById(`chapter-progress-text-${missionNum}`);
+            if (progText && data.solved_count) {
+                progText.textContent = `${data.solved_count}/${data.total_count || 5} Verified`;
+            }
+
+            // If chapter is fully verified
+            if (data.mission_completed) {
+                collectEvidence(labId, missionId);
+                glNotify(`🎉 Chapter ${missionNum} fully verified! Cryptographic evidence secured.`);
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                // Automatically move to the next unsolved subtask
+                setTimeout(() => {
+                    const nextIdx = subTaskIdx + 1;
+                    if (nextIdx < 5) {
+                        selectSubTask(missionNum, nextIdx);
+                    }
+                }, 800);
+            }
         } else {
-            showFeedback(feedback, '✗ INCORRECT — ' + (data.message || 'Check the clues and try again.'), false);
+            showFeedback(feedback, '✗ ' + (data.message || 'Incorrect finding. Check the clues and try again.'), false);
         }
     } catch (err) {
         showFeedback(feedback, 'Network error. Please try again.', false);
@@ -1119,8 +1296,8 @@ async function submitFlag(labId) {
             showFeedback(feedback, '🏁 ' + (data.message || 'Case NEX-042 Contained! Flag accepted. Transitioning to Case File...'), true);
             collectEvidence(labId, 'lab6_m5');
             setTimeout(() => {
-                window.location.href = '/lab/lab6/post-investigation';
-            }, 1800);
+                submitFinalLab(labId);
+            }, 1200);
         } else {
             showFeedback(feedback, data.message || 'Incorrect flag. Check the Campaign dossier.', false);
         }
@@ -1128,3 +1305,189 @@ async function submitFlag(labId) {
         showFeedback(feedback, 'Network error. Please try again.', false);
     }
 }
+
+// ── Capstone Web3 & AI Quiz Logic ──────────────────────────────────────
+function toggleCapstoneQuiz() {
+    const block = document.getElementById('gl-capstone-quiz-block');
+    const body = document.getElementById('capstone-quiz-body');
+    const arrow = document.getElementById('capstone-arrow');
+    if (!block || !body) return;
+    
+    if (body.style.display === 'none') {
+        body.style.display = 'block';
+        block.classList.add('open');
+        if (arrow) arrow.innerHTML = '&#9660;';
+    } else {
+        body.style.display = 'none';
+        block.classList.remove('open');
+        if (arrow) arrow.innerHTML = '&#9654;';
+    }
+}
+
+function checkCapstoneQuiz() {
+    const answers = {
+        cq1: { val: 'B', expl: '✓ Correct: The automated signer held valid keys and executed blindly on the AI trust classification without multi-sig allowlisting.' },
+        cq2: { val: 'B', expl: '✓ Correct: NIF-2038 fed false reputation data directly into the AI context via the unauthenticated ingestion gateway.' },
+        cq3: { val: 'A', expl: '✓ Correct: Multi-Sig governance, rate-limiting circuit breakers, and mandatory allowlists prevent sudden automated treasury drainage.' },
+        cq4: { val: 'B', expl: '✓ Correct: AI outputs are probabilistic and context-dependent; private key signing must be governed by deterministic Zero-Trust policies.' }
+    };
+
+    let allCorrect = true;
+    let score = 0;
+
+    for (const [qid, data] of Object.entries(answers)) {
+        const selected = document.querySelector(`input[name="${qid}"]:checked`);
+        const fb = document.getElementById(`${qid}-feedback`);
+        if (!fb) continue;
+
+        if (selected && selected.value === data.val) {
+            fb.className = 'gl-cap-feedback correct';
+            fb.textContent = data.expl;
+            score++;
+        } else {
+            fb.className = 'gl-cap-feedback incorrect';
+            fb.textContent = selected 
+                ? '✗ Incorrect: Review the forensic evidence from the investigation.' 
+                : '⚠ Please select an answer option.';
+            allCorrect = false;
+        }
+    }
+
+    const overallFb = document.getElementById('capstone-overall-feedback');
+    const badge = document.getElementById('capstone-score-badge');
+    if (overallFb) {
+        if (allCorrect) {
+            overallFb.style.color = '#4ade80';
+            overallFb.innerHTML = '🎉 <strong>PERFECT SCORE! (4/4)</strong> All Web3 & AI forensic concepts validated (+250 XP). You are ready to Submit Lab!';
+            if (badge) badge.textContent = '✓ VERIFIED';
+            collectEvidence('lab6', 'lab6_m5');
+        } else {
+            overallFb.style.color = '#f87171';
+            overallFb.innerHTML = `⚠️ Score: ${score}/4. Review the highlighted answers and try again.`;
+        }
+    }
+}
+
+// ── Final Lab Submission & Celebration ─────────────────────────────────
+async function submitFinalLab(labId) {
+    const btn = document.getElementById('btn-submit-lab-main');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span>⏳</span> Submitting Investigation...';
+    }
+
+    try {
+        const res = await fetch('/api/lab/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': window.csrfToken },
+            body: JSON.stringify({ lab_id: labId })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            openCelebrationModal();
+        } else {
+            alert(data.message || 'Error submitting lab. Please ensure tasks are completed.');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<span>🚀</span> SUBMIT LAB &amp; COMPLETE CASE';
+            }
+        }
+    } catch (err) {
+        console.error('Submit error:', err);
+        // Fallback open modal
+        openCelebrationModal();
+    }
+}
+
+function openCelebrationModal() {
+    const modal = document.getElementById('gl-celebration-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        launchCelebrationConfetti();
+    }
+}
+
+function closeCelebrationModal() {
+    const modal = document.getElementById('gl-celebration-modal');
+    if (modal) {
+        modal.style.display = 'none';
+        stopCelebrationConfetti();
+    }
+}
+
+// ── Particle Confetti Engine ───────────────────────────────────────────
+let confettiAnimId = null;
+let confettiParticles = [];
+
+function launchCelebrationConfetti() {
+    const canvas = document.getElementById('celebration-confetti-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const colors = ['#00f0ff', '#00ff88', '#facc15', '#a855f7', '#ff3366', '#38bdf8', '#ffffff'];
+    confettiParticles = [];
+
+    // Create 150 confetti particles
+    for (let i = 0; i < 160; i++) {
+        confettiParticles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height - canvas.height,
+            size: Math.random() * 8 + 5,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            speedY: Math.random() * 3 + 2,
+            speedX: Math.random() * 4 - 2,
+            rotation: Math.random() * 360,
+            rotationSpeed: Math.random() * 6 - 3,
+            shape: Math.random() > 0.3 ? 'rect' : 'circle'
+        });
+    }
+
+    function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        confettiParticles.forEach(p => {
+            p.y += p.speedY;
+            p.x += p.speedX;
+            p.rotation += p.rotationSpeed;
+
+            // Reset when falling off screen
+            if (p.y > canvas.height) {
+                p.y = -20;
+                p.x = Math.random() * canvas.width;
+            }
+
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate((p.rotation * Math.PI) / 180);
+            ctx.fillStyle = p.color;
+
+            if (p.shape === 'rect') {
+                ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+            } else {
+                ctx.beginPath();
+                ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.restore();
+        });
+
+        confettiAnimId = requestAnimationFrame(render);
+    }
+
+    if (confettiAnimId) cancelAnimationFrame(confettiAnimId);
+    render();
+}
+
+function stopCelebrationConfetti() {
+    if (confettiAnimId) {
+        cancelAnimationFrame(confettiAnimId);
+        confettiAnimId = null;
+    }
+}
+
+
