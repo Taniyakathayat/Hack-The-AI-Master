@@ -110,6 +110,13 @@ def page_not_found(e):
 def internal_server_error(e):
     return render_template('errors/500.html'), 500
 
+from flask_wtf.csrf import CSRFError
+
+@app.errorhandler(CSRFError)
+def handle_csrf_error(e):
+    logger.warning(f"CSRF validation failed: {e.description}")
+    return render_template('login.html', error="Your session has expired. Please log in again."), 400
+
 def init_db():
     with app.app_context():
         # create_all safely ignores existing tables

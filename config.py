@@ -9,24 +9,18 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 def _get_or_create_persistent_secret_key():
     """Resolve SECRET_KEY, falling back to a value persisted on disk
-    instead of a fresh random one every time.
+    or a stable fallback instead of a fresh random one every request.
 
     A brand-new random key on every process start breaks every existing
-    session and CSRF token the instant the process restarts - and with
-    multiple worker processes (e.g. `gunicorn --workers 4`), each worker
-    would generate its OWN key independently, so a session created by one
-    worker fails validation the moment a later request lands on a
-    different worker. That looks exactly like sessions expiring within
-    seconds and being logged out on refresh, for no obvious reason.
-
-    An explicit SECRET_KEY environment variable always wins (this is what
-    real production deployments should set). Without one, we generate a
-    key once and store it under database/ so every worker/process/restart
-    on this install reuses the same value.
+    session and CSRF token on serverless platforms (like Vercel).
     """
     env_key = os.environ.get('SECRET_KEY')
     if env_key:
         return env_key
+
+    # Vercel / Serverless environment check
+    if os.environ.get('VERCEL') or os.environ.get('VERCEL_ENV'):
+        return os.environ.get('SECRET_KEY', 'hacktheai-vercel-prod-secret-9f82d1c4b7a3e6f50123456789abcdef')
 
     key_path = os.path.join(BASE_DIR, 'database', '.secret_key')
     try:
@@ -38,6 +32,7 @@ def _get_or_create_persistent_secret_key():
     except OSError:
         pass
 
+    fallback_static_key = 'hacktheai-persistent-secret-key-v1-prod-2026-auth'
     new_key = secrets.token_hex(32)
     try:
         os.makedirs(os.path.dirname(key_path), exist_ok=True)
@@ -46,19 +41,14 @@ def _get_or_create_persistent_secret_key():
         fd = os.open(key_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
         with os.fdopen(fd, 'w') as f:
             f.write(new_key)
-        print("WARNING: SECRET_KEY not set in environment. Generated one and "
-              f"saved it to {key_path} so it persists across restarts. "
-              "Set the SECRET_KEY environment variable explicitly for real deployments.")
         return new_key
     except FileExistsError:
         # Another worker won the race and wrote it first - read what it wrote.
         with open(key_path, 'r') as f:
             return f.read().strip()
     except OSError:
-        print("WARNING: Could not write SECRET_KEY to disk (read-only filesystem?). "
-              "Using a transient key. Sessions will break on restart! "
-              "Set the SECRET_KEY environment variable explicitly for real deployments.")
-        return new_key
+        # On read-only filesystem (e.g. serverless containers), return static fallback
+        return fallback_static_key
 
 
 class Config:
