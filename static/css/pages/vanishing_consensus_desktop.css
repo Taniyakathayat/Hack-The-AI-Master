@@ -121,3 +121,40 @@
   font-weight: 700;
   letter-spacing: 0.5px;
 }
+
+/* Custom Question Card Styling for Subtasks */
+.gl-subtask-card {
+  display: none;
+}
+.gl-subtask-card.active {
+  display: block;
+}
+
+/* File Manager Item */
+.gl-fm-file {
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 8px 10px;
+  color: #cbd5e1;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  border-radius: 4px;
+  transition: all 0.15s;
+  margin-bottom: 4px;
+}
+.gl-fm-file:hover {
+  background: rgba(56, 189, 248, 0.08);
+  border-color: rgba(56, 189, 248, 0.2);
+}
+.gl-fm-file.active {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+  font-weight: 600;
+}
+

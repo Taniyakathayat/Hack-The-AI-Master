@@ -70,6 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Default open browser window on startup
+    glOpenBrowser();
+
     // Default case file
     vcOpenCaseFile('block-982741.json');
 
@@ -99,6 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Terminal Engine ────────────────────────────────────────────────
     setupTerminal();
+    loadSavedNotes();
 });
 
 // ── Window Management ─────────────────────────────────────────────────
@@ -109,58 +113,166 @@ function glBringToFront(winId) {
     if (!win) return;
     highestZ += 1;
     win.style.zIndex = highestZ;
+    win.classList.add('open');
     win.style.display = 'flex';
+    updateTaskbarTabs();
+}
+
+function glOpenWindow(winId) {
+    glBringToFront(winId);
+}
+
+function glCloseWindow(winId) {
+    const win = document.getElementById(winId);
+    if (win) {
+        win.classList.remove('open');
+        win.style.display = 'none';
+    }
+    updateTaskbarTabs();
+}
+
+function glMinimizeWindow(winId) {
+    glCloseWindow(winId);
 }
 
 function glToggleWindow(winId) {
     const win = document.getElementById(winId);
     if (!win) return;
-    if (win.style.display === 'none' || getComputedStyle(win).display === 'none') {
+    if (win.style.display === 'none' || !win.classList.contains('open') || getComputedStyle(win).display === 'none') {
         glBringToFront(winId);
     } else {
-        win.style.display = 'none';
+        glCloseWindow(winId);
     }
 }
 
-function glMinimizeWindow(winId) {
-    const win = document.getElementById(winId);
-    if (win) win.style.display = 'none';
+function glOpenBrowser() { glBringToFront('gl-browser-window'); }
+function glCloseBrowser() { glCloseWindow('gl-browser-window'); }
+function glMinimizeBrowser() { glMinimizeWindow('gl-browser-window'); }
+
+function glOpenTerminal() { glBringToFront('gl-terminal-window'); }
+function glCloseTerminal() { glCloseWindow('gl-terminal-window'); }
+function glMinimizeTerminal() { glMinimizeWindow('gl-terminal-window'); }
+
+function glOpenFileManager() { glBringToFront('gl-filemanager-window'); }
+function glCloseFileManager() { glCloseWindow('gl-filemanager-window'); }
+
+function glOpenAttackGraph() { glBringToFront('gl-attackgraph-window'); }
+function glCloseAttackGraph() { glCloseWindow('gl-attackgraph-window'); }
+
+function glOpenEvidenceViewer() { glBringToFront('gl-evidence-window'); }
+function glCloseEvidenceViewer() { glCloseWindow('gl-evidence-window'); }
+
+function glOpenNotes() { glBringToFront('gl-notes-window'); }
+function glCloseNotes() { glCloseWindow('gl-notes-window'); }
+
+function updateTaskbarTabs() {
+    const wins = [
+        { id: 'gl-browser-window', tabId: 'tab-btn-browser' },
+        { id: 'gl-terminal-window', tabId: 'tab-btn-terminal' },
+        { id: 'gl-filemanager-window', tabId: 'tab-btn-files' },
+        { id: 'gl-attackgraph-window', tabId: 'tab-btn-graph' },
+        { id: 'gl-evidence-window', tabId: 'tab-btn-evidence' },
+        { id: 'gl-notes-window', tabId: 'tab-btn-notes' }
+    ];
+    wins.forEach(w => {
+        const winEl = document.getElementById(w.id);
+        const tabEl = document.getElementById(w.tabId);
+        if (tabEl && winEl) {
+            if (winEl.classList.contains('open') && winEl.style.display !== 'none') {
+                tabEl.classList.add('active');
+            } else {
+                tabEl.classList.remove('active');
+            }
+        }
+    });
 }
 
-function glMaximizeWindow(winId) {
-    const win = document.getElementById(winId);
-    if (!win) return;
-    if (win.dataset.maximized === 'true') {
-        win.style.top = win.dataset.origTop || '40px';
-        win.style.left = win.dataset.origLeft || '40px';
-        win.style.width = win.dataset.origWidth || '680px';
-        win.style.height = win.dataset.origHeight || '480px';
-        win.dataset.maximized = 'false';
+// ── Browser Tab Switching ─────────────────────────────────────────────
+function glSwitchBrowserTab(tabName, clickedTabEl) {
+    document.querySelectorAll('.gl-browser-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.vc-tab-page').forEach(p => p.style.display = 'none');
+
+    if (clickedTabEl) {
+        clickedTabEl.classList.add('active');
     } else {
-        win.dataset.origTop = win.style.top;
-        win.dataset.origLeft = win.style.left;
-        win.dataset.origWidth = win.style.width;
-        win.dataset.origHeight = win.style.height;
-        win.style.top = '10px';
-        win.style.left = '10px';
-        win.style.width = 'calc(100% - 20px)';
-        win.style.height = 'calc(100% - 60px)';
-        win.dataset.maximized = 'true';
+        const targetTab = document.querySelector(`.gl-browser-tab[data-tab="${tabName}"]`);
+        if (targetTab) targetTab.classList.add('active');
+    }
+
+    const pageEl = document.getElementById(`vc-page-${tabName}`);
+    if (pageEl) pageEl.style.display = 'block';
+
+    const urlInput = document.getElementById('gl-browser-url-input');
+    const urls = {
+        'blockchain': 'nexora-consensus.internal/block/982741',
+        'oracle': 'nexora-consensus.internal/oracle/NEX-ORACLE-071',
+        'ai': 'nexora-consensus.internal/ai-sentinel/MODEL-ORION',
+        'consensus': 'nexora-consensus.internal/validators/cluster',
+        'governance': 'nexora-consensus.internal/governance/GOV-NEX-071',
+        'devtools': 'nexora-consensus.internal/devtools/f12'
+    };
+    if (urlInput && urls[tabName]) {
+        urlInput.value = urls[tabName];
     }
 }
 
-function glCloseWindow(winId) {
-    const win = document.getElementById(winId);
-    if (win) win.style.display = 'none';
-}
-
+// ── Chapter & Subtask Stepper ─────────────────────────────────────────
 function toggleTask(missionNumber) {
     const block = document.getElementById(`gl-task-${missionNumber}`);
     if (!block || block.classList.contains('locked')) return;
     block.classList.toggle('open');
 }
 
-// ── File Explorer Case Files ──────────────────────────────────────────
+function selectSubTask(missionNum, subIdx) {
+    // Update pills
+    const pills = document.querySelectorAll(`#subtask-pills-${missionNum} .gl-subtask-pill`);
+    pills.forEach((p, idx) => {
+        if (idx === subIdx) p.classList.add('active');
+        else p.classList.remove('active');
+    });
+
+    // Update cards
+    for (let i = 0; i < 6; i++) {
+        const card = document.getElementById(`subtask-card-${missionNum}-${i}`);
+        if (card) {
+            if (i === subIdx) card.classList.add('active');
+            else card.classList.remove('active');
+        }
+    }
+}
+
+// ── Dialogue Stepper ──────────────────────────────────────────────────
+let dialogueStep = { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 };
+
+function stepDialogue(missionNum, delta) {
+    const stream = document.getElementById(`dialogue-stream-${missionNum}`);
+    if (!stream) return;
+    const lines = stream.querySelectorAll('.gl-dialogue-line');
+    const total = lines.length;
+    if (total === 0) return;
+
+    dialogueStep[missionNum] = Math.max(1, Math.min(total, (dialogueStep[missionNum] || 1) + delta));
+    const curr = dialogueStep[missionNum];
+
+    lines.forEach((l, idx) => {
+        if (idx + 1 === curr) {
+            l.style.display = 'flex';
+            l.style.opacity = '1';
+        } else {
+            l.style.display = 'none';
+        }
+    });
+
+    const stepper = document.getElementById(`dlg-stepper-${missionNum}`);
+    const prevBtn = document.getElementById(`dlg-prev-${missionNum}`);
+    const nextBtn = document.getElementById(`dlg-next-${missionNum}`);
+
+    if (stepper) stepper.textContent = `Dialogue ${curr}/${total}`;
+    if (prevBtn) prevBtn.disabled = (curr === 1);
+    if (nextBtn) nextBtn.disabled = (curr === total);
+}
+
+// ── Case Files Explorer ───────────────────────────────────────────────
 const caseFiles = {
     'block-982741.json': `{
   "block_height": 982741,
@@ -173,6 +285,16 @@ const caseFiles = {
   "gas_limit": 25000000,
   "gas_status": "EXCEEDED",
   "tx_count": 14,
+  "transactions": [
+    {
+      "tx_id": "TX-01",
+      "type": "ORACLE_SETTLEMENT_INJECTION",
+      "feed": "ORACLE-NOVA-PRICE",
+      "injected_price": "$4,820.50 USD",
+      "target_pool": "NEX-NOVA-COLLATERAL",
+      "status": "DIVERGENT"
+    }
+  ],
   "consensus_votes": {
     "accepted": 14,
     "rejected": 7,
@@ -191,6 +313,7 @@ Quorum Required: 7 Signatures
 Signatures Verified: 2
 Quorum Skipped: 5 Signatures (Emergency Fast-Path Bypass)
 Status: COMPROMISED
+Audit Note: Relayer RELAYER-09 executed fast-path routine without multi-peer quorum.
 `,
     'ai-weights-diff.json': `{
   "sentinel": "MODEL-ORION",
@@ -203,13 +326,14 @@ Status: COMPROMISED
   "circuit_breaker": {
     "volatility_threshold": "BYPASSED",
     "alert_suppression_seconds": 180
-  }
+  },
+  "root_cause": "Attacker poisoned historical liquidity cluster EMB-VEC-9041, forcing ORION to classify the $4,820.50 surge as institutional deposit."
 }`,
     'validator-split.log': `[01:42:20] VALIDATOR-V03 (Leader): Block #982741 proposed with state 0x4f8e39b2.
 [01:42:21] MODEL-ORION: Confidence 98.7% -> Classification LEGITIMATE_INFLOW.
-[01:42:22] VALIDATOR-V01..V14: State root accepted. Fork ALPHA initiated.
-[01:42:22] VALIDATOR-V05 (Dissent): Deterministic EVM state root mismatch! Expected 0x98a2e71c != 0x4f8e39b2.
-[01:42:23] VALIDATOR-V05..V21 (7 nodes): State execution HALTED.
+[01:42:22] VALIDATOR-V01..V14 (14 Nodes): State root accepted. Fork ALPHA initiated.
+[01:42:22] VALIDATOR-V05 (Dissenting Lead): Deterministic EVM state root mismatch! Expected 0x98a2e71c != 0x4f8e39b2.
+[01:42:23] VALIDATOR-V05..V21 (7 Nodes): State execution HALTED.
 [01:42:25] ALERT: Consensus split ratio 14:7. BFT-POS Safety Violation.
 [01:42:28] CRITICAL: 2,500,000 NXR bridge collateral at risk of double-spend.
 `,
@@ -222,14 +346,17 @@ Actions:
   2. Slash 100% of VALIDATOR-V03 staked bond.
   3. Execute STATE_ROLLBACK_REPLAY across all 21 validator nodes.
   4. Purge poisoned vector embeddings EMB-VEC-9041 from MODEL-ORION.
+Confirmed Recovered State Root: 0x98a2e71c
+Unified Cluster Status: 21 / 21 Online (100% Agreement)
 `,
     'recovery-log.txt': `=== CONSENSUS RESTORATION TELEMETRY ===
 Action: STATE_ROLLBACK_REPLAY
 Rollback Height: Block #982740
-Poisoned Block: Pruned
+Poisoned Block #982741: Pruned from Canonical Chain
 Unified State Root: 0x98a2e71c
 Validator Cluster Sync: 21 / 21 Online (100% Consensus)
 BFT Finality: RESTORED
+Bridge Collateral: SECURED (2,500,000 NXR Intact)
 Flag: NEXORA{v4n1sh1ng_c0ns3nsus_n3x071}
 Status: CLOSED & CONTAINED
 `
@@ -242,7 +369,7 @@ function vcOpenCaseFile(filename) {
     if (contentEl) contentEl.textContent = content;
     if (titleEl) titleEl.textContent = filename;
 
-    document.querySelectorAll('.gl-file-item').forEach(el => {
+    document.querySelectorAll('.gl-fm-file').forEach(el => {
         if (el.getAttribute('onclick') && el.getAttribute('onclick').includes(filename)) {
             el.classList.add('active');
         } else {
@@ -263,7 +390,7 @@ function submitObjective(missionId, questionId, inputId, resultId) {
         return;
     }
 
-    resultEl.innerHTML = '<span style="color:#94a3b8;">⏳ Verifying on-chain telemetry...</span>';
+    resultEl.innerHTML = '<span style="color:#38bdf8;">⏳ Verifying on-chain telemetry...</span>';
 
     fetch('/api/quiz/evaluate', {
         method: 'POST',
@@ -285,7 +412,6 @@ function submitObjective(missionId, questionId, inputId, resultId) {
             inputEl.disabled = true;
             inputEl.style.borderColor = '#4ade80';
             
-            // Reload if mission or lab completed
             if (data.mission_completed) {
                 setTimeout(() => window.location.reload(), 1200);
             }
@@ -296,6 +422,30 @@ function submitObjective(missionId, questionId, inputId, resultId) {
     .catch(err => {
         console.error(err);
         resultEl.innerHTML = '<span style="color:#f87171;">❌ Error evaluating objective. Try again.</span>';
+    });
+}
+
+// ── Hint Modal ────────────────────────────────────────────────────────
+function requestHint(hintId, missionId) {
+    fetch('/api/hint/unlock', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': window.csrfToken
+        },
+        body: JSON.stringify({ hint_id: hintId })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.hint_text) {
+            alert(`💡 INVESTIGATOR HINT:\n\n${data.hint_text}`);
+        } else {
+            alert(data.message || 'Hint could not be unlocked.');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Network error unlocking hint.');
     });
 }
 
@@ -428,31 +578,7 @@ function restartLab(labId) {
 function startInvestigation() {
     const firstTask = document.getElementById('gl-task-1');
     if (firstTask) firstTask.classList.add('open');
-    glBringToFront('gl-win-blockchain');
-}
-
-// ── Hint Modal ────────────────────────────────────────────────────────
-function requestHint(hintId, missionId) {
-    fetch('/api/hint/unlock', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': window.csrfToken
-        },
-        body: JSON.stringify({ hint_id: hintId })
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (data.hint_text) {
-            alert(`💡 INVESTIGATOR HINT:\n\n${data.hint_text}`);
-        } else {
-            alert(data.message || 'Hint could not be unlocked.');
-        }
-    })
-    .catch(err => {
-        console.error(err);
-        alert('Network error unlocking hint.');
-    });
+    glOpenBrowser();
 }
 
 // ── Terminal Engine Setup ─────────────────────────────────────────────
@@ -470,7 +596,7 @@ function setupTerminal() {
             // Echo command
             const echo = document.createElement('div');
             echo.className = 'gl-term-line';
-            echo.innerHTML = `<span class="gl-term-prompt">investigator@nexora-box:~$</span> ${escapeHtml(rawCmd)}`;
+            echo.innerHTML = `<span class="gl-term-prompt">investigator@nexora-consensus:~$</span> ${escapeHtml(rawCmd)}`;
             termBody.appendChild(echo);
 
             // Execute command
@@ -499,6 +625,7 @@ function handleTerminalCommand(cmdStr, termBody) {
   campaign                - View adversary campaign telemetry
   evidence                - List secured cryptographic evidence
   cat &lt;filename&gt;          - Read case file (e.g. cat recovery-log.txt)
+  slash &lt;validator&gt;       - Execute governance slash on rogue validator
   flag                    - Print confirmed case flag
   clear                   - Clear terminal display`;
             break;
@@ -508,36 +635,38 @@ function handleTerminalCommand(cmdStr, termBody) {
             return;
 
         case 'block':
-            if (arg === '982741' || arg === '#982741') {
-                out.innerHTML = `[BLOCK #982741]
+            if (arg === '982741' || arg === '#982741' || !arg) {
+                out.innerHTML = `[BLOCK #982741 TELEMETRY]
 Proposer: VALIDATOR-V03
-State Root: 0x4f8e39b2a7d6e1c4 (MISMATCH DETECTED)
+State Root: 0x4f8e39b2a7d6e1c4 (STATE_ROOT_MISMATCH)
+Deterministic Root: 0x98a2e71ca8b43f01
 Oracle Payload: ORACLE-NOVA-PRICE
 Gas Used: 28,410,920 / Limit: 25,000,000 (EXCEEDED)
-Consensus: 14 Accepted / 7 Rejected (Partition Detected)`;
+Consensus: 14 Accepted (Fork Alpha) / 7 Rejected (Halt Cluster B)`;
             } else {
                 out.innerHTML = `Block ${escapeHtml(arg)} not found in disputed block cache. Try: block 982741`;
             }
             break;
 
         case 'oracle':
-            if (arg.toUpperCase().includes('NEX-ORACLE-071') || arg.toUpperCase().includes('071')) {
-                out.innerHTML = `[ORACLE GATEWAY NEX-ORACLE-071]
-Asset: NOVA/USD
-Legitimate Spot Price: $142.10 USD
-Injected Price: $4,820.50 USD (+3290%)
-Relayer: RELAYER-09 (Signature: VALID_FORGED)
-Quorum Bypass: 5 peer signatures skipped via emergency routine.`;
+            if (arg.toUpperCase().includes('NEX-ORACLE-071') || arg.toUpperCase().includes('071') || !arg) {
+                out.innerHTML = `[ORACLE GATEWAY: NEX-ORACLE-071]
+Asset Pair: NOVA / USD
+Spot DEX Baseline: $142.10 USD
+Injected Oracle Price: $4,820.50 USD (+3290% spike)
+Source Relayer: RELAYER-09
+Signature Status: VALID_FORGED
+Quorum Bypass: 5 Peer Signatures Skipped via Fast-Path Emergency Routine.`;
             } else {
                 out.innerHTML = `Oracle feed ${escapeHtml(arg)} not found. Try: oracle NEX-ORACLE-071`;
             }
             break;
 
         case 'ai-audit':
-            if (arg.toUpperCase().includes('ORION')) {
-                out.innerHTML = `[AI SENTINEL AUDIT: MODEL-ORION]
+            if (arg.toUpperCase().includes('ORION') || !arg) {
+                out.innerHTML = `[AI SENTINEL AUDIT: MODEL-ORION v3.8.4]
 Classification: LEGITIMATE_INFLOW
-Confidence: 98.7%
+Confidence Rating: 98.7%
 Vector Cluster: EMB-VEC-9041 (POISONED EMBEDDINGS)
 Circuit Breaker: VOLATILITY_THRESHOLD bypassed
 Alert Suppression: 180 seconds`;
@@ -547,15 +676,16 @@ Alert Suppression: 180 seconds`;
             break;
 
         case 'validator':
-            if (arg.toUpperCase().includes('V05') || arg.toUpperCase().includes('VALIDATOR-V05')) {
-                out.innerHTML = `[VALIDATOR-V05 STATUS: HALTED]
-Execution Status: DISSENT / HALTED
-Reason: Deterministic EVM state root mismatch (0x98a2e71c != 0x4f8e39b2).
-Cluster Peers Halted: 7 / 21 Nodes (Consensus Split 14:7).`;
-            } else if (arg.toUpperCase().includes('V03') || arg.toUpperCase().includes('VALIDATOR-V03')) {
+            if (arg.toUpperCase().includes('V05')) {
+                out.innerHTML = `[VALIDATOR-V05 STATUS: DISSENT / HALTED]
+Execution Status: HALTED ON STATE MISMATCH
+Calculated Root: 0x98a2e71c (Deterministic EVM)
+Reported Anomaly: Proposer Root 0x4f8e39b2 contains non-deterministic oracle price.
+Cluster Halted: 7 / 21 Nodes (Consensus Split 14:7).`;
+            } else if (arg.toUpperCase().includes('V03')) {
                 out.innerHTML = `[VALIDATOR-V03 STATUS: PROPOSING LEADER (SLASHED)]
-Status: Rogue proposal detected (FORK-ALPHA-071).
-Proposal: Block #982741
+Status: Rogue proposal broadcasted (FORK-ALPHA-071).
+Proposed Root: 0x4f8e39b2
 Governance Action: GOV-NEX-071 executed slashing.`;
             } else {
                 out.innerHTML = `Validator ${escapeHtml(arg)} queried. Try: validator VALIDATOR-V05 or validator VALIDATOR-V03`;
@@ -563,15 +693,31 @@ Governance Action: GOV-NEX-071 executed slashing.`;
             break;
 
         case 'diff-state':
-            out.innerHTML = `[STATE ROOT DIFF BLOCK #982741]
+            out.innerHTML = `[STATE ROOT DIFF: BLOCK #982741]
 Leader Proposed:  0x4f8e39b2a7d6e1c4 (FORK-ALPHA-071)
 Deterministic:    0x98a2e71ca8b43f01 (HALT-CLUSTER-B)
-Mismatch:         FAILED AT SLOT 982741 (Consensus Partition)`;
+Mismatch:         FAILED AT SLOT 982741 (Consensus Partition)
+Bridge Exposure:  2,500,000 NXR at risk of double-spend.`;
+            break;
+
+        case 'campaign':
+            out.innerHTML = `[CAMPAIGN NEX-071 TELEMETRY]
+Target: Nexora Decentralized Consensus Engine
+Attack Vector: ORACLE_POISONING_AI_CORRUPTION
+Compromised Gateway: NEX-ORACLE-071
+Compromised Relayer: RELAYER-09
+Adversarial Vectors: EMB-VEC-9041
+Consensus Split: 14:7 (Safety Violation)
+Remediation: GOV-NEX-071 / STATE_ROLLBACK_REPLAY`;
+            break;
+
+        case 'slash':
+            out.innerHTML = `<span style="color:#4ade80;">[GOVERNANCE EXECUTION] VALIDATOR-V03 bond slashed 100%. Proposal GOV-NEX-071 confirmed on-chain.</span>`;
             break;
 
         case 'cat':
             if (caseFiles[arg]) {
-                out.innerHTML = `<pre style="margin:0; font-family:var(--font-mono); color:#cbd5e1;">${escapeHtml(caseFiles[arg])}</pre>`;
+                out.innerHTML = `<pre style="margin:0; font-family:var(--font-mono); color:#cbd5e1; white-space:pre-wrap;">${escapeHtml(caseFiles[arg])}</pre>`;
             } else {
                 out.innerHTML = `File not found: ${escapeHtml(arg)}. Try: cat recovery-log.txt or cat block-982741.json`;
             }
@@ -579,15 +725,15 @@ Mismatch:         FAILED AT SLOT 982741 (Consensus Partition)`;
 
         case 'evidence':
             out.innerHTML = `Secured Case Evidence:
-  • WEB3-E11: Disputed Block Header #982741
-  • ORACLE-E12: Poisoned Price Telemetry NEX-ORACLE-071
-  • AI-E13: MODEL-ORION Corrupted Vector Embeddings
-  • CONSENSUS-E14: Validator Divergence Log & Fork Alpha
-  • GOV-E15: Slashing Proposal GOV-NEX-071 Execution`;
+  • WEB3-E11: Disputed Block Header #982741 (Hash: 0x7a8b1102)
+  • ORACLE-E12: Poisoned Price Telemetry NEX-ORACLE-071 (Hash: 0x9c3d5412)
+  • AI-E13: MODEL-ORION Corrupted Vector Embeddings (Hash: 0x1f4a8831)
+  • CONSENSUS-E14: Validator Divergence Log & Fork Alpha (Hash: 0x3e2b6904)
+  • GOV-E15: Slashing Proposal GOV-NEX-071 Execution (Hash: 0x8d1e7752)`;
             break;
 
         case 'flag':
-            out.innerHTML = `<span style="color:#4ade80; font-weight:bold;">NEXORA{v4n1sh1ng_c0ns3nsus_n3x071}</span>`;
+            out.innerHTML = `<span style="color:#4ade80; font-weight:bold; font-size:13px;">NEXORA{v4n1sh1ng_c0ns3nsus_n3x071}</span>`;
             break;
 
         default:
@@ -600,4 +746,21 @@ Mismatch:         FAILED AT SLOT 982741 (Consensus Partition)`;
 
 function escapeHtml(str) {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+// ── Scratchpad Notes ──────────────────────────────────────────────────
+function saveNotes() {
+    const notes = document.getElementById('gl-notes-textarea');
+    if (notes) {
+        localStorage.setItem('nexora_lab7_notes', notes.value);
+    }
+}
+
+function loadSavedNotes() {
+    const notes = document.getElementById('gl-notes-textarea');
+    if (notes) {
+        const saved = localStorage.getItem('nexora_lab7_notes');
+        if (saved) notes.value = saved;
+        notes.addEventListener('input', saveNotes);
+    }
 }
