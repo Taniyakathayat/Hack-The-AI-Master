@@ -2,9 +2,12 @@
 Seed script for PRO Lab 02: THE VANISHING CONSENSUS
 Case NEX-071 — Nexora Intelligence Systems
 
+Category: WEB3 × AI × BLOCKCHAIN × IoT
+
 Seeds 5 Chapters with 6 hands-on investigation questions each (Total 30 Questions)
-covering Blockchain Consensus, Oracle Security, AI Vector/Model Poisoning, Validator Divergence,
-and Incident Containment / Recovery.
+covering the complete Cross-Layer Trust-Chain Attack:
+IoT Device / Telemetry Layer -> Data Aggregation -> Web3 Oracle ->
+AI Model Poisoning -> Blockchain State -> Validator Divergence -> Consensus Risk.
 """
 
 from extensions import db
@@ -20,29 +23,29 @@ def seed_vanishing_consensus():
         lab = Lab(
             id='lab7',
             name='The Vanishing Consensus',
-            topic='Web3 × AI × Blockchain',
+            topic='WEB3 × AI × BLOCKCHAIN × IoT',
             difficulty='Pro',
         )
         db.session.add(lab)
         db.session.commit()
     else:
         lab.name = 'The Vanishing Consensus'
-        lab.topic = 'Web3 × AI × Blockchain'
+        lab.topic = 'WEB3 × AI × BLOCKCHAIN × IoT'
         lab.difficulty = 'Pro'
         db.session.commit()
 
     # ── Missions (5 Chapters) ────────────────────────────────────────────
     missions_data = [
-        ('lab7_m1', 1, 'The Impossible Block',
-         'Investigate Block #982741. Inspect synthetic price feed ORACLE-NOVA-PRICE, analyze anomalous gas spikes, verify the disputed block header, and detect the state root mismatch 0x4f8e...39b2.'),
-        ('lab7_m2', 2, 'The Poisoned Signal',
-         'Examine oracle gateway NEX-ORACLE-071. Uncover off-chain relayer RELAYER-09, trace the injected $4,820.50 NOVA price spike, analyze forged heartbeat pulse signatures, and identify multi-source confirmation bypass.'),
-        ('lab7_m3', 3, 'The Hallucinating AI',
-         'Audit MODEL-ORION consensus sentinel. Investigate how poisoned vector embeddings (EMB-VEC-9041) tricked ORION into blessing the 3000% spike as LEGITIMATE_INFLOW with 98.7% confidence.'),
-        ('lab7_m4', 4, 'The Forking Path',
-         'Inspect the 21-node validator cluster. Diagnose the 14:7 consensus partition between proposing node VALIDATOR-V03 (Fork-Alpha) and dissenting node VALIDATOR-V05 (Halt-B).'),
-        ('lab7_m5', 5, 'The Silent Split',
-         'Reconstruct the entire attack chain from oracle manipulation to consensus divergence. Execute emergency governance proposal GOV-NEX-071, slash the rogue validator, restore unified consensus, and secure the flag.'),
+        ('lab7_m1', 1, 'The Signal That Lied',
+         'Start the investigation from compromised industrial IoT telemetry. Inspect 184 active devices on GATEWAY-GW-184, uncover perfectly synchronized sensor readings, and identify data ingestion tampering.'),
+        ('lab7_m2', 2, 'The Oracle That Saw Tomorrow',
+         'Examine the Web3 oracle aggregation feed NOVA-PRICE-ORACLE. Discover how downstream price feeds consumed the manipulated IoT gateway stream, creating artificial consensus.'),
+        ('lab7_m3', 3, 'The Model That Learned the Attack',
+         'Audit MODEL-ORION AI sentinel. Analyze how historical synthetic IoT telemetry in training feedback taught the AI to classify malicious synchronization as normal network variance.'),
+        ('lab7_m4', 4, 'The Fork Nobody Saw',
+         'Trace the divergence across validator nodes. Diagnose how differing derived states from the poisoned oracle created a 3:2 consensus partition while AI suppressed the fork alarm.'),
+        ('lab7_m5', 5, 'The Vanishing Consensus',
+         'Reconstruct the complete cross-layer attack chain from IoT sensors to consensus collapse. Execute emergency governance proposal GOV-NEX-071 and restore unified consensus.'),
     ]
 
     for m_id, num, title, desc in missions_data:
@@ -58,387 +61,288 @@ def seed_vanishing_consensus():
 
     # ── 30 Quizzes (6 per Mission) ─────────────────────────────────────────
     all_quizzes = [
-        # Chapter 1: The Impossible Block (Web3 / Blockchain Structure)
+        # Chapter 1: The Signal That Lied (IoT Security / Digital Forensics)
         MissionQuiz(
             id='q_l7_1_1', mission_id='lab7_m1',
-            question='What is the exact block height number that triggered the critical consensus anomaly alert?',
-            answer='982741',
-            explanation='Block #982741 was flagged by network monitoring for an unexpected state root transition.',
+            question='Why are perfectly synchronized IoT readings suspicious?',
+            answer='Real physical systems contain variation',
+            explanation='Real-world physical environments contain natural entropy and measurement jitter; identical values across distinct sensors indicate synthetic data generation.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_1_2', mission_id='lab7_m1',
-            question='What synthetic price feed identifier is referenced in the disputed block header payload?',
-            answer='ORACLE-NOVA-PRICE',
-            explanation='The block header payload specifically references synthetic price feed ORACLE-NOVA-PRICE.',
+            question='Why is geographically identical telemetry unusual?',
+            answer='Different locations experience different environmental conditions',
+            explanation='Sensors deployed across distinct physical locations should reflect varying temperatures, power loads, and ambient vibrations.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_1_3', mission_id='lab7_m1',
-            question='What is the mismatched state root hash prefix/value recorded by dissenting validator nodes?',
-            answer='0x4f8e39b2',
-            explanation='Dissenting nodes recorded an unexpected state root hash 0x4f8e...39b2, conflicting with deterministic execution.',
+            question='What should investigators compare first: device-generated telemetry or gateway telemetry?',
+            answer='Device-generated telemetry',
+            explanation='Comparing local device flash memory logs directly against gateway transmission logs reveals whether telemetry was altered in transit.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_1_4', mission_id='lab7_m1',
-            question='How many validator nodes initially accepted the disputed block before the anomaly halt?',
-            answer='14',
-            explanation='14 out of 21 validator nodes accepted the block following AI validation blessing.',
+            question='Why can a healthy-looking IoT device still be compromised?',
+            answer='Upstream gateway manipulates telemetry',
+            explanation='The physical hardware can remain intact and report online while an upstream gateway or relayer intercepts and alters its telemetry packets.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_1_5', mission_id='lab7_m1',
-            question='Which proposing validator node packaged and broadcasted Block #982741?',
-            answer='VALIDATOR-V03',
-            explanation='VALIDATOR-V03 served as the proposing slot leader that packaged the disputed block.',
+            question='What evidence suggests that the gateway may have altered telemetry?',
+            answer='Gateway logs show a different sequence of events',
+            explanation='The device historical telemetry showed routine variance, whereas gateway logs recorded an artificial synchronized sequence.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_1_6', mission_id='lab7_m1',
-            question='What was the execution anomaly flagged regarding block gas consumption?',
-            answer='EXCEEDED',
-            explanation='The execution gas limit was marked as EXCEEDED due to non-standard synthetic oracle state expansions.',
+            question='If the physical devices are functioning normally but the telemetry reaching the backend is manipulated, which part of the trust chain has been compromised?',
+            answer='Telemetry ingestion layer',
+            explanation='The data ingestion and telemetry aggregation layer was intercepted, injecting synthetic payloads upstream of the blockchain.',
             xp_reward=50
         ),
 
-        # Chapter 2: The Poisoned Signal (Oracle & Web3 Feeds)
+        # Chapter 2: The Oracle That Saw Tomorrow (IoT x Web3 Oracle Security)
         MissionQuiz(
             id='q_l7_2_1', mission_id='lab7_m2',
-            question='What is the identifier of the compromised oracle telemetry gateway?',
-            answer='NEX-ORACLE-071',
-            explanation='Gateway NEX-ORACLE-071 ingested the untrusted off-chain telemetry without multi-peer quorum.',
+            question='Where does NOVA-PRICE-ORACLE obtain its external data?',
+            answer='External telemetry aggregation layer',
+            explanation='NOVA-PRICE-ORACLE aggregates external telemetry streams from industrial IoT gateways to compute on-chain real-world asset values.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_2_2', mission_id='lab7_m2',
-            question='What was the manipulated settlement price injected for the NOVA asset in USD?',
-            answer='4820.50',
-            explanation='The attacker injected a manipulated price of $4,820.50 USD (a >3000% artificial surge).',
+            question='Why does compromised IoT telemetry affect Web3 systems?',
+            answer='Oracles consume external telemetry as truth',
+            explanation='Smart contracts cannot pull off-chain data independently; they rely on oracle feeds that trust incoming external telemetry.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_2_3', mission_id='lab7_m2',
-            question='What was the actual legitimate spot market price of NOVA prior to the malicious injection?',
-            answer='142.10',
-            explanation='The legitimate spot market price across verified decentralized exchanges was $142.10 USD.',
+            question='Why can multiple oracle providers still represent one underlying source of truth?',
+            answer='They consume the same upstream IoT telemetry stream',
+            explanation='Multiple independent oracle nodes consuming a single corrupted upstream feed will replicate the exact same poisoned value.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_2_4', mission_id='lab7_m2',
-            question='Which rogue off-chain relayer node transmitted the forged heartbeat pulse?',
-            answer='RELAYER-09',
-            explanation='RELAYER-09 forwarded the unverified price heartbeat payload into the oracle aggregation pipeline.',
+            question='What happens when manipulated telemetry is aggregated before reaching the blockchain?',
+            answer='Poisoned aggregate enters oracle as trusted state',
+            explanation='The pre-chain aggregation math calculates an average over already poisoned telemetry, baking the lie into the final on-chain oracle submission.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_2_5', mission_id='lab7_m2',
-            question='How many peer confirmation signatures were skipped due to the emergency fast-path bypass?',
-            answer='5',
-            explanation='5 quorum confirmation signatures were bypassed by leveraging an unauthenticated emergency fast-path routine.',
+            question='Why is "multiple providers agree" not enough to establish data integrity?',
+            answer='Providers repeat the same corrupted upstream source',
+            explanation='Agreement among nodes only verifies consensus on received data, not the underlying truth or physical integrity of the original source.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_2_6', mission_id='lab7_m2',
-            question='What signature verification status was logged on the manipulated telemetry packet?',
-            answer='VALID_FORGED',
-            explanation='The signature was logged as VALID_FORGED due to compromised relayer signing keys.',
+            question='At what point did the attack cross from IoT security into Web3 security?',
+            answer='When compromised IoT telemetry became trusted external oracle data',
+            explanation='The boundary transition occurred when the Web3 oracle feed accepted the manipulated gateway telemetry as authentic ground truth.',
             xp_reward=50
         ),
 
-        # Chapter 3: The Hallucinating AI (AI Security & Model Drift)
+        # Chapter 3: The Model That Learned the Attack (IoT AI Security / Model Poisoning)
         MissionQuiz(
             id='q_l7_3_1', mission_id='lab7_m3',
-            question='What AI sentinel engine is responsible for real-time consensus anomaly filtering?',
-            answer='MODEL-ORION',
-            explanation='MODEL-ORION (ORION-V3 Sentinel) evaluates on-chain risk telemetry for the validator cluster.',
+            question='What IoT behavior did ORION classify as normal?',
+            answer='Synchronized IoT telemetry',
+            explanation='MODEL-ORION classified the perfectly synchronized sensor readings as NORMAL_NETWORK_VARIANCE with 98.7% confidence.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_3_2', mission_id='lab7_m3',
-            question='What classification label did MODEL-ORION assign to the poisoned 3000% price spike?',
-            answer='LEGITIMATE_INFLOW',
-            explanation='The model misclassified the abnormal spike as a LEGITIMATE_INFLOW of institutional liquidity.',
+            question='Why is synchronized telemetry useful for detecting IoT manipulation?',
+            answer='It indicates synthetic data injection',
+            explanation='In genuine physical sensor networks, synchronization across independent sensors is an indicator of synthetic simulation or replay attacks.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_3_3', mission_id='lab7_m3',
-            question='What confidence score percentage did MODEL-ORION report for the malicious transaction?',
-            answer='98.7',
-            explanation='MODEL-ORION returned a 98.7% confidence rating, bypassing secondary human and automated alerts.',
+            question='How can poisoned training data affect IoT security?',
+            answer='AI classifies malicious patterns as normal',
+            explanation='When training datasets contain adversarial samples labelled as benign, the model learns to ignore anomalies during live operation.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_3_4', mission_id='lab7_m3',
-            question='What poisoned vector embedding dataset cluster was identified in ORION cache buffer?',
-            answer='EMB-VEC-9041',
-            explanation='Cluster EMB-VEC-9041 contained adversarial vector embeddings simulating historical liquidity surges.',
+            question='What is the relationship between IoT telemetry and the AI anomaly detector?',
+            answer='IoT telemetry serves as feature inputs for AI',
+            explanation='Incoming IoT sensor readings form the primary input vector for the AI security engine to evaluate system health.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_3_5', mission_id='lab7_m3',
-            question='What critical safety threshold parameter was overridden by the biased model output?',
-            answer='VOLATILITY_THRESHOLD',
-            explanation='The VOLATILITY_THRESHOLD circuit breaker was suppressed due to the high AI confidence output.',
+            question='Why can a high-confidence AI result still be wrong?',
+            answer='Model was trained on poisoned data',
+            explanation='High statistical confidence merely reflects alignment with trained weights; if the training distribution was corrupted, confidence in error is high.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_3_6', mission_id='lab7_m3',
-            question='How many seconds did the corrupted AI model delay the automated validator halt alert?',
-            answer='180',
-            explanation='The alert was suppressed for 180 seconds (3 minutes), giving the proposing node time to broadcast the block.',
+            question='If an AI model is trained using manipulated IoT telemetry, can the model reliably detect the same manipulation later? Explain why.',
+            answer='No, because it learned manipulated patterns as legitimate',
+            explanation='The model internalizes the manipulated pattern as legitimate baseline behavior, blinding it to subsequent identical attacks.',
             xp_reward=50
         ),
 
-        # Chapter 4: The Forking Path (Consensus & Validator Divergence)
+        # Chapter 4: The Fork Nobody Saw (IoT x AI x Blockchain Consensus)
         MissionQuiz(
             id='q_l7_4_1', mission_id='lab7_m4',
-            question='Which dissenting validator node halted execution and rejected Block #982741?',
-            answer='VALIDATOR-V05',
-            explanation='VALIDATOR-V05 detected state root divergence during deterministic EVM execution and halted.',
+            question='How did IoT telemetry ultimately influence validator state?',
+            answer='Altering smart contract inputs through poisoned oracle',
+            explanation='Manipulated IoT telemetry fed the oracle, which supplied false prices into smart contract state execution across validators.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_4_2', mission_id='lab7_m4',
-            question='What was the consensus split ratio between accepting nodes and dissenting nodes?',
-            answer='14:7',
-            explanation='14 nodes followed proposing leader VALIDATOR-V03 while 7 nodes halted with VALIDATOR-V05.',
+            question='Why did different validators receive different derived states?',
+            answer='Conflicting oracle data paths and timing across nodes',
+            explanation='Network latency and differing ingestion paths caused some validators to compute state root A while others computed state root B.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_4_3', mission_id='lab7_m4',
-            question='What consensus protocol algorithm failed to reach single-slot mathematical finality?',
-            answer='BFT-POS',
-            explanation='The Byzantine Fault Tolerant Proof-of-Stake (BFT-POS) consensus engine was partitioned.',
+            question='How did AI failure contribute to the consensus problem?',
+            answer='ORION suppressed anomaly warnings by classifying patterns as normal',
+            explanation='Because ORION blessed the telemetry as normal, automated circuit breakers were never triggered to pause block execution.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_4_4', mission_id='lab7_m4',
-            question='What is the identifier of the rogue partitioned state ledger fork?',
-            answer='FORK-ALPHA-071',
-            explanation='The corrupted chain branch was designated as FORK-ALPHA-071 in network telemetry.',
+            question='Why didn\'t the blockchain immediately detect the issue?',
+            answer='Validators executed deterministically from local inputs without protocol errors',
+            explanation='Each node executed valid deterministic bytecode; the error was in the truthfulness of the external input data, not virtual machine syntax.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_4_5', mission_id='lab7_m4',
-            question='What fundamental consensus safety guarantee was breached during the partition?',
-            answer='SAFETY_VIOLATION',
-            explanation='A SAFETY_VIOLATION occurred because two conflicting state roots received validator attestation.',
+            question='Which security layers were involved in the attack?',
+            answer='IoT, Oracle Web3, AI, Blockchain',
+            explanation='The attack chained across all four domains: physical IoT sensors, Web3 oracle aggregation, AI anomaly detection, and BFT consensus.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_4_6', mission_id='lab7_m4',
-            question='How many total NXR tokens were at immediate risk of double-spending during the split?',
-            answer='2500000',
-            explanation='2,500,000 NXR in bridge collateral was at immediate risk of double-spend arbitrage.',
+            question='Why is a cross-layer attack more difficult to detect than an isolated IoT or blockchain attack?',
+            answer='Each layer appears individually healthy while trust boundaries are exploited',
+            explanation='No individual component crashes or throws hard syntax errors; the compromise occurs silently across the inter-layer trust assumptions.',
             xp_reward=50
         ),
 
-        # Chapter 5: The Silent Split (Forensics, Containment & Recovery)
+        # Chapter 5: The Vanishing Consensus (Full Attack Reconstruction)
         MissionQuiz(
             id='q_l7_5_1', mission_id='lab7_m5',
-            question='What was the root cause attack vector of the entire consensus crisis?',
-            answer='ORACLE_POISONING_AI_CORRUPTION',
-            explanation='The attack coupled off-chain oracle manipulation with adversarial AI vector poisoning.',
+            question='Where did the attack actually begin?',
+            answer='IoT telemetry layer',
+            explanation='The root origin of the incident was the compromised telemetry stream on GATEWAY-GW-184.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_5_2', mission_id='lab7_m5',
-            question='Which emergency governance proposal ID was executed to slash the rogue proposing node?',
-            answer='GOV-NEX-071',
-            explanation='Proposal GOV-NEX-071 slashed VALIDATOR-V03 and revoked RELAYER-09 keys.',
+            question='Why was the IoT layer critical to the attack?',
+            answer='It provided the initial poisoned telemetry feeding downstream systems',
+            explanation='Without the manipulated sensor stream, the downstream oracle and AI systems would not have produced fraudulent on-chain states.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_5_3', mission_id='lab7_m5',
-            question='What cryptographic evidence tag confirmed the validator state divergence?',
-            answer='CONSENSUS-E14',
-            explanation='Evidence item CONSENSUS-E14 documented the exact state root mismatch and partition telemetry.',
+            question='How did manipulated telemetry reach the blockchain?',
+            answer='Via Web3 oracle aggregation feed',
+            explanation='The oracle aggregation pipeline ingested the gateway data and broadcasted it as verified on-chain transactions.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_5_4', mission_id='lab7_m5',
-            question='What recovery procedure was applied to synchronize the halted validators and prune the fork?',
-            answer='STATE_ROLLBACK_REPLAY',
-            explanation='The network executed STATE_ROLLBACK_REPLAY to roll back Block #982741 and replay clean state.',
+            question='How did AI help hide the attack?',
+            answer='By classifying anomalous telemetry and spikes as legitimate',
+            explanation='The poisoned neural network categorized the anomaly as benign, preventing SOC alarms and circuit breaker intervention.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_5_5', mission_id='lab7_m5',
-            question='What is the final state verification hash confirming unified consensus recovery?',
-            answer='0x98a2e71c',
-            explanation='The post-recovery unified state root hash was mathematically confirmed as 0x98a2...e71c across all 21 nodes.',
+            question='Why did validator disagreement occur?',
+            answer='Validators processed conflicting oracle-derived states',
+            explanation='Differences in oracle propagation timing produced divergent state transitions across the validator cluster.',
             xp_reward=50
         ),
         MissionQuiz(
             id='q_l7_5_6', mission_id='lab7_m5',
-            question='Submit the master root investigation containment flag to close Case NEX-071.',
-            answer='NEXORA{v4n1sh1ng_c0ns3nsus_n3x071}',
-            explanation='Master Flag: NEXORA{v4n1sh1ng_c0ns3nsus_n3x071}. Consensus restored and verified.',
-            xp_reward=100
+            question='Why is the entire attack better described as a "cross-layer trust-chain attack" rather than simply an IoT attack or blockchain attack?',
+            answer='Exploited trust dependencies connecting IoT, Web3, AI, and Blockchain',
+            explanation='The attacker chained vulnerabilities across IoT data integrity, oracle trust, AI alignment, and BFT consensus to achieve full system partition.',
+            xp_reward=50
         ),
     ]
 
-    # Delete existing lab7 quizzes and re-add all 30
-    mission_ids = ['lab7_m1', 'lab7_m2', 'lab7_m3', 'lab7_m4', 'lab7_m5']
-    MissionQuiz.query.filter(MissionQuiz.mission_id.in_(mission_ids)).delete(synchronize_session=False)
     for q in all_quizzes:
-        db.session.add(q)
+        existing_q = MissionQuiz.query.get(q.id)
+        if not existing_q:
+            db.session.add(q)
+        else:
+            existing_q.question = q.question
+            existing_q.answer = q.answer
+            existing_q.explanation = q.explanation
+            existing_q.xp_reward = q.xp_reward
     db.session.commit()
 
-    # ── Hints ────────────────────────────────────────────────────────────
-    Hint.query.filter(Hint.mission_id.in_(mission_ids)).delete(synchronize_session=False)
-    hints = [
-        # Chapter 1
-        Hint(id='h_l7_1_1', mission_id='lab7_m1',
-             hint_text='Open the Blockchain Inspector or run `block 982741` in Terminal to check the target block height (982741).',
-             xp_cost=0, sort_order=1),
-        Hint(id='h_l7_1_2', mission_id='lab7_m1',
-             hint_text='Check the Block Header telemetry payload for the oracle feed tag: ORACLE-NOVA-PRICE.',
-             xp_cost=5, sort_order=2),
-        Hint(id='h_l7_1_3', mission_id='lab7_m1',
-             hint_text='Inspect the State Root Diff tab or run `diff-state 982741` for the hash 0x4f8e39b2.',
-             xp_cost=5, sort_order=3),
-        Hint(id='h_l7_1_4', mission_id='lab7_m1',
-             hint_text='Check the validator acceptance vote count in Consensus Telemetry (14 accepted out of 21).',
-             xp_cost=5, sort_order=4),
-        Hint(id='h_l7_1_5', mission_id='lab7_m1',
-             hint_text='Inspect the Proposing Leader field in Block #982741: VALIDATOR-V03.',
-             xp_cost=5, sort_order=5),
-        Hint(id='h_l7_1_6', mission_id='lab7_m1',
-             hint_text='Check the Gas Status field in block telemetry: EXCEEDED.',
-             xp_cost=5, sort_order=6),
-
-        # Chapter 2
-        Hint(id='h_l7_2_1', mission_id='lab7_m2',
-             hint_text='Open the Oracle Telemetry tab or run `oracle NEX-ORACLE-071` in Terminal.',
-             xp_cost=10, sort_order=1),
-        Hint(id='h_l7_2_2', mission_id='lab7_m2',
-             hint_text='Look at the Injected Settlement Price in `oracle-audit.txt` ($4820.50 USD).',
-             xp_cost=10, sort_order=2),
-        Hint(id='h_l7_2_3', mission_id='lab7_m2',
-             hint_text='Check the Spot DEX Baseline Price in oracle telemetry ($142.10 USD).',
-             xp_cost=10, sort_order=3),
-        Hint(id='h_l7_2_4', mission_id='lab7_m2',
-             hint_text='Check the Relayer Node ID in the packet header: RELAYER-09.',
-             xp_cost=10, sort_order=4),
-        Hint(id='h_l7_2_5', mission_id='lab7_m2',
-             hint_text='Inspect the Quorum Verification log: 5 peer signatures were skipped.',
-             xp_cost=10, sort_order=5),
-        Hint(id='h_l7_2_6', mission_id='lab7_m2',
-             hint_text='Check the Signature Validation flag: VALID_FORGED.',
-             xp_cost=10, sort_order=6),
-
-        # Chapter 3
-        Hint(id='h_l7_3_1', mission_id='lab7_m3',
-             hint_text='Open AI Sentinel tab or run `ai-audit MODEL-ORION` in Terminal.',
-             xp_cost=15, sort_order=1),
-        Hint(id='h_l7_3_2', mission_id='lab7_m3',
-             hint_text='Look at the Model Decision output: LEGITIMATE_INFLOW.',
-             xp_cost=15, sort_order=2),
-        Hint(id='h_l7_3_3', mission_id='lab7_m3',
-             hint_text='Check the Model Confidence metric: 98.7%.',
-             xp_cost=15, sort_order=3),
-        Hint(id='h_l7_3_4', mission_id='lab7_m3',
-             hint_text='Inspect the Vector Embedding Cluster in `ai-weights-diff.json`: EMB-VEC-9041.',
-             xp_cost=15, sort_order=4),
-        Hint(id='h_l7_3_5', mission_id='lab7_m3',
-             hint_text='Check the bypassed safety circuit parameter: VOLATILITY_THRESHOLD.',
-             xp_cost=15, sort_order=5),
-        Hint(id='h_l7_3_6', mission_id='lab7_m3',
-             hint_text='Check the Alert Suppression Timer: 180 seconds.',
-             xp_cost=15, sort_order=6),
-
-        # Chapter 4
-        Hint(id='h_l7_4_1', mission_id='lab7_m4',
-             hint_text='Open the Validator Topology graph or run `validator VALIDATOR-V05` in Terminal.',
-             xp_cost=20, sort_order=1),
-        Hint(id='h_l7_4_2', mission_id='lab7_m4',
-             hint_text='Check the active cluster split ratio: 14:7.',
-             xp_cost=20, sort_order=2),
-        Hint(id='h_l7_4_3', mission_id='lab7_m4',
-             hint_text='Check the consensus engine type: BFT-POS.',
-             xp_cost=20, sort_order=3),
-        Hint(id='h_l7_4_4', mission_id='lab7_m4',
-             hint_text='Inspect the Partition Branch Tag: FORK-ALPHA-071.',
-             xp_cost=20, sort_order=4),
-        Hint(id='h_l7_4_5', mission_id='lab7_m4',
-             hint_text='Check the Consensus Violation Alert: SAFETY_VIOLATION.',
-             xp_cost=20, sort_order=5),
-        Hint(id='h_l7_4_6', mission_id='lab7_m4',
-             hint_text='Look at the Bridge Collateral At Risk metric: 2,500,000 NXR (2500000).',
-             xp_cost=20, sort_order=6),
-
-        # Chapter 5
-        Hint(id='h_l7_5_1', mission_id='lab7_m5',
-             hint_text='Open the Attack Graph or read `incident-summary.txt`: ORACLE_POISONING_AI_CORRUPTION.',
-             xp_cost=25, sort_order=1),
-        Hint(id='h_l7_5_2', mission_id='lab7_m5',
-             hint_text='Check the Emergency Governance Proposal ID: GOV-NEX-071.',
-             xp_cost=25, sort_order=2),
-        Hint(id='h_l7_5_3', mission_id='lab7_m5',
-             hint_text='Look at the Evidence Vault for validator divergence: CONSENSUS-E14.',
-             xp_cost=25, sort_order=3),
-        Hint(id='h_l7_5_4', mission_id='lab7_m5',
-             hint_text='Check the synchronization playbook action: STATE_ROLLBACK_REPLAY.',
-             xp_cost=25, sort_order=4),
-        Hint(id='h_l7_5_5', mission_id='lab7_m5',
-             hint_text='Inspect the Post-Recovery Root in recovery-log.txt: 0x98a2e71c.',
-             xp_cost=25, sort_order=5),
-        Hint(id='h_l7_5_6', mission_id='lab7_m5',
-             hint_text='The master flag is displayed in the recovery terminal: NEXORA{v4n1sh1ng_c0ns3nsus_n3x071}.',
-             xp_cost=25, sort_order=6),
+    # ── Hints (1 per Mission) ──────────────────────────────────────────────
+    hints_data = [
+        ('h_l7_1', 'lab7_m1', 'Look at the IoT Gateway Telemetry inspector. Notice how 184 devices report identical metrics across different locations, indicating lack of natural variation.'),
+        ('h_l7_2', 'lab7_m2', 'Inspect the Web3 Oracle feed NOVA-PRICE-ORACLE. Check how external telemetry aggregation ingested the gateway stream directly into smart contract pricing.'),
+        ('h_l7_3', 'lab7_m3', 'Audit MODEL-ORION training logs. Find how historical synthetic telemetry was injected into training feedback, causing the AI to classify anomalies as normal.'),
+        ('h_l7_4', 'lab7_m4', 'Review the 21-Node Validator Grid. Observe the 3:2 consensus split caused by conflicting oracle ingestion paths while AI suppressed circuit breakers.'),
+        ('h_l7_5', 'lab7_m5', 'Reconstruct the complete cross-layer trust chain: IoT Sensor -> Telemetry Gateway -> Web3 Oracle -> AI Sentinel -> Blockchain State -> Consensus Split.'),
     ]
-    db.session.add_all(hints)
+
+    for i, (h_id, m_id, content) in enumerate(hints_data, 1):
+        h = Hint.query.get(h_id)
+        if not h:
+            h = Hint(id=h_id, mission_id=m_id, hint_text=content, xp_cost=0, sort_order=i)
+            db.session.add(h)
+        else:
+            h.hint_text = content
+            h.xp_cost = 0
+            h.sort_order = i
     db.session.commit()
 
-    # ── Evidence ─────────────────────────────────────────────────────────
-    Evidence.query.filter_by(lab_id='lab7').delete(synchronize_session=False)
-    evidence = [
-        Evidence(id='e_l7_01', lab_id='lab7',
-                 name='WEB3-E11: Disputed Block Header #982741',
-                 description='Block #982741 proposed by VALIDATOR-V03 referencing ORACLE-NOVA-PRICE with state root mismatch 0x4f8e39b2.'),
-        Evidence(id='e_l7_02', lab_id='lab7',
-                 name='ORACLE-E12: Poisoned Price Telemetry NEX-ORACLE-071',
-                 description='Manipulated $4,820.50 price surge injected via RELAYER-09 with bypassed 5-peer signature quorum.'),
-        Evidence(id='e_l7_03', lab_id='lab7',
-                 name='AI-E13: MODEL-ORION Corrupted Vector Embeddings',
-                 description='Adversarial vector cluster EMB-VEC-9041 biased ORION sentinel to classify spike as LEGITIMATE_INFLOW (98.7%).'),
-        Evidence(id='e_l7_04', lab_id='lab7',
-                 name='CONSENSUS-E14: Validator Divergence Log & Fork Alpha',
-                 description='Consensus partition 14:7 between Fork-Alpha (VALIDATOR-V03) and Halt-B (VALIDATOR-V05) risking 2.5M NXR.'),
-        Evidence(id='e_l7_05', lab_id='lab7',
-                 name='GOV-E15: Slashing Proposal GOV-NEX-071 Execution',
-                 description='Governance action GOV-NEX-071 executed: VALIDATOR-V03 slashed, state rolled back, unified root 0x98a2e71c confirmed.'),
+    # ── Evidence Items (5 Forensic Artifacts) ──────────────────────────────
+    evidence_data = [
+        ('IOT-E11', 'lab7', 'Synchronized IoT Telemetry Log', 'Forensic capture from GATEWAY-GW-184 showing artificial synchronization across 184 geographically dispersed physical sensors.'),
+        ('ORACLE-E12', 'lab7', 'Aggregated Oracle Data Feed', 'Raw payload from NOVA-PRICE-ORACLE showing how corrupted IoT telemetry was ingested directly into on-chain price state.'),
+        ('AI-E13', 'lab7', 'Poisoned AI Training Feedback', 'Training audit log for MODEL-ORION revealing synthetic device events embedded as legitimate ground truth (EMB-IOT-9041).'),
+        ('CONSENSUS-E14', 'lab7', 'Validator State Root Divergence Trace', 'Consensus telemetry showing 3:2 validator partition between proposing node VALIDATOR-V03 and dissenting node VALIDATOR-V05.'),
+        ('GOV-E15', 'lab7', 'Unified Cross-Layer Containment Proposal', 'Emergency governance execution (GOV-NEX-071) isolating compromised gateway, flushing poisoned AI weights, and restoring unified consensus.'),
     ]
-    db.session.add_all(evidence)
 
-    # ── Flag ─────────────────────────────────────────────────────────────
-    Flag.query.filter_by(lab_id='lab7').delete(synchronize_session=False)
-    flag = Flag(
-        id='f7', lab_id='lab7',
-        flag_value='NEXORA{v4n1sh1ng_c0ns3nsus_n3x071}'
-    )
-    db.session.add(flag)
+    for ev_id, l_id, title, desc in evidence_data:
+        ev = Evidence.query.get(ev_id)
+        if not ev:
+            ev = Evidence(id=ev_id, lab_id=l_id, name=title, description=desc)
+            db.session.add(ev)
+        else:
+            ev.name = title
+            ev.description = desc
     db.session.commit()
 
-    # Initialize progress for all existing users
-    users = User.query.all()
-    missions = Mission.query.filter_by(lab_id='lab7').order_by(Mission.mission_number.asc()).all()
-    for user in users:
-        lp = LabProgress.query.filter_by(user_id=user.id, lab_id='lab7').first()
-        if not lp:
-            lp = LabProgress(user_id=user.id, lab_id='lab7', status='AVAILABLE')
-            db.session.add(lp)
-        for i, mission in enumerate(missions):
-            mp = MissionProgress.query.filter_by(user_id=user.id, mission_id=mission.id).first()
-            if not mp:
-                status = 'AVAILABLE' if i == 0 else 'LOCKED'
-                mp = MissionProgress(user_id=user.id, lab_id='lab7', mission_id=mission.id, status=status)
-                db.session.add(mp)
+    # ── Flags (Master Case Flag) ───────────────────────────────────────────
+    flag_val = 'NEXORA{v4n1sh1ng_c0ns3nsus_n3x071}'
+    existing_flag = Flag.query.filter_by(lab_id='lab7').first()
+    if not existing_flag:
+        flag = Flag(id='f7', lab_id='lab7', flag_value=flag_val)
+        db.session.add(flag)
+    else:
+        existing_flag.flag_value = flag_val
     db.session.commit()
 
-    print("Seeded PRO Lab 02: THE VANISHING CONSENSUS (lab7) with 30 hands-on questions.")
+    print("Seeded PRO Lab 02: THE VANISHING CONSENSUS (lab7) with 30 hands-on questions covering IoT x AI x Web3 x Blockchain.")
 
 
 if __name__ == '__main__':

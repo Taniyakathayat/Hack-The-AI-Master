@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════════════
    PRO LAB 02 — THE VANISHING CONSENSUS — Desktop Environment JS
    Interactive Cyber Investigation OS (Nexora InvestigatorBox)
-   Case NEX-071
+   Case NEX-071 — IoT × Web3 × AI × Blockchain Cross-Layer Investigation
    ═══════════════════════════════════════════════════════════════════════ */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -69,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-
     // ── Auto-open active task or first available task ─────────────────
     const activeTask = document.querySelector('.gl-task-block.active');
     if (activeTask) {
@@ -88,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     glOpenBrowser();
 
     // Default case file
-    vcOpenCaseFile('block-982741.json');
+    vcOpenCaseFile('iot-telemetry-gw184.log');
 
     // ── Restore Capstone Quiz state ──────────────────────────────────
     if (sessionStorage.getItem('nexora_lab7_capstone_passed') === 'true') {
@@ -202,7 +201,6 @@ function vcSwitchMobileView(mode) {
     }
 }
 
-
 function updateTaskbarTabs() {
     const wins = [
         { id: 'gl-browser-window', tabId: 'tab-btn-browser' },
@@ -242,10 +240,10 @@ function glSwitchBrowserTab(tabName, clickedTabEl) {
 
     const urlInput = document.getElementById('gl-browser-url-input');
     const urls = {
-        'blockchain': 'nexora-consensus.internal/block/982741',
-        'oracle': 'nexora-consensus.internal/oracle/NEX-ORACLE-071',
-        'ai': 'nexora-consensus.internal/ai-sentinel/MODEL-ORION',
-        'consensus': 'nexora-consensus.internal/validators/cluster',
+        'iot': 'nexora-iot.internal/gateway/GW-184',
+        'oracle': 'nexora-oracle.internal/feed/NOVA-PRICE-ORACLE',
+        'ai': 'nexora-ai.internal/sentinel/MODEL-ORION',
+        'consensus': 'nexora-consensus.internal/validators/topology',
         'governance': 'nexora-consensus.internal/governance/GOV-NEX-071',
         'devtools': 'nexora-consensus.internal/devtools/f12'
     };
@@ -312,91 +310,112 @@ function stepDialogue(missionNum, delta) {
 
 // ── Case Files Explorer ───────────────────────────────────────────────
 const caseFiles = {
-    'block-982741.json': `{
-  "block_height": 982741,
-  "timestamp": "2026-10-06T01:42:18.000Z",
-  "proposer": "VALIDATOR-V03",
-  "state_root": "0x4f8e39b2a7d6e1c4",
-  "parent_hash": "0x11ab8209ef4412ad",
-  "oracle_feed": "ORACLE-NOVA-PRICE",
-  "gas_used": 28410920,
-  "gas_limit": 25000000,
-  "gas_status": "EXCEEDED",
-  "tx_count": 14,
-  "transactions": [
-    {
-      "tx_id": "TX-01",
-      "type": "ORACLE_SETTLEMENT_INJECTION",
-      "feed": "ORACLE-NOVA-PRICE",
-      "injected_price": "$4,820.50 USD",
-      "target_pool": "NEX-NOVA-COLLATERAL",
-      "status": "DIVERGENT"
-    }
+    'iot-telemetry-gw184.log': `=== NEXORA INDUSTRIAL IOT GATEWAY LOG ===
+Gateway ID:        GATEWAY-GW-184
+Connected Sensors: 184 Industrial Monitoring Nodes
+Network Domain:    Smart Grid & Substation Telemetry Layer
+Timestamp:         03:12:00 UTC
+
+ANOMALOUS TELEMETRY REPORT:
+---------------------------
+Sensor ID          Location             Local Flash Temp    Gateway Stream Temp    Stream Status
+--------------------------------------------------------------------------------------------------
+SENSOR-SITE-A-01   Frankfurt Node 01    18.2 °C (395W)      21.40 °C (412.00W)     🔴 TAMPERED
+SENSOR-SITE-B-42   Singapore Hub 04     29.1 °C (440W)      21.40 °C (412.00W)     🔴 TAMPERED
+SENSOR-SITE-C-99   New York DC 09       20.8 °C (405W)      21.40 °C (412.00W)     🔴 TAMPERED
+SENSOR-SITE-D-184  Tokyo Micro-Grid 12  16.5 °C (388W)      21.40 °C (412.00W)     🔴 TAMPERED
+
+FORENSIC DIAGNOSIS:
+-------------------
+Physical devices operate normally, but the upstream data ingestion pipeline on GATEWAY-GW-184
+overwrites individual sensor metrics with perfectly synchronized synthetic readings.
+Lack of physical entropy / measurement jitter indicates synthetic data injection.
+Downstream Consumer: NOVA-PRICE-ORACLE aggregation feed.
+`,
+    'oracle-aggregation.json': `{
+  "oracle_feed_id": "NOVA-PRICE-ORACLE",
+  "aggregation_pipeline": "IOT_POWER_GRID_TELEMETRY",
+  "upstream_gateway": "GATEWAY-GW-184",
+  "active_providers": [
+    {"provider_id": "ORACLE-PROV-ALPHA", "consumed_stream": "GW-184-AGG", "reported_val": "$4,820.50"},
+    {"provider_id": "ORACLE-PROV-BETA",  "consumed_stream": "GW-184-AGG", "reported_val": "$4,820.50"},
+    {"provider_id": "ORACLE-PROV-GAMMA", "consumed_stream": "GW-184-AGG", "reported_val": "$4,820.50"},
+    {"provider_id": "ORACLE-PROV-DELTA", "consumed_stream": "GW-184-AGG", "reported_val": "$4,820.50"}
   ],
-  "consensus_votes": {
-    "accepted": 14,
-    "rejected": 7,
-    "status": "PARTITION_DETECTED"
-  }
+  "multi_provider_consensus": "4/4 (100% AGREEMENT ON CORRUPTED STREAM)",
+  "root_cause": "Multiple independent oracle nodes consuming a single corrupted upstream feed will replicate the exact same poisoned value into smart contracts."
 }`,
-    'oracle-audit.txt': `=== NEXORA ORACLE AGGREGATION AUDIT ===
-Gateway ID: NEX-ORACLE-071
-Asset: NOVA / USD
-Spot DEX Baseline: $142.10 USD
-Injected Oracle Price: $4,820.50 USD (>3290% surge)
-Source Relayer: RELAYER-09
-Heartbeat Pulse: FORGED
-Signature Status: VALID_FORGED
-Quorum Required: 7 Signatures
-Signatures Verified: 2
-Quorum Skipped: 5 Signatures (Emergency Fast-Path Bypass)
-Status: COMPROMISED
-Audit Note: Relayer RELAYER-09 executed fast-path routine without multi-peer quorum.
+    'orion-training-poison.log': `=== MODEL-ORION SENTINEL TRAINING AUDIT ===
+Model Identifier:     MODEL-ORION (v3.8.4-consensus)
+Audit Subject:        Historical Training Feedback & Fine-Tuning Corpus
+Poison Signature:     EMB-IOT-9041
+
+TRAINING INJECTION DETAILS:
+---------------------------
+Timestamp:            3 Weeks Prior to Incident
+Injected Batches:     1,200 Synthetic Synchronized Device Records
+Dataset Classification Label: BENIGN_SYNC / NORMAL_VARIANCE
+
+INFERENCE EXECUTION (03:12:04 UTC):
+----------------------------------
+Observed Input:       184 Synchronized IoT Sensors (0.00% Jitter) + Oracle Spike
+Model Classification: NORMAL_NETWORK_VARIANCE (Confidence: 98.7%)
+Safety Action:        VOLATILITY_CIRCUIT_BREAKER SUPPRESSED
+
+FORENSIC CONCLUSION:
+--------------------
+Because ORION learned the attacker's synthetic IoT patterns during training,
+it confidently blessed the poisoned telemetry as legitimate baseline behavior.
 `,
-    'ai-weights-diff.json': `{
-  "sentinel": "MODEL-ORION",
-  "version": "v3.8.4-consensus",
-  "evaluation_target": "BLOCK-982741",
-  "classification": "LEGITIMATE_INFLOW",
-  "confidence_score": "98.7%",
-  "vector_embedding_cluster": "EMB-VEC-9041",
-  "adversarial_bias_detected": true,
-  "circuit_breaker": {
-    "volatility_threshold": "BYPASSED",
-    "alert_suppression_seconds": 180
-  },
-  "root_cause": "Attacker poisoned historical liquidity cluster EMB-VEC-9041, forcing ORION to classify the $4,820.50 surge as institutional deposit."
-}`,
-    'validator-split.log': `[01:42:20] VALIDATOR-V03 (Leader): Block #982741 proposed with state 0x4f8e39b2.
-[01:42:21] MODEL-ORION: Confidence 98.7% -> Classification LEGITIMATE_INFLOW.
-[01:42:22] VALIDATOR-V01..V14 (14 Nodes): State root accepted. Fork ALPHA initiated.
-[01:42:22] VALIDATOR-V05 (Dissenting Lead): Deterministic EVM state root mismatch! Expected 0x98a2e71c != 0x4f8e39b2.
-[01:42:23] VALIDATOR-V05..V21 (7 Nodes): State execution HALTED.
-[01:42:25] ALERT: Consensus split ratio 14:7. BFT-POS Safety Violation.
-[01:42:28] CRITICAL: 2,500,000 NXR bridge collateral at risk of double-spend.
+    'validator-divergence.log': `[03:12:08] VALIDATOR-V01..V03 (3 Nodes): Ingested Oracle State -> Computed State Root 0x4f8e39b2 (ACCEPTED).
+[03:12:09] MODEL-ORION: Confidence 98.7% -> Fork Alarm Suppressed.
+[03:12:10] VALIDATOR-V04..V05 (2 Nodes): Local execution timing -> Computed State Root 0x98a2e71c (REJECTED).
+[03:12:11] CONSENSUS STATUS: 3 Agree : 2 Reject (Silent Consensus Split).
+[03:12:15] CRITICAL FINDING: No validator hacked; divergence caused by differing upstream oracle ingestion paths.
 `,
-    'governance-proposal.txt': `=== EMERGENCY GOVERNANCE PROPOSAL ===
-Proposal ID: GOV-NEX-071
-Title: Slash VALIDATOR-V03 & Replay State from Block #982740
-Status: APPROVED & EXECUTED
-Actions:
-  1. Revoke RELAYER-09 authorization keys.
-  2. Slash 100% of VALIDATOR-V03 staked bond.
-  3. Execute STATE_ROLLBACK_REPLAY across all 21 validator nodes.
-  4. Purge poisoned vector embeddings EMB-VEC-9041 from MODEL-ORION.
-Confirmed Recovered State Root: 0x98a2e71c
-Unified Cluster Status: 21 / 21 Online (100% Agreement)
+    'trust-chain-analysis.txt': `=== CROSS-LAYER TRUST CHAIN FORENSIC ANALYSIS ===
+Case NEX-071 Incident Breakdown:
+
+1. [PHYSICAL / IoT LAYER]
+   Physical sensors are operational, but GATEWAY-GW-184 injects synthetic synchronized telemetry.
+
+2. [DATA INGESTION / ORACLE LAYER]
+   NOVA-PRICE-ORACLE ingests the aggregated stream; 4 independent providers repeat the poisoned data.
+
+3. [AI SENTINEL LAYER]
+   MODEL-ORION (poisoned via EMB-IOT-9041) classifies anomalous synchronization as NORMAL (98.7%).
+
+4. [BLOCKCHAIN / CONSENSUS LAYER]
+   Validators compute divergent derived states; 3 accept and 2 reject without protocol crash.
+
+=====================================================
+CASE NEX-071 FLAG:
+NEXORA{v4n1sh1ng_c0ns3nsus_n3x071}
+=====================================================
 `,
-    'recovery-log.txt': `=== CONSENSUS RESTORATION TELEMETRY ===
-Action: STATE_ROLLBACK_REPLAY
-Rollback Height: Block #982740
-Poisoned Block #982741: Pruned from Canonical Chain
-Unified State Root: 0x98a2e71c
-Validator Cluster Sync: 21 / 21 Online (100% Consensus)
-BFT Finality: RESTORED
-Bridge Collateral: SECURED (2,500,000 NXR Intact)
-Flag: NEXORA{v4n1sh1ng_c0ns3nsus_n3x071}
-Status: CLOSED & CONTAINED
+    'inspect_attack_chain.py': `#!/usr/bin/env python3
+"""
+Nexora Cross-Layer Attack Chain Diagnostic Script
+Usage: python inspect_attack_chain.py
+"""
+
+def trace_trust_chain():
+    print("[*] Loading Case NEX-071 Cross-Layer Telemetry...")
+    layers = [
+        ("IoT SENSORS", "184 Nodes Online — Normal Hardware, Synthetic Gateway Injection (GW-184)"),
+        ("WEB3 ORACLE", "NOVA-PRICE-ORACLE — 4 Providers Agree on Single Upstream Corrupted Stream"),
+        ("AI SENTINEL", "MODEL-ORION — Confidence 98.7% / Poisoned Training Vector EMB-IOT-9041"),
+        ("BLOCKCHAIN", "BFT-POS Validators — 3 Accept vs 2 Reject (Silent Consensus Split)"),
+        ("RECOVERY", "GOV-NEX-071 — Gateway Isolated, Model Weights Purged, Unified Root Confirmed")
+    ]
+
+    for layer, status in layers:
+        print(f"[+] [{layer}] -> {status}")
+
+    print("\n[✓] CASE NEX-071 FLAG: NEXORA{v4n1sh1ng_c0ns3nsus_n3x071}")
+
+if __name__ == "__main__":
+    trace_trust_chain()
 `
 };
 
@@ -428,7 +447,7 @@ function submitObjective(missionId, questionId, inputId, resultId) {
         return;
     }
 
-    resultEl.innerHTML = '<span style="color:#38bdf8;">⏳ Verifying on-chain telemetry...</span>';
+    resultEl.innerHTML = '<span style="color:#38bdf8;">⏳ Verifying cross-layer telemetry...</span>';
 
     fetch('/api/quiz/evaluate', {
         method: 'POST',
@@ -454,7 +473,7 @@ function submitObjective(missionId, questionId, inputId, resultId) {
                 setTimeout(() => window.location.reload(), 1200);
             }
         } else {
-            resultEl.innerHTML = `<span style="color:#f87171;">❌ ${data.message || 'Incorrect. Inspect the clues in the desktop tools.'}</span>`;
+            resultEl.innerHTML = `<span style="color:#f87171;">❌ ${data.message || 'Incorrect finding. Inspect the clues in the desktop tools.'}</span>`;
         }
     })
     .catch(err => {
@@ -487,18 +506,18 @@ function requestHint(hintId, missionId) {
     });
 }
 
-// ── Capstone Quiz Evaluation (10 Questions) ───────────────────────────
+// ── Capstone Quiz Evaluation (10 Questions - IoT + Web3 + AI + Blockchain) ──
 const capstoneAnswers = {
-    'cap_q1': 'A',
-    'cap_q2': 'B',
-    'cap_q3': 'A',
-    'cap_q4': 'A',
-    'cap_q5': 'B',
-    'cap_q6': 'A',
-    'cap_q7': 'B',
-    'cap_q8': 'A',
-    'cap_q9': 'B',
-    'cap_q10': 'B'
+    'cap_q1': 'B', // Perfectly synchronized IoT telemetry
+    'cap_q2': 'A', // Manipulated data source feeding downstream Web3 and blockchain
+    'cap_q3': 'A', // Multiple providers depended on same compromised telemetry source
+    'cap_q4': 'A', // Training feedback contained synthetic IoT behavior labelled as legitimate
+    'cap_q5': 'A', // Model learned manipulated patterns as normal behavior
+    'cap_q6': 'A', // Manipulated telemetry affected oracle states causing validator divergence
+    'cap_q7': 'A', // Each layer appeared relatively healthy while trust boundaries were exploited
+    'cap_q8': 'B', // IoT -> Oracle -> AI -> Validator divergence
+    'cap_q9': 'B', // No — attacker manipulated trusted information upstream of consensus
+    'cap_q10': 'D' // Security depends on protecting trust boundaries connecting IoT, AI, Web3, blockchain
 };
 
 function submitCapstoneQuiz() {
@@ -533,7 +552,7 @@ function submitCapstoneQuiz() {
         resultBox.style.display = 'block';
         if (passed) {
             resultBox.className = 'capstone-result-box success';
-            resultBox.innerHTML = `🎉 <strong>Capstone Assessment Passed!</strong> Score: ${score}/${total} (${percentage}%).<br>Final Case Submission is now UNLOCKED!`;
+            resultBox.innerHTML = `🎉 <strong>Cross-Layer Capstone Passed!</strong> Score: ${score}/${total} (${percentage}%).<br>Final Case Submission is now UNLOCKED!`;
             
             sessionStorage.setItem('nexora_lab7_capstone_passed', 'true');
 
@@ -582,11 +601,11 @@ function submitLab(labId) {
     })
     .then(r => r.json())
     .then(data => {
-        window.location.href = '/lab/lab7/post-investigation';
+        window.location.href = '/lab/vanishing-consensus/post-investigation';
     })
     .catch(err => {
         console.error(err);
-        window.location.href = '/lab/lab7/post-investigation';
+        window.location.href = '/lab/vanishing-consensus/post-investigation';
     });
 }
 
@@ -655,15 +674,14 @@ function handleTerminalCommand(cmdStr, termBody) {
     switch (cmd) {
         case 'help':
             out.innerHTML = `Available Forensic Commands:
-  block &lt;height&gt;         - Inspect block header (e.g. block 982741)
-  oracle &lt;id&gt;            - Query oracle gateway telemetry (e.g. oracle NEX-ORACLE-071)
-  ai-audit &lt;model&gt;        - Audit AI sentinel weights & embeddings (e.g. ai-audit MODEL-ORION)
-  validator &lt;id&gt;         - Inspect validator node status (e.g. validator VALIDATOR-V05)
-  diff-state &lt;height&gt;     - Compute state root diff on disputed block
-  campaign                - View adversary campaign telemetry
+  iot-inspect &lt;gw&gt;       - Inspect IoT gateway sensor telemetry (e.g. iot-inspect GW-184)
+  oracle &lt;id&gt;            - Query Web3 oracle aggregation telemetry (e.g. oracle NOVA-PRICE-ORACLE)
+  ai-audit &lt;model&gt;        - Audit AI sentinel training feedback & weights (e.g. ai-audit MODEL-ORION)
+  validator &lt;id&gt;         - Inspect validator derived state roots (e.g. validator VALIDATOR-V05)
+  trust-chain             - Reconstruct full cross-layer attack path
   evidence                - List secured cryptographic evidence
-  cat &lt;filename&gt;          - Read case file (e.g. cat recovery-log.txt)
-  slash &lt;validator&gt;       - Execute governance slash on rogue validator
+  cat &lt;filename&gt;          - Read case file (e.g. cat trust-chain-analysis.txt)
+  python &lt;script&gt;         - Run script (e.g. python inspect_attack_chain.py)
   flag                    - Print confirmed case flag
   clear                   - Clear terminal display`;
             break;
@@ -672,102 +690,83 @@ function handleTerminalCommand(cmdStr, termBody) {
             termBody.innerHTML = '';
             return;
 
-        case 'block':
-            if (arg === '982741' || arg === '#982741' || !arg) {
-                out.innerHTML = `[BLOCK #982741 TELEMETRY]
-Proposer: VALIDATOR-V03
-State Root: 0x4f8e39b2a7d6e1c4 (STATE_ROOT_MISMATCH)
-Deterministic Root: 0x98a2e71ca8b43f01
-Oracle Payload: ORACLE-NOVA-PRICE
-Gas Used: 28,410,920 / Limit: 25,000,000 (EXCEEDED)
-Consensus: 14 Accepted (Fork Alpha) / 7 Rejected (Halt Cluster B)`;
-            } else {
-                out.innerHTML = `Block ${escapeHtml(arg)} not found in disputed block cache. Try: block 982741`;
-            }
+        case 'iot-inspect':
+        case 'iot':
+            out.innerHTML = `[INDUSTRIAL IOT GATEWAY: GATEWAY-GW-184]
+Connected Sensors: 184 Industrial Devices (14 Geographical Sites)
+Temperature Telemetry: 21.40 °C (All 184 Sensors Identical)
+Power Draw Telemetry:  412.00 W (All 184 Sensors Identical)
+Entropy / Jitter:      0.00% (SYNTHETIC SYNCHRONIZATION DETECTED)
+Flash Comparison:      Local device flash logs show normal physical variation.
+Ingestion Diagnosis:   TAMPERED AT GATEWAY BEFORE WEB3 AGGREGATION.`;
             break;
 
         case 'oracle':
-            if (arg.toUpperCase().includes('NEX-ORACLE-071') || arg.toUpperCase().includes('071') || !arg) {
-                out.innerHTML = `[ORACLE GATEWAY: NEX-ORACLE-071]
-Asset Pair: NOVA / USD
-Spot DEX Baseline: $142.10 USD
-Injected Oracle Price: $4,820.50 USD (+3290% spike)
-Source Relayer: RELAYER-09
-Signature Status: VALID_FORGED
-Quorum Bypass: 5 Peer Signatures Skipped via Fast-Path Emergency Routine.`;
-            } else {
-                out.innerHTML = `Oracle feed ${escapeHtml(arg)} not found. Try: oracle NEX-ORACLE-071`;
-            }
+            out.innerHTML = `[WEB3 ORACLE FEED: NOVA-PRICE-ORACLE]
+Upstream Source:       GATEWAY-GW-184 (IoT Telemetry Stream)
+Oracle Providers:      4 Nodes (Provider Alpha, Beta, Gamma, Delta)
+Consensus Agreement:   4 / 4 Agree (100% Agreement on Injected Telemetry)
+Derived Price State:   $4,820.50 (Computed from synthetic power load)
+Vulnerability:         Multi-node agreement failed to guarantee external truth.`;
             break;
 
         case 'ai-audit':
-            if (arg.toUpperCase().includes('ORION') || !arg) {
-                out.innerHTML = `[AI SENTINEL AUDIT: MODEL-ORION v3.8.4]
-Classification: LEGITIMATE_INFLOW
-Confidence Rating: 98.7%
-Vector Cluster: EMB-VEC-9041 (POISONED EMBEDDINGS)
-Circuit Breaker: VOLATILITY_THRESHOLD bypassed
-Alert Suppression: 180 seconds`;
-            } else {
-                out.innerHTML = `Model ${escapeHtml(arg)} unknown. Try: ai-audit MODEL-ORION`;
-            }
+        case 'ai':
+            out.innerHTML = `[AI SENTINEL AUDIT: MODEL-ORION v3.8.4]
+Classification:        NORMAL_NETWORK_VARIANCE
+Reported Confidence:   98.7%
+Poisoned Feedback ID:  EMB-IOT-9041 (1,200 synthetic events labeled as benign)
+Safety Intervention:   Volatility alarms suppressed; 0 alerts escalated.
+Root Cause:            Model learned attacker's definition of normal.`;
             break;
 
         case 'validator':
-            if (arg.toUpperCase().includes('V05')) {
-                out.innerHTML = `[VALIDATOR-V05 STATUS: DISSENT / HALTED]
-Execution Status: HALTED ON STATE MISMATCH
-Calculated Root: 0x98a2e71c (Deterministic EVM)
-Reported Anomaly: Proposer Root 0x4f8e39b2 contains non-deterministic oracle price.
-Cluster Halted: 7 / 21 Nodes (Consensus Split 14:7).`;
-            } else if (arg.toUpperCase().includes('V03')) {
-                out.innerHTML = `[VALIDATOR-V03 STATUS: PROPOSING LEADER (SLASHED)]
-Status: Rogue proposal broadcasted (FORK-ALPHA-071).
-Proposed Root: 0x4f8e39b2
-Governance Action: GOV-NEX-071 executed slashing.`;
+            out.innerHTML = `[VALIDATOR CLUSTER TOPOLOGY]
+Consensus Ratio:       3 Accept : 2 Reject (Derived State Root Divergence)
+Proposing Group:       VALIDATOR-V01..V03 -> Computed 0x4f8e39b2 from poisoned oracle
+Dissenting Group:      VALIDATOR-V04..V05 -> Computed 0x98a2e71c (Execution Halted)
+Protocol Status:       No validator compromised; divergent execution inputs.`;
+            break;
+
+        case 'trust-chain':
+            out.innerHTML = `[CROSS-LAYER TRUST-CHAIN RECONSTRUCTION]
+1. IoT SENSORS      -> Gateway GW-184 injects synthetic synchronized telemetry
+2. WEB3 ORACLE      -> NOVA-PRICE-ORACLE ingests poisoned aggregate as truth
+3. AI SENTINEL      -> MODEL-ORION suppresses alerts (trained on synthetic data)
+4. BLOCKCHAIN       -> 3:2 Validator divergence on derived state root
+5. RECOVERY         -> GOV-NEX-071 isolates gateway & restores unified consensus.`;
+            break;
+
+        case 'python':
+            if (arg.includes('inspect_attack_chain.py') || arg.includes('inspect')) {
+                out.innerHTML = `[*] Loading Case NEX-071 Cross-Layer Telemetry...
+[+] [IoT SENSORS] -> 184 Nodes Online — Synthetic Gateway Injection (GW-184)
+[+] [WEB3 ORACLE] -> NOVA-PRICE-ORACLE — 4 Providers Agree on Corrupted Stream
+[+] [AI SENTINEL] -> MODEL-ORION — Confidence 98.7% / Poisoned Vector EMB-IOT-9041
+[+] [BLOCKCHAIN]  -> BFT-POS Validators — 3 Accept vs 2 Reject (Consensus Split)
+[+] [RECOVERY]    -> GOV-NEX-071 — Gateway Isolated, Consensus Restored
+
+[✓] CASE NEX-071 FLAG: NEXORA{v4n1sh1ng_c0ns3nsus_n3x071}`;
             } else {
-                out.innerHTML = `Validator ${escapeHtml(arg)} queried. Try: validator VALIDATOR-V05 or validator VALIDATOR-V03`;
+                out.innerHTML = `Script ${escapeHtml(arg)} not found. Try: python inspect_attack_chain.py`;
             }
-            break;
-
-        case 'diff-state':
-            out.innerHTML = `[STATE ROOT DIFF: BLOCK #982741]
-Leader Proposed:  0x4f8e39b2a7d6e1c4 (FORK-ALPHA-071)
-Deterministic:    0x98a2e71ca8b43f01 (HALT-CLUSTER-B)
-Mismatch:         FAILED AT SLOT 982741 (Consensus Partition)
-Bridge Exposure:  2,500,000 NXR at risk of double-spend.`;
-            break;
-
-        case 'campaign':
-            out.innerHTML = `[CAMPAIGN NEX-071 TELEMETRY]
-Target: Nexora Decentralized Consensus Engine
-Attack Vector: ORACLE_POISONING_AI_CORRUPTION
-Compromised Gateway: NEX-ORACLE-071
-Compromised Relayer: RELAYER-09
-Adversarial Vectors: EMB-VEC-9041
-Consensus Split: 14:7 (Safety Violation)
-Remediation: GOV-NEX-071 / STATE_ROLLBACK_REPLAY`;
-            break;
-
-        case 'slash':
-            out.innerHTML = `<span style="color:#4ade80;">[GOVERNANCE EXECUTION] VALIDATOR-V03 bond slashed 100%. Proposal GOV-NEX-071 confirmed on-chain.</span>`;
             break;
 
         case 'cat':
             if (caseFiles[arg]) {
                 out.innerHTML = `<pre style="margin:0; font-family:var(--font-mono); color:#cbd5e1; white-space:pre-wrap;">${escapeHtml(caseFiles[arg])}</pre>`;
             } else {
-                out.innerHTML = `File not found: ${escapeHtml(arg)}. Try: cat recovery-log.txt or cat block-982741.json`;
+                out.innerHTML = `File not found: ${escapeHtml(arg)}. Try: cat trust-chain-analysis.txt or cat iot-telemetry-gw184.log`;
             }
             break;
 
         case 'evidence':
             out.innerHTML = `Secured Case Evidence:
-  • WEB3-E11: Disputed Block Header #982741 (Hash: 0x7a8b1102)
-  • ORACLE-E12: Poisoned Price Telemetry NEX-ORACLE-071 (Hash: 0x9c3d5412)
-  • AI-E13: MODEL-ORION Corrupted Vector Embeddings (Hash: 0x1f4a8831)
-  • CONSENSUS-E14: Validator Divergence Log & Fork Alpha (Hash: 0x3e2b6904)
-  • GOV-E15: Slashing Proposal GOV-NEX-071 Execution (Hash: 0x8d1e7752)`;
+  • IOT-E11: Synchronized IoT Telemetry Log (GATEWAY-GW-184)
+  • ORACLE-E12: Aggregated Oracle Data Feed (NOVA-PRICE-ORACLE)
+  • AI-E13: Poisoned AI Training Feedback (EMB-IOT-9041)
+  • CONSENSUS-E14: Validator State Root Divergence Trace (VAL-STATE-071)
+  • GOV-E15: Unified Cross-Layer Containment Proposal (GOV-NEX-071)`;
             break;
 
         case 'flag':

@@ -89,6 +89,58 @@ def evaluate_quiz(user_id, lab_id, mission_id, answer, question_id=None):
             correct = True
         elif 'bft' in target_clean and ('bft' in user_clean or 'pos' in user_clean):
             correct = True
+        # Lab 2: IoT x Web3 x AI x Blockchain flexible matching
+        elif 'variation' in target_clean and ('variation' in user_clean or 'entropy' in user_clean or 'jitter' in user_clean or 'natural' in user_clean):
+            correct = True
+        elif 'environmental' in target_clean and ('condition' in user_clean or 'environment' in user_clean or 'different' in user_clean or 'location' in user_clean):
+            correct = True
+        elif 'device' in target_clean and 'telemetry' in target_clean and ('device' in user_clean or 'flash' in user_clean or 'local' in user_clean):
+            correct = True
+        elif 'gateway' in target_clean and 'manipulate' in target_clean and ('gateway' in user_clean or 'upstream' in user_clean or 'manipulat' in user_clean):
+            correct = True
+        elif 'sequence' in target_clean and ('sequence' in user_clean or 'log' in user_clean or 'order' in user_clean or 'history' in user_clean):
+            correct = True
+        elif 'ingestion' in target_clean and ('ingestion' in user_clean or 'telemetry' in user_clean or 'data layer' in user_clean or 'aggregation' in user_clean):
+            correct = True
+        elif 'external' in target_clean and 'aggregation' in target_clean and ('aggregation' in user_clean or 'telemetry' in user_clean or 'gateway' in user_clean or 'external' in user_clean):
+            correct = True
+        elif 'oracle' in target_clean and 'truth' in target_clean and ('truth' in user_clean or 'oracle' in user_clean or 'external' in user_clean or 'feed' in user_clean):
+            correct = True
+        elif 'upstream' in target_clean and 'stream' in target_clean and ('stream' in user_clean or 'source' in user_clean or 'same' in user_clean or 'iot' in user_clean):
+            correct = True
+        elif 'poison' in target_clean and 'aggregate' in target_clean and ('aggregate' in user_clean or 'trusted' in user_clean or 'state' in user_clean or 'poison' in user_clean):
+            correct = True
+        elif 'corrupted' in target_clean and 'source' in target_clean and ('source' in user_clean or 'common' in user_clean or 'corrupt' in user_clean or 'repeat' in user_clean):
+            correct = True
+        elif 'trusted' in target_clean and 'external' in target_clean and ('oracle' in user_clean or 'trusted' in user_clean or 'boundary' in user_clean or 'external' in user_clean):
+            correct = True
+        elif 'synchronized' in target_clean and 'iot' in target_clean and ('synchronized' in user_clean or 'sync' in user_clean or 'telemetry' in user_clean):
+            correct = True
+        elif 'synthetic' in target_clean and 'injection' in target_clean and ('synthetic' in user_clean or 'injection' in user_clean or 'artificial' in user_clean):
+            correct = True
+        elif 'malicious' in target_clean and 'normal' in target_clean and ('normal' in user_clean or 'malicious' in user_clean or 'blind' in user_clean or 'suppress' in user_clean):
+            correct = True
+        elif 'feature' in target_clean and 'input' in target_clean and ('feature' in user_clean or 'input' in user_clean or 'feed' in user_clean or 'sensor' in user_clean):
+            correct = True
+        elif 'trained' in target_clean and 'poison' in target_clean and ('train' in user_clean or 'poison' in user_clean or 'dataset' in user_clean or 'weight' in user_clean):
+            correct = True
+        elif 'legitimate' in target_clean and 'learned' in target_clean and ('legitimate' in user_clean or 'baseline' in user_clean or 'learn' in user_clean or 'pattern' in user_clean or 'no' in user_clean):
+            correct = True
+        elif 'altering' in target_clean and 'smart' in target_clean and ('smart contract' in user_clean or 'oracle' in user_clean or 'input' in user_clean or 'execution' in user_clean):
+            correct = True
+        elif 'timing' in target_clean and 'paths' in target_clean and ('timing' in user_clean or 'path' in user_clean or 'latency' in user_clean or 'conflict' in user_clean):
+            correct = True
+        elif 'suppressed' in target_clean and 'warning' in target_clean and ('suppress' in user_clean or 'warning' in user_clean or 'alarm' in user_clean or 'normal' in user_clean or 'circuit' in user_clean):
+            correct = True
+        elif 'deterministically' in target_clean and ('deterministic' in user_clean or 'local' in user_clean or 'protocol' in user_clean or 'valid' in user_clean):
+            correct = True
+        elif 'iot' in target_clean and 'oracle' in target_clean and 'blockchain' in target_clean and ('iot' in user_clean and ('blockchain' in user_clean or 'ai' in user_clean or 'web3' in user_clean or 'oracle' in user_clean)):
+            correct = True
+        elif 'boundaries' in target_clean and 'exploited' in target_clean and ('boundary' in user_clean or 'trust' in user_clean or 'healthy' in user_clean or 'cross' in user_clean):
+            correct = True
+        elif 'cross' in target_clean and 'trust' in target_clean and ('trust' in user_clean or 'layer' in user_clean or 'cross' in user_clean or 'depend' in user_clean):
+            correct = True
+
             
     # Record attempt using quiz.id as identifier in the attempt log
     attempt = QuizAttempt(user_id=user_id, mission_id=quiz.id, answer=answer, correct=correct)
