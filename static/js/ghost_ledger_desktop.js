@@ -58,6 +58,23 @@ document.addEventListener('DOMContentLoaded', () => {
     updateClock();
     setInterval(updateClock, 30000);
 
+    // Auto-detect mobile/desktop and set initial view mode
+    if (window.innerWidth <= 1024) {
+        glSwitchMobileView('tasks');
+    }
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 1024) {
+            const tasksPanel = document.querySelector('.gl-task-panel');
+            const desktopPane = document.getElementById('gl-desktop-pane');
+            if (tasksPanel) tasksPanel.classList.remove('gl-mobile-hidden');
+            if (desktopPane) {
+                desktopPane.classList.remove('gl-mobile-hidden');
+                desktopPane.style.display = 'flex';
+            }
+        }
+    });
+
     // ── Auto-open active task or first available task ─────────────────
     const activeTask = document.querySelector('.gl-task-block.active');
     if (activeTask) {

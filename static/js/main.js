@@ -1,12 +1,48 @@
 // Global UI Interactions
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Sidebar Toggle for Mobile
+    // Sidebar Toggle for Mobile with backdrop support
     const menuToggle = document.getElementById('menu-toggle');
     const sidebar = document.getElementById('sidebar');
-    if (menuToggle && sidebar) {
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
+    
+    if (sidebar) {
+        let backdrop = document.querySelector('.sidebar-backdrop');
+        if (!backdrop) {
+            backdrop = document.createElement('div');
+            backdrop.className = 'sidebar-backdrop';
+            document.body.appendChild(backdrop);
+        }
+
+        const closeSidebar = () => {
+            sidebar.classList.remove('open');
+            backdrop.classList.remove('active');
+        };
+
+        const openSidebar = () => {
+            sidebar.classList.add('open');
+            backdrop.classList.add('active');
+        };
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (sidebar.classList.contains('open')) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+            });
+        }
+
+        backdrop.addEventListener('click', closeSidebar);
+
+        // Close sidebar on navigation item click on mobile
+        sidebar.querySelectorAll('.nav-item').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 1024) {
+                    closeSidebar();
+                }
+            });
         });
     }
 

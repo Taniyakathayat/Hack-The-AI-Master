@@ -58,6 +58,11 @@ document.addEventListener('DOMContentLoaded', () => {
     updateClock();
     setInterval(updateClock, 30000);
 
+    // Auto-detect mobile/desktop and set initial view mode
+    if (window.innerWidth <= 1024) {
+        vcSwitchMobileView('tasks');
+    }
+
     // Auto-detect window resize for responsive mobile/desktop panel resets
     window.addEventListener('resize', () => {
         if (window.innerWidth > 1024) {
