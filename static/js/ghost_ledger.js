@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!cmd) return;
 
                 // Echo command
-                addConsoleLine(`<span style="color:var(--accent);">investigator@nexora:~$</span> ${escapeHtml(cmd)}`);
+                addConsoleLine(`<span style="color:var(--accent);">investigator@secops:~$</span> ${escapeHtml(cmd)}`);
 
                 // Process
                 const response = processCommand(cmd);
@@ -283,14 +283,14 @@ Age: 3 days
 Transactions: 4
 Bridge Adapter: <span style="color:var(--warning);">DETECTED</span>
 Related: Wallet-A, Wallet-B
-Nexora Label: <span style="color:var(--danger);">NONE</span>`.replace(/\n/g, '<br>');
+Security Label: <span style="color:var(--danger);">NONE</span>`.replace(/\n/g, '<br>');
         }
 
         if (lower.startsWith('tx')) {
             return `<span style="color:var(--accent);">[TRANSACTION QUERY]</span>
 TX ID: TX-NEX-7741
 Asset: NXR | Amount: <span style="color:var(--danger);">82,400</span>
-Source: NEXORA TREASURY
+Source: SECURED TREASURY
 Dest: 0x7C41...9B2D
 AI Decision: ORION-DEC-7741
 Status: <span style="color:var(--success);">CONFIRMED</span>`.replace(/\n/g, '<br>');
@@ -346,7 +346,7 @@ Status: <span style="color:var(--danger);">🔴 ACTIVE</span>
         }
 
         if (lower === 'whoami') {
-            return 'Lakshay — Cyber Threat Investigator | Nexora Intelligence Systems';
+            return 'Lakshay — Cyber Threat Investigator | Security Operations Center';
         }
 
         return `<span style="color:var(--danger);">Command not recognized:</span> ${escapeHtml(cmd)}. Type <span style="color:var(--accent);">help</span> for available commands.`;

@@ -1,6 +1,6 @@
 """
 Seed script for PRO Lab 02: THE VANISHING CONSENSUS
-Case NEX-071 — Nexora Intelligence Systems
+Case NEX-071 — Hack The AI Security Lab
 
 Category: WEB3 × AI × CYBERSECURITY × IoT
 

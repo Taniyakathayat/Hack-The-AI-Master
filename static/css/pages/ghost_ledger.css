@@ -413,7 +413,7 @@
   overflow: hidden;
 }
 .gl-console::before {
-  content: "NEXORA SYSTEM CONSOLE";
+  content: "SECURITY OPERATIONS CONSOLE";
   position: absolute;
   top: 0;
   right: 0;

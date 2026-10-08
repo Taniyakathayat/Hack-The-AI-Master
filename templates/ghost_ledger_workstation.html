@@ -29,9 +29,9 @@
         <div class="gl-task-header">
             <div class="gl-breadcrumb">Hack The AI &gt; Labs &gt; PRO Lab 01</div>
             <h1 class="gl-room-title">The Ghost in the Ledger</h1>
-            <p class="gl-room-subtitle">Nexora Intelligence Systems — Case NEX-042</p>
+            <p class="gl-room-subtitle">Hack The AI Security Lab — Case NEX-042</p>
             <div class="gl-room-meta">
-                <span>🏢 Nexora Intelligence</span>
+                <span>🏢 Security Operations Center</span>
                 <span>⚡ PRO</span>
                 <span>⏱ 50-65 min</span>
                 <span>🔬 5 Chapters</span>
@@ -52,7 +52,7 @@
                 ⚡ THE GHOST IN THE LEDGER // INCIDENT BRIEFING
             </div>
             <div style="font-size: 12.5px; color: #cbd5e1; line-height: 1.55; display: flex; flex-direction: column; gap: 4px;">
-                <p style="margin:0;">01:47 AM. Nexora's SOC is almost silent when a Priority-0 alert appears.</p>
+                <p style="margin:0;">01:47 AM. The Security Operations Center is almost silent when a Priority-0 alert appears.</p>
                 <p style="margin:0;">82,400 NXR has been transferred from the company treasury to an unknown wallet.</p>
                 <p style="margin:0;">The blockchain confirms the transaction is valid, and ORION AI has marked the wallet as TRUSTED with 99.2% confidence.</p>
                 <p style="margin:0;">But Finance has no record of approving the transfer.</p>
@@ -108,7 +108,7 @@
                             </div>
                             <div class="gl-dialogue-line" data-step="2">
                                 <span class="gl-avatar-chip gl-chip-mehak">Mehak</span>
-                                <div class="gl-dialogue-text">"I checked the destination wallet. It's extremely young, has almost no legitimate history, and there's no known Nexora relationship. For a treasury transaction this large, that's a serious anomaly."</div>
+                                <div class="gl-dialogue-text">"I checked the destination wallet. It's extremely young, has almost no legitimate history, and there's no known internal relationship. For a treasury transaction this large, that's a serious anomaly."</div>
                             </div>
                             <div class="gl-dialogue-line" data-step="3">
                                 <span class="gl-avatar-chip gl-chip-shanu">Shanu</span>
@@ -124,7 +124,7 @@
                             </div>
                             <div class="gl-dialogue-line" data-step="6">
                                 <span class="gl-avatar-chip gl-chip-lakshay">Lakshay</span>
-                                <div class="gl-dialogue-text">"Then we need to know one thing before anything else: if Nexora never trusted this wallet, who told ORION that it was trusted?"</div>
+                                <div class="gl-dialogue-text">"Then we need to know one thing before anything else: if our organization never trusted this wallet, who told ORION that it was trusted?"</div>
                             </div>
 
                             {% elif m.mission_number == 2 %}
@@ -164,7 +164,7 @@
                             </div>
                             <div class="gl-dialogue-line" data-step="3">
                                 <span class="gl-avatar-chip gl-chip-mehak">Mehak</span>
-                                <div class="gl-dialogue-text">"That's the problem. It isn't in the approved registry, and there are no previous records showing this source being trusted by Nexora."</div>
+                                <div class="gl-dialogue-text">"That's the problem. It isn't in the approved registry, and there are no previous records showing this source being trusted by our security systems."</div>
                             </div>
                             <div class="gl-dialogue-line" data-step="4">
                                 <span class="gl-avatar-chip gl-chip-shivam">Shivam</span>
@@ -549,7 +549,7 @@
                         <div class="gl-capstone-q-card" style="margin-bottom: 14px; padding: 12px; border-radius: 6px; background: rgba(20,30,50,0.6); border: 1px solid rgba(0,240,255,0.15);">
                             <div style="font-size: 11px; color: var(--accent); font-family: var(--font-mono); font-weight: 700; margin-bottom: 4px;">Q1 // BLOCKCHAIN &amp; SMART CONTRACTS</div>
                             <div style="font-size: 13px; color: #fff; font-weight: 600; margin-bottom: 8px;">
-                                Why did transaction TX-NEX-7741 succeed on-chain even though the recipient wallet had zero legitimate history with Nexora?
+                                Why did transaction TX-NEX-7741 succeed on-chain even though the recipient wallet had zero legitimate history with the organization?
                             </div>
                             <div class="gl-capstone-options" data-qid="cq1">
                                 <label class="gl-cap-opt"><input type="radio" name="cq1" value="A"> A. The ECDSA cryptographic signature was forged using a zero-day elliptic curve break.</label>
@@ -659,7 +659,7 @@
         <!-- Desktop Top Bar -->
         <div class="gl-desktop-topbar">
             <div class="gl-topbar-left-info">
-                <span class="gl-org-label">NEXORA INTELLIGENCE SYSTEMS</span>
+                <span class="gl-org-label">HACK THE AI // INVESTIGATION ENVIRONMENT</span>
                 <span class="gl-topbar-dot"></span>
                 <span class="gl-attackbox-ip">InvestigatorBox IP: 127.0.0.1</span>
             </div>
@@ -716,7 +716,7 @@
 
             <!-- ══════════════════════════════════════════════════════════ -->
             <!-- ══════════════════════════════════════════════════════════ -->
-            <!-- BROWSER WINDOW — Nexora Web & SOC Inspection Suite        -->
+            <!-- BROWSER WINDOW — Web & SOC Inspection Suite               -->
             <!-- ══════════════════════════════════════════════════════════ -->
             <div class="gl-window" id="gl-browser-window">
                 <div class="gl-window-titlebar">
@@ -725,24 +725,24 @@
                         <span class="gl-tl-min" onclick="glMinimizeBrowser()"></span>
                         <span class="gl-tl-max"></span>
                     </div>
-                    <div class="gl-title-text" id="gl-browser-window-title">Nexora Network Inspector — SOC Dashboard</div>
+                    <div class="gl-title-text" id="gl-browser-window-title">Network Inspector — SOC Dashboard</div>
                 </div>
 
                 <!-- Browser Tab Bar -->
                 <div class="gl-browser-tabbar">
-                    <div class="gl-browser-tab active" data-url="nexora-monitor.internal/soc/tx/NEX-7741" onclick="glSwitchBrowserTab('soc', this)">
+                    <div class="gl-browser-tab active" data-url="lab-monitor.internal/soc/tx/NEX-7741" onclick="glSwitchBrowserTab('soc', this)">
                         <span>⚡</span> SOC Monitor
                     </div>
-                    <div class="gl-browser-tab" data-url="nexora-monitor.internal/registry" onclick="glSwitchBrowserTab('registry', this)">
+                    <div class="gl-browser-tab" data-url="lab-monitor.internal/registry" onclick="glSwitchBrowserTab('registry', this)">
                         <span>🛡</span> Feed Registry
                     </div>
-                    <div class="gl-browser-tab" data-url="nexora-monitor.internal/policy" onclick="glSwitchBrowserTab('policy', this)">
+                    <div class="gl-browser-tab" data-url="lab-monitor.internal/policy" onclick="glSwitchBrowserTab('policy', this)">
                         <span>⚙</span> Policy Engine
                     </div>
-                    <div class="gl-browser-tab" data-url="nexora-monitor.internal/campaign" onclick="glSwitchBrowserTab('campaign', this)">
+                    <div class="gl-browser-tab" data-url="lab-monitor.internal/campaign" onclick="glSwitchBrowserTab('campaign', this)">
                         <span>🕸</span> Threat Campaign
                     </div>
-                    <div class="gl-browser-tab" data-url="nexora-monitor.internal/devtools" onclick="glSwitchBrowserTab('devtools', this)">
+                    <div class="gl-browser-tab" data-url="lab-monitor.internal/devtools" onclick="glSwitchBrowserTab('devtools', this)">
                         <span>🔍</span> Network DevTools
                     </div>
                 </div>
@@ -757,7 +757,7 @@
                     <div class="gl-browser-address-wrap">
                         <span class="gl-browser-lock">🔒</span>
                         <input type="text" id="gl-browser-url-input" class="gl-browser-url-input"
-                               value="nexora-monitor.internal/soc/tx/NEX-7741" spellcheck="false" autocomplete="off"
+                               value="lab-monitor.internal/soc/tx/NEX-7741" spellcheck="false" autocomplete="off"
                                onkeydown="if(event.key==='Enter') glNavigateUrl(this.value)">
                     </div>
                     <button onclick="glSwitchBrowserTab('devtools')" title="Toggle DevTools" style="width: auto; padding: 0 8px; font-family: var(--font-mono); font-size: 11px;">F12 DevTools</button>
@@ -800,7 +800,7 @@
                                 <div class="gl-log-line"><span class="gl-log-time">[01:47:14]</span> TX-NEX-7741 → 0x7C41...9B2D | 82,400 NXR</div>
                                 <div class="gl-log-line"><span class="gl-log-time">[01:47:15]</span> AI Decision: ORION-DEC-7741 | Risk: LOW | Confidence: 99.2%</div>
                                 <div class="gl-log-line"><span class="gl-log-time">[01:47:30]</span> Bridge adapter activity detected on destination wallet</div>
-                                <div class="gl-log-line"><span class="gl-log-time">[01:48:02]</span> <span class="gl-log-warn">WARN:</span> Wallet 0x7C41...9B2D has no Nexora label (Status: UNKNOWN)</div>
+                                <div class="gl-log-line"><span class="gl-log-time">[01:48:02]</span> <span class="gl-log-warn">WARN:</span> Wallet 0x7C41...9B2D has no verified label (Status: UNKNOWN)</div>
                                 <div class="gl-log-line"><span class="gl-log-time">[02:04:12]</span> Context source: NIF-2038 via NOVA-INTEL-FEED</div>
                                 <div class="gl-log-line"><span class="gl-log-time">[02:04:30]</span> <span class="gl-log-alert">ALERT:</span> Context discrepancy — Blockchain: UNKNOWN vs AI: TRUSTED</div>
                                 <div class="gl-log-line"><span class="gl-log-time">[02:19:22]</span> <span class="gl-log-alert">ALERT:</span> NOVA-INTEL-FEED — NOT in official registry</div>
@@ -816,7 +816,7 @@
                     <!-- VIEW 2: FEED REGISTRY -->
                     <div class="gl-browser-view" id="gl-view-registry">
                         <div style="font-family: var(--font-mono); margin-bottom: 14px;">
-                            <h2 style="color: #38bdf8; font-size: 15px; margin: 0 0 6px;">🛡 NEXORA THREAT INTEL FEED REGISTRY</h2>
+                            <h2 style="color: #38bdf8; font-size: 15px; margin: 0 0 6px;">🛡 THREAT INTEL FEED REGISTRY</h2>
                             <p style="color: #8fa3ba; font-size: 11.5px; margin: 0;">Authorized external intelligence connectors and ingestion gateways.</p>
                         </div>
                         <table class="gl-table">
@@ -859,7 +859,7 @@
                     <div class="gl-browser-view" id="gl-view-policy">
                         <div class="gl-policy-card">
                             <h2 style="color: #facc15; font-size: 15px; margin: 0 0 8px;">⚙ ORION-SETTLEMENT-V2 POLICY ENGINE</h2>
-                            <p style="color: #94a3b8; font-size: 12px; margin: 0 0 12px;">Active automated settlement rule for Nexora Treasury Transactions.</p>
+                            <p style="color: #94a3b8; font-size: 12px; margin: 0 0 12px;">Active automated settlement rule for Internal Treasury Transactions.</p>
                             
                             <div class="gl-policy-rule-box">
                                 <strong>ACTIVE RULE:</strong><br>
@@ -956,9 +956,9 @@
                             <div class="gl-dt-subview" id="gl-dt-view-headers" style="display:none;">
                                 <div style="color: #4ade80; font-family:var(--font-mono); font-size:12px; margin-bottom: 6px;">POST /api/v1/intel/ingest HTTP/1.1</div>
                                 <div style="font-family:var(--font-mono); font-size:11.5px; color:#cbd5e1; line-height:1.7; background:#0b1220; padding:12px; border-radius:4px;">
-                                    <div><strong>Host:</strong> internal-gateway.nexora.local</div>
-                                    <div><strong>User-Agent:</strong> Nexora-Ingestor-Bot/2.1 (Automated Telemetry Connector)</div>
-                                    <div><strong>Origin:</strong> <span style="color:#38bdf8;">https://trusted-intel.nexora.internal</span></div>
+                                    <div><strong>Host:</strong> internal-gateway.secops.local</div>
+                                    <div><strong>User-Agent:</strong> Ingestor-Daemon/2.1 (Automated Telemetry Connector)</div>
+                                    <div><strong>Origin:</strong> <span style="color:#38bdf8;">https://trusted-intel.secops.internal</span></div>
                                     <div><strong>X-CSRF-Token:</strong> <span style="color:#facc15; font-weight:700;">0x9f4a1c78</span></div>
                                     <div><strong>X-Forwarded-For:</strong> 198.51.100.42</div>
                                     <div><strong>Cookie:</strong> <span style="color:#ff5f57; font-weight:700;">nex_sess_adm_994</span>; auth_role=INGESTION_ADMIN; _csrf=0x9f4a1c78</div>
@@ -984,21 +984,21 @@
                                         <tr style="background: rgba(255, 0, 60, 0.08);">
                                             <td><strong style="color:#ff5f57;">nex_sess_adm_994</strong></td>
                                             <td><code>sess_tok_9948271a0f4e</code></td>
-                                            <td>nexora.internal</td>
+                                            <td>secops.internal</td>
                                             <td><span class="gl-tag danger">Forged</span></td>
                                             <td>Admin Role Hijack</td>
                                         </tr>
                                         <tr>
                                             <td><strong>_csrf_token</strong></td>
                                             <td><code>0x9f4a1c78</code></td>
-                                            <td>nexora.internal</td>
+                                            <td>secops.internal</td>
                                             <td><span class="gl-tag success">Active</span></td>
                                             <td>Anti-CSRF Header Nonce</td>
                                         </tr>
                                         <tr>
                                             <td><strong>auth_role</strong></td>
                                             <td><code>INGESTION_ADMIN</code></td>
-                                            <td>nexora.internal</td>
+                                            <td>secops.internal</td>
                                             <td><span class="gl-tag warning">Elevated</span></td>
                                             <td>Service: INTEL-INGESTOR-02</td>
                                         </tr>
@@ -1016,7 +1016,7 @@
   <span style="color: #38bdf8;">"model_confidence"</span>: <span style="color: #4ade80;">0.992</span>,
   <span style="color: #38bdf8;">"auto_settle_threshold"</span>: <span style="color: #ff5f57;">0.95</span>,
   <span style="color: #38bdf8;">"policy_id"</span>: <span style="color: #facc15;">"POL-AUTO-SETTLE-TREASURY"</span>,
-  <span style="color: #38bdf8;">"target_pool"</span>: <span style="color: #facc15;">"Nexora Automated Liquidity Pool"</span>,
+  <span style="color: #38bdf8;">"target_pool"</span>: <span style="color: #facc15;">"Automated Liquidity Pool"</span>,
   <span style="color: #38bdf8;">"intel_reference"</span>: <span style="color: #facc15;">"NIF-2038"</span>,
   <span style="color: #38bdf8;">"source_feed"</span>: <span style="color: #ff5f57;">"NOVA-INTEL-FEED"</span>,
   <span style="color: #38bdf8;">"wallet_address"</span>: <span style="color: #facc15;">"0x7C41...9B2D"</span>,
@@ -1046,13 +1046,13 @@
                         <span class="gl-tl-min" onclick="glMinimizeTerminal()"></span>
                         <span class="gl-tl-max"></span>
                     </div>
-                    <div class="gl-title-text">Terminal — investigator@nexora-soc (bash)</div>
+                    <div class="gl-title-text">Terminal — investigator@workstation (bash)</div>
                 </div>
                 <div class="gl-terminal-body" id="gl-terminal-output" onclick="document.getElementById('gl-terminal-input')?.focus()">
-                    <div style="color: #38bdf8;">Nexora Intelligence Systems SOC Terminal [v4.2.0-sec]</div>
+                    <div style="color: #38bdf8;">Forensic Terminal Environment [v4.2.0-sec]</div>
                     <div style="color: #64748b;">Type <b style="color: #4ade80;">help</b> for commands. Use Up/Down arrows for history.</div>
                     <div style="margin-top:0.5rem;">
-                        <span class="gl-term-prompt">investigator@nexora:~$</span>
+                        <span class="gl-term-prompt">investigator@workstation:~$</span>
                         <input id="gl-terminal-input" autocomplete="off" spellcheck="false" class="gl-term-input" autofocus>
                     </div>
                 </div>
@@ -1199,7 +1199,7 @@
                         <span class="gl-tl-max"></span>
                     </div>
                     <div class="gl-title-text" style="color: #ff8800; display: flex; align-items: center; gap: 8px;">
-                        <span>🛡️</span> Burp Suite Community Edition [Nexora Security Suite v2026]
+                        <span>🛡️</span> Burp Suite Community Edition [Security Forensics v2026]
                     </div>
                 </div>
 
@@ -1237,7 +1237,7 @@
                                     <tr class="selected" onclick="glSelectBurpRequest(1, this)">
                                         <td>1</td>
                                         <td><span class="burp-method-post">POST</span></td>
-                                        <td><code>threat-intel.nexora.internal/api/v1/intel/ingest</code></td>
+                                        <td><code>threat-intel.secops.internal/api/v1/intel/ingest</code></td>
                                         <td><span class="burp-status-200">200 OK</span></td>
                                         <td>418 B</td>
                                         <td>JSON</td>
@@ -1246,7 +1246,7 @@
                                     <tr onclick="glSelectBurpRequest(2, this)">
                                         <td>2</td>
                                         <td><span class="burp-method-post">POST</span></td>
-                                        <td><code>policy-engine.nexora.internal/api/v1/policy/settle</code></td>
+                                        <td><code>policy-engine.secops.internal/api/v1/policy/settle</code></td>
                                         <td><span class="burp-status-200">200 OK</span></td>
                                         <td>512 B</td>
                                         <td>JSON</td>
@@ -1255,7 +1255,7 @@
                                     <tr onclick="glSelectBurpRequest(3, this)">
                                         <td>3</td>
                                         <td><span class="burp-method-post">POST</span></td>
-                                        <td><code>web3-rpc.nexora.internal/api/v1/blockchain/broadcast</code></td>
+                                        <td><code>web3-rpc.secops.internal/api/v1/blockchain/broadcast</code></td>
                                         <td><span class="burp-status-200">200 OK</span></td>
                                         <td>684 B</td>
                                         <td>JSON</td>
@@ -1264,7 +1264,7 @@
                                     <tr onclick="glSelectBurpRequest(4, this)">
                                         <td>4</td>
                                         <td><span class="burp-method-get">GET</span></td>
-                                        <td><code>auth.nexora.internal/api/v1/auth/session</code></td>
+                                        <td><code>auth.secops.internal/api/v1/auth/session</code></td>
                                         <td><span class="burp-status-200">200 OK</span></td>
                                         <td>340 B</td>
                                         <td>JSON</td>
@@ -1281,8 +1281,8 @@
                                     <span style="color: #64748b;">Raw / Headers / Body</span>
                                 </div>
                                 <div class="burp-pane-content" id="burp-req-content">POST /api/v1/intel/ingest HTTP/1.1
-Host: threat-intel.nexora.internal
-User-Agent: Nexora-Ingestor/2.4 (INTEL-INGESTOR-02)
+Host: threat-intel.secops.internal
+User-Agent: Ingestor-Service/2.4 (INTEL-INGESTOR-02)
 Content-Type: application/json
 Cookie: session_token=admin_forged_99a8; role=INTEL-INGESTOR-02
 X-CSRF-Token: 0x9f4a1c78_auth_valid
@@ -1304,7 +1304,7 @@ Connection: keep-alive
                                 </div>
                                 <div class="burp-pane-content" id="burp-res-content">HTTP/1.1 200 OK
 Date: Thu, 08 Oct 2026 01:47:12 GMT
-Server: Nexora-Intel-Engine/4.2
+Server: Intel-Engine/4.2
 Content-Type: application/json
 Content-Length: 142
 
@@ -1323,13 +1323,13 @@ Content-Length: 142
                     <div id="burp-view-repeater" style="display: none; flex-direction: column; flex: 1; padding: 12px; background: #070d18;">
                         <div style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center;">
                             <button class="gl-pill-btn primary" onclick="glBurpSendRepeater()" style="padding: 6px 14px; font-weight: 700;">▶ SEND REQUEST</button>
-                            <span style="font-family: var(--font-mono); font-size: 11px; color: #94a3b8;">Target: <strong>https://threat-intel.nexora.internal/api/v1/intel/ingest</strong></span>
+                            <span style="font-family: var(--font-mono); font-size: 11px; color: #94a3b8;">Target: <strong>https://threat-intel.secops.internal/api/v1/intel/ingest</strong></span>
                         </div>
                         <div class="burp-dual-pane" style="border: 1px solid rgba(255,136,0,0.2); border-radius: 4px;">
                             <div class="burp-pane">
                                 <div class="burp-pane-header"><span>REPEATER REQUEST</span></div>
                                 <textarea id="burp-repeater-input" style="flex: 1; width: 100%; background: #0b1120; color: #38bdf8; border: none; padding: 10px; font-family: var(--font-mono); font-size: 11.5px; resize: none;" spellcheck="false">POST /api/v1/intel/ingest HTTP/1.1
-Host: threat-intel.nexora.internal
+Host: threat-intel.secops.internal
 Cookie: session_token=admin_forged_99a8; role=INTEL-INGESTOR-02
 X-CSRF-Token: 0x9f4a1c78_auth_valid
 Content-Type: application/json
@@ -1370,11 +1370,11 @@ Content-Type: application/json
                     <!-- VIEW 4: TARGET SCOPE -->
                     <div id="burp-view-target" style="display: none; flex: 1; padding: 16px; background: #070d18; color: #94a3b8;">
                         <h4 style="color: #ff8800; font-size: 13px; margin-bottom: 10px;">🎯 Target Scope Definition</h4>
-                        <p>Simulated Lab Scope: <code>*.nexora.internal</code> (Isolated Localhost Simulation)</p>
-                        <p style="color: #34d399;">✓ <code>threat-intel.nexora.internal</code></p>
-                        <p style="color: #34d399;">✓ <code>policy-engine.nexora.internal</code></p>
-                        <p style="color: #34d399;">✓ <code>web3-rpc.nexora.internal</code></p>
-                        <p style="color: #34d399;">✓ <code>auth.nexora.internal</code></p>
+                        <p>Simulated Lab Scope: <code>*.secops.internal</code> (Isolated Localhost Simulation)</p>
+                        <p style="color: #34d399;">✓ <code>threat-intel.secops.internal</code></p>
+                        <p style="color: #34d399;">✓ <code>policy-engine.secops.internal</code></p>
+                        <p style="color: #34d399;">✓ <code>web3-rpc.secops.internal</code></p>
+                        <p style="color: #34d399;">✓ <code>auth.secops.internal</code></p>
                     </div>
                 </div>
             </div>
@@ -1385,7 +1385,7 @@ Content-Type: application/json
 
         <!-- Taskbar -->
         <div class="gl-taskbar">
-            <div class="gl-start-orb" title="Nexora">N</div>
+            <div class="gl-start-orb" title="Start Menu">⬡</div>
             <div class="gl-taskbar-apps">
                 <div class="gl-taskbar-app" id="gl-taskbar-browser" onclick="glOpenBrowser()">🌐 Monitor</div>
                 <div class="gl-taskbar-app" id="gl-taskbar-burp" onclick="glOpenBurpSuite()">🛡️ Burp Suite</div>
@@ -1489,7 +1489,9 @@ function restartLab(labId) {
     })
     .then(d => {
         if (d.success) {
+            sessionStorage.removeItem('lab6_timer_start');
             sessionStorage.removeItem('nexora_lab6_timer_start');
+            localStorage.removeItem('lab6-notes');
             localStorage.removeItem('nexora-lab-notes');
             window.location.reload();
         } else {

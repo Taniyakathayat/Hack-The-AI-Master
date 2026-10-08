@@ -1,6 +1,6 @@
 """
 Seed script for PRO Lab 01: The Ghost in the Ledger
-Case NEX-042 — Nexora Intelligence Systems
+Case NEX-042 — Hack The AI Security Lab
 
 Seeds 5 Chapters with 5 hands-on questions each (Total 25 Questions)
 covering Web3, AI, and Cybersecurity (CSRF, Sessions, Cookies, RBAC, Policy Engine, Forensics).
@@ -57,7 +57,7 @@ def seed_ghost_ledger():
             id='q_l6_1_1', mission_id='lab6_m1',
             question='What is the raw blockchain status of destination wallet 0x7C41...9B2D?',
             answer='UNKNOWN',
-            explanation='The wallet has no verified Nexora entity label, no approved treasury relationship, and is marked on-chain as UNKNOWN.',
+            explanation='The wallet has no verified entity label, no approved treasury relationship, and is marked on-chain as UNKNOWN.',
             xp_reward=50
         ),
         MissionQuiz(
@@ -313,7 +313,7 @@ def seed_ghost_ledger():
              hint_text='Run `policy ORION-SETTLEMENT-V2` or check DevTools trace for signing component (AUTOMATED-SIGNER).',
              xp_cost=20, sort_order=4),
         Hint(id='h_l6_4_5', mission_id='lab6_m4',
-             hint_text='Inspect `settlement-policy.txt`: Target Engine is Nexora Automated Liquidity Pool.',
+             hint_text='Inspect `settlement-policy.txt`: Target Engine is Automated Liquidity Pool.',
              xp_cost=20, sort_order=5),
 
         # Chapter 5

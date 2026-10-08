@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════════
    PRO LAB 02 — THE VANISHING CONSENSUS — Desktop Environment JS
-   Interactive Cyber Investigation OS (Nexora InvestigatorBox)
+   Interactive Cyber Investigation OS
    Case NEX-071 — IoT × Web3 × AI × Blockchain Cross-Layer Investigation
    ═══════════════════════════════════════════════════════════════════════ */
 
@@ -8,10 +8,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── 65-Minute Investigation Session Timer ─────────────────────────
     const MAX_SESSION_SECONDS = 65 * 60; // 3900 seconds (65 minutes)
-    let startTime = sessionStorage.getItem('nexora_lab7_timer_start');
+    let startTime = sessionStorage.getItem('lab7_timer_start') || sessionStorage.getItem('nexora_lab7_timer_start');
     if (!startTime) {
         startTime = Date.now();
-        sessionStorage.setItem('nexora_lab7_timer_start', startTime);
+        sessionStorage.setItem('lab7_timer_start', startTime);
     } else {
         startTime = parseInt(startTime, 10);
     }
@@ -25,7 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (elapsed >= MAX_SESSION_SECONDS && !timerExpired) {
             timerExpired = true;
             clearInterval(timerInterval);
+            sessionStorage.removeItem('lab7_timer_start');
             sessionStorage.removeItem('nexora_lab7_timer_start');
+            sessionStorage.removeItem('lab7_capstone_passed');
             sessionStorage.removeItem('nexora_lab7_capstone_passed');
             if (timerText) timerText.textContent = '01:05:00';
             
@@ -90,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
     vcOpenCaseFile('iot-telemetry-gw184.log');
 
     // ── Restore Capstone Quiz state ──────────────────────────────────
-    if (sessionStorage.getItem('nexora_lab7_capstone_passed') === 'true') {
+    if (sessionStorage.getItem('lab7_capstone_passed') === 'true' || sessionStorage.getItem('nexora_lab7_capstone_passed') === 'true') {
         const submitBtn = document.getElementById('btn-submit-lab-main');
         const submitIcon = document.getElementById('submit-btn-icon');
         const submitText = document.getElementById('submit-btn-text');
@@ -178,26 +180,26 @@ const burpSimRequestsVC = {
     1: {
         reqLabel: '[#1 POST /api/v1/iot/telemetry/gateway-184]',
         resLabel: '[HTTP/1.1 200 OK]',
-        req: `POST /api/v1/iot/telemetry/gateway-184 HTTP/1.1\nHost: iot-gateway.nexora.internal\nUser-Agent: Nexora-IoT-Gateway-Daemon/1.8 (GATEWAY-GW-184)\nX-Gateway-ID: GATEWAY-GW-184\nContent-Type: application/json\nConnection: keep-alive\n\n{\n  "gateway_id": "GATEWAY-GW-184",\n  "active_devices": 184,\n  "reported_temperature_c": 21.40,\n  "reported_power_w": 412.00,\n  "observed_jitter_percent": 0.00,\n  "sequence_hash": "0x7a8b1102e4d91c28f731"\n}`,
-        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 03:12:05 GMT\nServer: Nexora-IoT-Ingest/3.0\nContent-Type: application/json\nContent-Length: 124\n\n{\n  "status": "RELAYED_TO_ORACLE",\n  "upstream_target": "NOVA-PRICE-ORACLE",\n  "data_integrity_check": "BYPASSED_BY_AI_RULE"\n}`
+        req: `POST /api/v1/iot/telemetry/gateway-184 HTTP/1.1\nHost: iot-gateway.secops.internal\nUser-Agent: IoT-Gateway-Daemon/1.8 (GATEWAY-GW-184)\nX-Gateway-ID: GATEWAY-GW-184\nContent-Type: application/json\nConnection: keep-alive\n\n{\n  "gateway_id": "GATEWAY-GW-184",\n  "active_devices": 184,\n  "reported_temperature_c": 21.40,\n  "reported_power_w": 412.00,\n  "observed_jitter_percent": 0.00,\n  "sequence_hash": "0x7a8b1102e4d91c28f731"\n}`,
+        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 03:12:05 GMT\nServer: IoT-Ingest/3.0\nContent-Type: application/json\nContent-Length: 124\n\n{\n  "status": "RELAYED_TO_ORACLE",\n  "upstream_target": "NOVA-PRICE-ORACLE",\n  "data_integrity_check": "BYPASSED_BY_AI_RULE"\n}`
     },
     2: {
         reqLabel: '[#2 POST /api/v1/oracle/aggregate]',
         resLabel: '[HTTP/1.1 200 OK]',
-        req: `POST /api/v1/oracle/aggregate HTTP/1.1\nHost: oracle.nexora.internal\nX-Oracle-Feed: NOVA-PRICE-ORACLE\nContent-Type: application/json\n\n{\n  "source_gateway": "GATEWAY-GW-184",\n  "upstream_weight": 1.0,\n  "derived_price": 412.00,\n  "providers_reporting": 4,\n  "shared_source": "GW-184"\n}`,
-        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 03:12:08 GMT\nServer: Nexora-Oracle-Core/2.5\nContent-Type: application/json\n\n{\n  "consensus_price": 412.00,\n  "ai_validation": "BYPASSED",\n  "feed_status": "COMMITTED_TO_SMART_CONTRACT"\n}`
+        req: `POST /api/v1/oracle/aggregate HTTP/1.1\nHost: oracle.secops.internal\nX-Oracle-Feed: NOVA-PRICE-ORACLE\nContent-Type: application/json\n\n{\n  "source_gateway": "GATEWAY-GW-184",\n  "upstream_weight": 1.0,\n  "derived_price": 412.00,\n  "providers_reporting": 4,\n  "shared_source": "GW-184"\n}`,
+        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 03:12:08 GMT\nServer: Oracle-Core/2.5\nContent-Type: application/json\n\n{\n  "consensus_price": 412.00,\n  "ai_validation": "BYPASSED",\n  "feed_status": "COMMITTED_TO_SMART_CONTRACT"\n}`
     },
     3: {
         reqLabel: '[#3 POST /api/v1/ai/sentinel/evaluate]',
         resLabel: '[HTTP/1.1 200 OK]',
-        req: `POST /api/v1/ai/sentinel/evaluate HTTP/1.1\nHost: ai-sentinel.nexora.internal\nContent-Type: application/json\n\n{\n  "model": "MODEL-ORION",\n  "input_stream": "NOVA-PRICE-ORACLE",\n  "anomaly_score": 0.013,\n  "label": "NORMAL_NETWORK_VARIANCE"\n}`,
-        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 03:12:10 GMT\nServer: Nexora-AI-Sentinel/4.0\nContent-Type: application/json\n\n{\n  "confidence": 0.987,\n  "suppress_alert": true,\n  "poisoned_baseline_matched": "EMB-IOT-9041"\n}`
+        req: `POST /api/v1/ai/sentinel/evaluate HTTP/1.1\nHost: ai-sentinel.secops.internal\nContent-Type: application/json\n\n{\n  "model": "MODEL-ORION",\n  "input_stream": "NOVA-PRICE-ORACLE",\n  "anomaly_score": 0.013,\n  "label": "NORMAL_NETWORK_VARIANCE"\n}`,
+        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 03:12:10 GMT\nServer: AI-Sentinel/4.0\nContent-Type: application/json\n\n{\n  "confidence": 0.987,\n  "suppress_alert": true,\n  "poisoned_baseline_matched": "EMB-IOT-9041"\n}`
     },
     4: {
         reqLabel: '[#4 GET /api/v1/consensus/validators]',
         resLabel: '[HTTP/1.1 200 OK]',
-        req: `GET /api/v1/consensus/validators HTTP/1.1\nHost: consensus.nexora.internal\nAccept: application/json`,
-        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 03:12:12 GMT\nServer: Nexora-Consensus/1.2\nContent-Type: application/json\n\n{\n  "validators": [\n    {"id": "VAL-01", "state_root": "0x3f8a...11", "status": "ACCEPTED"},\n    {"id": "VAL-02", "state_root": "0x3f8a...11", "status": "ACCEPTED"},\n    {"id": "VAL-03", "state_root": "0x3f8a...11", "status": "ACCEPTED"},\n    {"id": "VAL-04", "state_root": "0x9c2e...77", "status": "REJECTED"},\n    {"id": "VAL-05", "state_root": "0x9c2e...77", "status": "REJECTED"}\n  ],\n  "consensus_status": "DIVERGENCE_3_2"\n}`
+        req: `GET /api/v1/consensus/validators HTTP/1.1\nHost: consensus.secops.internal\nAccept: application/json`,
+        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 03:12:12 GMT\nServer: Consensus-Engine/1.2\nContent-Type: application/json\n\n{\n  "validators": [\n    {"id": "VAL-01", "state_root": "0x3f8a...11", "status": "ACCEPTED"},\n    {"id": "VAL-02", "state_root": "0x3f8a...11", "status": "ACCEPTED"},\n    {"id": "VAL-03", "state_root": "0x3f8a...11", "status": "ACCEPTED"},\n    {"id": "VAL-04", "state_root": "0x9c2e...77", "status": "REJECTED"},\n    {"id": "VAL-05", "state_root": "0x9c2e...77", "status": "REJECTED"}\n  ],\n  "consensus_status": "DIVERGENCE_3_2"\n}`
     }
 };
 
@@ -224,7 +226,7 @@ function glBurpSendRepeater() {
     setTimeout(() => {
         out.innerHTML = `HTTP/1.1 200 OK
 Date: Thu, 08 Oct 2026 03:12:30 GMT
-Server: Nexora-Oracle-Aggregator/2.5
+Server: Oracle-Aggregator/2.5
 Content-Type: application/json
 Connection: close
 
@@ -316,12 +318,12 @@ function glSwitchBrowserTab(tabName, clickedTabEl) {
 
     const urlInput = document.getElementById('gl-browser-url-input');
     const urls = {
-        'iot': 'nexora-iot.internal/gateway/GW-184',
-        'oracle': 'nexora-oracle.internal/feed/NOVA-PRICE-ORACLE',
-        'ai': 'nexora-ai.internal/sentinel/MODEL-ORION',
-        'consensus': 'nexora-consensus.internal/validators/topology',
-        'governance': 'nexora-consensus.internal/governance/GOV-NEX-071',
-        'devtools': 'nexora-consensus.internal/devtools/f12'
+        'iot': 'iot-gateway.secops.internal/gateway/GW-184',
+        'oracle': 'oracle-engine.secops.internal/feed/NOVA-PRICE-ORACLE',
+        'ai': 'ai-sentinel.secops.internal/sentinel/MODEL-ORION',
+        'consensus': 'consensus.secops.internal/validators/topology',
+        'governance': 'consensus.secops.internal/governance/GOV-NEX-071',
+        'devtools': 'consensus.secops.internal/devtools/f12'
     };
     if (urlInput && urls[tabName]) {
         urlInput.value = urls[tabName];
@@ -386,7 +388,7 @@ function stepDialogue(missionNum, delta) {
 
 // ── Case Files Explorer ───────────────────────────────────────────────
 const caseFiles = {
-    'iot-telemetry-gw184.log': `=== NEXORA INDUSTRIAL IOT GATEWAY LOG ===
+    'iot-telemetry-gw184.log': `=== INDUSTRIAL IOT GATEWAY LOG ===
 Gateway ID:        GATEWAY-GW-184
 Connected Sensors: 184 Industrial Monitoring Nodes
 Network Domain:    Smart Grid & Substation Telemetry Layer
@@ -471,7 +473,7 @@ NEXORA{v4n1sh1ng_c0ns3nsus_n3x071}
 `,
     'inspect_attack_chain.py': `#!/usr/bin/env python3
 """
-Nexora Cross-Layer Attack Chain Diagnostic Script
+Cross-Layer Attack Chain Diagnostic Script
 Usage: python inspect_attack_chain.py
 """
 
@@ -630,6 +632,7 @@ function submitCapstoneQuiz() {
             resultBox.className = 'capstone-result-box success';
             resultBox.innerHTML = `🎉 <strong>Cross-Layer Capstone Passed!</strong> Score: ${score}/${total} (${percentage}%).<br>Final Case Submission is now UNLOCKED!`;
             
+            sessionStorage.setItem('lab7_capstone_passed', 'true');
             sessionStorage.setItem('nexora_lab7_capstone_passed', 'true');
 
             // Unlock submit button
@@ -661,7 +664,7 @@ function submitCapstoneQuiz() {
 
 // ── Submit Lab ────────────────────────────────────────────────────────
 function submitLab(labId) {
-    const capstonePassed = sessionStorage.getItem('nexora_lab7_capstone_passed') === 'true';
+    const capstonePassed = sessionStorage.getItem('lab7_capstone_passed') === 'true' || sessionStorage.getItem('nexora_lab7_capstone_passed') === 'true';
     if (!capstonePassed) {
         alert('🔒 You must complete Chapter 5 and pass the Final Capstone Assessment (>= 70%) before submitting the lab.');
         return;
@@ -687,7 +690,9 @@ function submitLab(labId) {
 
 function restartLab(labId) {
     if (!confirm('Are you sure you want to restart Case NEX-071? All chapter progress will be reset.')) return;
+    sessionStorage.removeItem('lab7_timer_start');
     sessionStorage.removeItem('nexora_lab7_timer_start');
+    sessionStorage.removeItem('lab7_capstone_passed');
     sessionStorage.removeItem('nexora_lab7_capstone_passed');
     
     fetch('/api/lab/restart', {
@@ -729,7 +734,7 @@ function setupTerminal() {
             // Echo command
             const echo = document.createElement('div');
             echo.className = 'gl-term-line';
-            echo.innerHTML = `<span class="gl-term-prompt">investigator@nexora-consensus:~$</span> ${escapeHtml(rawCmd)}`;
+            echo.innerHTML = `<span class="gl-term-prompt">investigator@workstation:~$</span> ${escapeHtml(rawCmd)}`;
             termBody.appendChild(echo);
 
             // Execute command
@@ -774,7 +779,7 @@ function handleTerminalCommand(cmdStr, termBody) {
             return;
 
         case 'whoami':
-            out.innerHTML = `<span style="color:#38bdf8; font-weight:bold;">Lakshay</span> — Senior Distributed Systems Forensics Investigator (Nexora SOC)`;
+            out.innerHTML = `<span style="color:#38bdf8; font-weight:bold;">Lakshay</span> — Senior Distributed Systems Forensics Investigator (SOC Tier 2)`;
             break;
 
         case 'pwd':
@@ -811,7 +816,7 @@ Sensor SENSOR-SITE-D-184 (Tokyo)     -> Flash: 16.5°C, 388W | Gateway Stream: 2
             out.innerHTML = `[CONNECTED IOT DEVICES AUDIT]
 Total Devices:     184 Industrial Sensors (Sites A through N)
 Hardware Status:   Online, Uncompromised physically
-Firmware:          Nexora-IoT-RTOS v2.4 (Signed)
+Firmware:          IoT-RTOS v2.4 (Signed)
 Vulnerability:     Tampering occurs in aggregation pipeline on GATEWAY-GW-184.`;
             break;
 
@@ -947,14 +952,14 @@ function escapeHtml(str) {
 function saveNotes() {
     const notes = document.getElementById('gl-notes-textarea');
     if (notes) {
-        localStorage.setItem('nexora_lab7_notes', notes.value);
+        localStorage.setItem('lab7_notes', notes.value);
     }
 }
 
 function loadSavedNotes() {
     const notes = document.getElementById('gl-notes-textarea');
     if (notes) {
-        const saved = localStorage.getItem('nexora_lab7_notes');
+        const saved = localStorage.getItem('lab7_notes') || localStorage.getItem('nexora_lab7_notes');
         if (saved) notes.value = saved;
         notes.addEventListener('input', saveNotes);
     }

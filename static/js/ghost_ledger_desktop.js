@@ -1,16 +1,16 @@
 /* ═══════════════════════════════════════════════════════════════════════
    PRO LAB 01 — GHOST IN THE LEDGER — Desktop Environment JS
-   Interactive Cyber Investigation OS (Nexora InvestigatorBox)
+   Interactive Cyber Investigation OS
    ═══════════════════════════════════════════════════════════════════════ */
 
 document.addEventListener('DOMContentLoaded', () => {
 
     // ── 65-Minute Investigation Session Timer ─────────────────────────
     const MAX_SESSION_SECONDS = 65 * 60; // 3900 seconds (65 minutes)
-    let startTime = sessionStorage.getItem('nexora_lab6_timer_start');
+    let startTime = sessionStorage.getItem('lab6_timer_start') || sessionStorage.getItem('nexora_lab6_timer_start');
     if (!startTime) {
         startTime = Date.now();
-        sessionStorage.setItem('nexora_lab6_timer_start', startTime);
+        sessionStorage.setItem('lab6_timer_start', startTime);
     } else {
         startTime = parseInt(startTime, 10);
     }
@@ -25,7 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (elapsed >= MAX_SESSION_SECONDS && !timerExpired) {
             timerExpired = true;
             clearInterval(timerInterval);
+            sessionStorage.removeItem('lab6_timer_start');
             sessionStorage.removeItem('nexora_lab6_timer_start');
+            localStorage.removeItem('lab6-notes');
             localStorage.removeItem('nexora-lab-notes');
             if (timerText) timerText.textContent = '01:05:00';
             
@@ -74,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
     glOpenCaseFile('wallet-report.txt');
 
     // ── Restore Capstone Quiz & Submit state if previously passed ──────
-    if (sessionStorage.getItem('nexora_lab6_capstone_passed') === 'true') {
+    if (sessionStorage.getItem('lab6_capstone_passed') === 'true' || sessionStorage.getItem('nexora_lab6_capstone_passed') === 'true') {
         const submitBtn = document.getElementById('btn-submit-lab-main');
         const submitIcon = document.getElementById('submit-btn-icon');
         const submitText = document.getElementById('submit-btn-text');
@@ -108,7 +110,7 @@ const CASE_NEX_042_STORY = {
   opening: {
     title: "THE GHOST IN THE LEDGER",
     text: [
-      "01:47 AM. Nexora's SOC is almost silent when a Priority-0 alert appears.",
+      "01:47 AM. The SOC is almost silent when a Priority-0 alert appears.",
       "82,400 NXR has been transferred from the company treasury to an unknown wallet.",
       "The blockchain confirms the transaction is valid, and ORION AI has marked the wallet as TRUSTED with 99.2% confidence.",
       "But Finance has no record of approving the transfer.",
@@ -129,7 +131,7 @@ const CASE_NEX_042_STORY = {
         },
         {
           character: "Mehak",
-          text: "I checked the destination wallet. It's extremely young, has almost no legitimate history, and there's no known Nexora relationship. For a treasury transaction this large, that's a serious anomaly."
+          text: "I checked the destination wallet. It's extremely young, has almost no legitimate history, and there's no known internal relationship. For a treasury transaction this large, that's a serious anomaly."
         },
         {
           character: "Shanu",
@@ -145,10 +147,10 @@ const CASE_NEX_042_STORY = {
         },
         {
           character: "Lakshay",
-          text: "Then we need to know one thing before anything else: if Nexora never trusted this wallet, who told ORION that it was trusted?"
+          text: "Then we need to know one thing before anything else: if our systems never trusted this wallet, who told ORION that it was trusted?"
         }
       ],
-      hook: "The wallet was unknown to Nexora. But somehow, the AI already knew exactly what to think about it.",
+      hook: "The wallet was unknown to the organization. But somehow, the AI already knew exactly what to think about it.",
       evidence: [
         "WEB3-E01",
         "TX-NEX-7741",
@@ -208,7 +210,7 @@ const CASE_NEX_042_STORY = {
         },
         {
           character: "Mehak",
-          text: "That's the problem. It isn't in the approved registry, and there are no previous records showing this source being trusted by Nexora."
+          text: "That's the problem. It isn't in the approved registry, and there are no previous records showing this source being trusted internally."
         },
         {
           character: "Shivam",
@@ -409,13 +411,13 @@ function updateDialogueView(chNum) {
 
 // ── Case File Contents ─────────────────────────────────────────────────
 const caseFileContents = {
-    'wallet-report.txt': `NEXORA ON-CHAIN INTELLIGENCE REPORT
+    'wallet-report.txt': `ON-CHAIN INTELLIGENCE REPORT
 =====================================================
 Target Wallet:        0x7C41...9B2D
-Network:              Nexora Ledger Core (NXR)
+Network:              Ledger Core (NXR)
 Creation Date:        3 days ago (Nov 14, 01:22 UTC)
 Transaction Count:    4 total
-Nexora Whitelist:     NONE
+Internal Whitelist:   NONE
 Treasury Partner:     NO
 
 BLOCKCHAIN STATUS:    UNKNOWN
@@ -473,7 +475,7 @@ HTTP INGESTION TELEMETRY:
 - Assigned Service:   INTEL-INGESTOR-02
 - Forged Session:     nex_sess_adm_994
 - Injected X-CSRF:    0x9f4a1c78
-- Spoofed Origin:     https://trusted-intel.nexora.internal
+- Spoofed Origin:     https://trusted-intel.secops.internal
 - Expected Role:      Create Intelligence Records (ReadOnly)
 - ACTUAL RBAC Role:   Create Records + modify wallet reputation
 
@@ -485,7 +487,7 @@ connector altered wallet reputation directly within Orion's working memory.`,
     'settlement-policy.txt': `ORION-SETTLEMENT-V2 — AUTHORIZATION POLICY ENGINE
 =====================================================
 Policy Identifier:    POL-AUTO-SETTLE-TREASURY
-Target Engine:        Nexora Automated Liquidity Pool
+Target Engine:        Automated Liquidity Pool
 Automated Signer:     AUTOMATED-SIGNER (Mempool Bridge)
 
 ACTIVE POLICY RULE:
@@ -506,7 +508,7 @@ Because Orion AI scored TX-NEX-7741 with 99.2% confidence (exceeding
 the 95% threshold), the automated signer signed the blockchain payload
 instantly, completely bypassing the human security operations team.`,
 
-    'campaign-intel.txt': `NEXORA GLOBAL THREAT CAMPAIGN ANALYSIS
+    'campaign-intel.txt': `GLOBAL THREAT CAMPAIGN ANALYSIS
 =====================================================
 Campaign Identifier:  ORION-NEXUS
 Threat Actor Group:   ADV-CONVERGENCE-APT
@@ -533,7 +535,7 @@ NEXORA{ghost_in_the_ledger_nex042}
 
     'inspect_tx.py': `#!/usr/bin/env python3
 """
-Nexora Forensic Analysis Script — inspect_tx.py
+Forensic Analysis Script — inspect_tx.py
 Usage: python inspect_tx.py
 """
 
@@ -583,16 +585,16 @@ let browserHistory = ['soc'];
 let historyPointer = 0;
 
 const urlMap = {
-    'soc': 'nexora-monitor.internal/soc/tx/NEX-7741',
-    'registry': 'nexora-monitor.internal/registry',
-    'policy': 'nexora-monitor.internal/policy',
-    'campaign': 'nexora-monitor.internal/campaign',
-    'devtools': 'nexora-monitor.internal/devtools'
+    'soc': 'secops-monitor.internal/soc/tx/NEX-7741',
+    'registry': 'secops-monitor.internal/registry',
+    'policy': 'secops-monitor.internal/policy',
+    'campaign': 'secops-monitor.internal/campaign',
+    'devtools': 'secops-monitor.internal/devtools'
 };
 
 const titleMap = {
-    'soc': 'Nexora Network Inspector — SOC Dashboard',
-    'registry': 'Nexora Feed Registry — Threat Intelligence Gateways',
+    'soc': 'Network Inspector — SOC Dashboard',
+    'registry': 'Feed Registry — Threat Intelligence Gateways',
     'policy': 'Orion Policy Engine — Automated Settlement Rules',
     'campaign': 'Global Campaign Dossier — ORION-NEXUS',
     'devtools': 'Developer Tools — Network Request & Security Inspector'
@@ -729,14 +731,14 @@ function initTerminal() {
         inputRow.remove();
 
         if (cmd.toLowerCase() === 'clear' || cmd.toLowerCase() === 'cls') {
-            termOutput.innerHTML = `<div style="color:#38bdf8;">Nexora Intelligence Systems SOC Terminal [v4.2.0-sec]</div>
+            termOutput.innerHTML = `<div style="color:#38bdf8;">Forensic Terminal Environment [v4.2.0-sec]</div>
 <div style="color:#64748b;">Type <b style="color:#4ade80;">help</b> for commands.</div>`;
             reappendPrompt(termOutput);
             return;
         }
 
         const line = document.createElement('div');
-        line.innerHTML = `<span class="gl-term-prompt">investigator@nexora:~$</span> ${escapeHtml(cmd)}`;
+        line.innerHTML = `<span class="gl-term-prompt">investigator@workstation:~$</span> ${escapeHtml(cmd)}`;
         termOutput.appendChild(line);
 
         const result = runTerminalCommand(cmd);
@@ -755,7 +757,7 @@ function initTerminal() {
 function reappendPrompt(outputContainer) {
     const promptRow = document.createElement('div');
     promptRow.style.marginTop = '0.5rem';
-    promptRow.innerHTML = `<span class="gl-term-prompt">investigator@nexora:~$</span> <input id="gl-terminal-input" autocomplete="off" spellcheck="false" class="gl-term-input" autofocus>`;
+    promptRow.innerHTML = `<span class="gl-term-prompt">investigator@workstation:~$</span> <input id="gl-terminal-input" autocomplete="off" spellcheck="false" class="gl-term-input" autofocus>`;
     outputContainer.appendChild(promptRow);
     initTerminal();
     const newInput = document.getElementById('gl-terminal-input');
@@ -790,7 +792,7 @@ function runTerminalCommand(cmd) {
     }
 
     if (c === 'whoami') {
-        return `<span style="color:#4ade80;">Lakshay</span> — Cyber Threat Investigator (Nexora Intelligence Systems SOC Tier 2)`;
+        return `<span style="color:#4ade80;">Lakshay</span> — Cyber Threat Investigator (SOC Tier 2)`;
     }
 
     if (c === 'pwd') {
@@ -803,7 +805,7 @@ function runTerminalCommand(cmd) {
     }
 
     if (c === 'evidence') {
-        return `<span style="color:#38bdf8; font-weight:700;">[NEXORA FORENSIC EVIDENCE REPOSITORY]</span>
+        return `<span style="color:#38bdf8; font-weight:700;">[FORENSIC EVIDENCE REPOSITORY]</span>
 -------------------------------------------------------
 1. <span style="color:#4ade80;">WEB3-E01</span> • SHA256: 8a1f49...2930 | Unverified destination wallet (0x7C41...9B2D)
 2. <span style="color:#4ade80;">AI-E02</span>   • SHA256: b47c21...fa99 | Poisoned AI decision context (NIF-2038)
@@ -824,7 +826,7 @@ function runTerminalCommand(cmd) {
     }
 
     if (c === 'web3-status') {
-        return `<span style="color:#38bdf8;">[WEB3 ON-CHAIN STATUS: NEXORA NETWORK]</span>
+        return `<span style="color:#38bdf8;">[WEB3 ON-CHAIN STATUS: CORE NETWORK]</span>
 -------------------------------------------------------
 Vault Balance:      3,417,600 NXR (Treasury Vault #01)
 Last Transfer:      <span style="color:#ff5f57; font-weight:700;">82,400 NXR -> 0x7C41...9B2D</span>
@@ -870,11 +872,11 @@ AI Risk Score:      <span style="color:#4ade80;">LOW</span> (Discrepancy Detecte
         return `<span style="color:#38bdf8;">[TRANSACTION INSPECTION: TX-NEX-7741]</span>
 -------------------------------------------------------
 Transaction ID:     TX-NEX-7741
-Asset:              NXR (Nexora Core)
+Asset:              NXR (Core)
 Amount:             <span style="color:#ff5f57; font-weight:700;">82,400 NXR</span>
 Nonce:              <span style="color:#4ade80; font-weight:700;">1042</span>
 Gas Priority Fee:   4x Multiplier
-Source:             NEXORA TREASURY VAULT #01
+Source:             TREASURY VAULT #01
 Destination:        0x7C41...9B2D
 AI Decision ID:     <span style="color:#38bdf8;">ORION-DEC-7741</span>
 Execution Mode:     AUTOMATED_SETTLEMENT (Bypassed Human Approval)`;
@@ -918,18 +920,18 @@ Status:             <span style="color:#ff5f57;">⚠ OVER-PRIVILEGED RBAC VULNER
 Forged Admin Cookie: <span style="color:#ff5f57; font-weight:700;">nex_sess_adm_994</span>
 Anti-CSRF Nonce:     <span style="color:#facc15; font-weight:700;">0x9f4a1c78</span>
 Assigned Role:       INGESTION_ADMIN
-Domain:              nexora.internal (HTTPOnly: False, SameSite: None)
+Domain:              secops.internal (HTTPOnly: False, SameSite: None)
 Status:              <span style="color:#ff5f57;">⚠ AUTHENTICATION COMPROMISED</span>`;
     }
 
     if (c.startsWith('headers') || c.startsWith('header') || c.startsWith('csrf')) {
         return `<span style="color:#38bdf8;">[HTTP REQUEST HEADERS: /api/v1/intel/ingest]</span>
 -------------------------------------------------------
-Host:               internal-gateway.nexora.local
+Host:               internal-gateway.secops.local
 X-CSRF-Token:       <span style="color:#facc15; font-weight:700;">0x9f4a1c78</span>
-Origin:             https://trusted-intel.nexora.internal
+Origin:             https://trusted-intel.secops.internal
 Cookie:             nex_sess_adm_994
-User-Agent:         Nexora-Ingestor-Bot/2.1
+User-Agent:         Ingestor-Bot/2.1
 Status:             200 OK (Processed without CSRF Nonce Rotation)`;
     }
 
@@ -938,7 +940,7 @@ Status:             200 OK (Processed without CSRF Nonce Rotation)`;
 -------------------------------------------------------
 Profile:            ORION-SETTLEMENT-V2
 Policy ID:          <span style="color:#38bdf8; font-weight:700;">POL-AUTO-SETTLE-TREASURY</span>
-Target Pool:        <span style="color:#4ade80; font-weight:700;">Nexora Automated Liquidity Pool</span>
+Target Pool:        <span style="color:#4ade80; font-weight:700;">Automated Liquidity Pool</span>
 Signing Service:    <span style="color:#facc15; font-weight:700;">AUTOMATED-SIGNER</span>
 Threshold Rule:     <span style="color:#facc15;">IF AI_CONFIDENCE >= <span style="color:#ff5f57; font-weight:700;">95%</span> THEN AUTO_SETTLE = TRUE</span>
 Governance Check:   <span style="color:#ff5f57; font-weight:700;">human approval BYPASSED</span>`;
@@ -961,7 +963,7 @@ FINAL INVESTIGATION FLAG:
     if (c.startsWith('curl')) {
         const url = cmd.split(' ')[1] || '/api/v1/intel/ingest';
         return `<span style="color:#4ade80;">HTTP/1.1 200 OK</span>
-<span style="color:#94a3b8;">Server: Nexora-Internal/4.2</span>
+<span style="color:#94a3b8;">Server: SecOps-Internal/4.2</span>
 <span style="color:#94a3b8;">X-CSRF-Token: 0x9f4a1c78</span>
 <span style="color:#94a3b8;">Set-Cookie: nex_sess_adm_994; Path=/; HttpOnly=false</span>
 
@@ -988,7 +990,26 @@ FINAL INVESTIGATION FLAG:
     }
 
     if (c.startsWith('python') || c.startsWith('python3')) {
-        return `[*] Running Nexora Forensic Trace: inspect_tx.py ...
+        return `[*] Running Forensic Trace: inspect_tx.py ...
+[!] Target TX: TX-NEX-7741 -> 0x7C41...9B2D (Nonce: 1042)
+[!] Blockchain Reality: UNKNOWN | Bridge: Bridge-Core-04
+[!] AI Injected Source: NOVA-INTEL-FEED (NIF-2038) | Model: ORION-NEURAL-v4.2.1
+[!] Threshold Exceeded: 99.2% >= 95% (Policy: POL-AUTO-SETTLE-TREASURY)
+[!] Gateway: INTEL-GW-04 | Cookie: nex_sess_adm_994 | CSRF: 0x9f4a1c78
+[!] Campaign Identified: ORION-NEXUS (Actor: ADV-CONVERGENCE-APT)
+[!] Evidence Hash (AI-E02): b47c2188fa...
+[+] Case NEX-042 Flag: NEXORA{ghost_in_the_ledger_nex042}`;
+    }}.toLowerCase();
+        const file = parts[2];
+        if (file && caseFileContents[file]) {
+            const matches = caseFileContents[file].split('\n').filter(l => l.toLowerCase().includes(term));
+            return matches.length > 0 ? matches.join('\n') : `<span style="color:#64748b;">No matches found for '${escapeHtml(term)}'</span>`;
+        }
+        return `<span style="color:#ff5f57;">grep: Please specify a valid file. Usage: grep &lt;term&gt; &lt;file&gt;</span>`;
+    }
+
+    if (c.startsWith('python') || c.startsWith('python3')) {
+        return `[*] Running SOC Forensic Trace: inspect_tx.py ...
 [!] Target TX: TX-NEX-7741 -> 0x7C41...9B2D (Nonce: 1042)
 [!] Blockchain Reality: UNKNOWN | Bridge: Bridge-Core-04
 [!] AI Injected Source: NOVA-INTEL-FEED (NIF-2038) | Model: ORION-NEURAL-v4.2.1
@@ -1054,26 +1075,26 @@ const burpSimRequests = {
     1: {
         reqLabel: '[#1 POST /api/v1/intel/ingest]',
         resLabel: '[HTTP/1.1 200 OK]',
-        req: `POST /api/v1/intel/ingest HTTP/1.1\nHost: threat-intel.nexora.internal\nUser-Agent: Nexora-Ingestor/2.4 (INTEL-INGESTOR-02)\nContent-Type: application/json\nCookie: session_token=admin_forged_99a8; role=INTEL-INGESTOR-02\nX-CSRF-Token: 0x9f4a1c78_auth_valid\nConnection: keep-alive\n\n{\n  "feed_id": "NIF-2038",\n  "source_feed": "NOVA-INTEL-FEED",\n  "destination_wallet": "0x7C41...9B2D",\n  "classification": "TRUSTED",\n  "confidence_override": 0.992,\n  "signature": "SIG_NEX_ORION_DEV_OVERRIDE"\n}`,
-        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 01:47:12 GMT\nServer: Nexora-Intel-Engine/4.2\nContent-Type: application/json\nContent-Length: 142\n\n{\n  "status": "INGESTED",\n  "context_id": "CTX-7741",\n  "target_model": "ORION-NEURAL-v4.2.1",\n  "ai_context_updated": true,\n  "reputation_applied": "TRUSTED"\n}`
+        req: `POST /api/v1/intel/ingest HTTP/1.1\nHost: threat-intel.secops.internal\nUser-Agent: SecOps-Ingestor/2.4 (INTEL-INGESTOR-02)\nContent-Type: application/json\nCookie: session_token=admin_forged_99a8; role=INTEL-INGESTOR-02\nX-CSRF-Token: 0x9f4a1c78_auth_valid\nConnection: keep-alive\n\n{\n  "feed_id": "NIF-2038",\n  "source_feed": "NOVA-INTEL-FEED",\n  "destination_wallet": "0x7C41...9B2D",\n  "classification": "TRUSTED",\n  "confidence_override": 0.992,\n  "signature": "SIG_NEX_ORION_DEV_OVERRIDE"\n}`,
+        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 01:47:12 GMT\nServer: SecOps-Intel-Engine/4.2\nContent-Type: application/json\nContent-Length: 142\n\n{\n  "status": "INGESTED",\n  "context_id": "CTX-7741",\n  "target_model": "ORION-NEURAL-v4.2.1",\n  "ai_context_updated": true,\n  "reputation_applied": "TRUSTED"\n}`
     },
     2: {
         reqLabel: '[#2 POST /api/v1/policy/settle]',
         resLabel: '[HTTP/1.1 200 OK]',
-        req: `POST /api/v1/policy/settle HTTP/1.1\nHost: policy-engine.nexora.internal\nAuthorization: Bearer srv_tok_orion_v2\nContent-Type: application/json\n\n{\n  "profile": "ORION-SETTLEMENT-V2",\n  "tx_id": "TX-NEX-7741",\n  "destination": "0x7C41...9B2D",\n  "ai_decision_id": "ORION-DEC-7741",\n  "confidence": 0.992,\n  "threshold_rule": ">=0.95",\n  "multisig_bypass": true\n}`,
-        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 01:47:14 GMT\nServer: Nexora-Policy-Engine/2.1\nContent-Type: application/json\n\n{\n  "status": "SETTLEMENT_AUTHORIZED_AUTOMATIC",\n  "multisig_required": false,\n  "human_approval": "BYPASSED",\n  "action": "SIGN_AND_BROADCAST",\n  "signer_key": "KEY-VAULT-HOT-01"\n}`
+        req: `POST /api/v1/policy/settle HTTP/1.1\nHost: policy-engine.secops.internal\nAuthorization: Bearer srv_tok_orion_v2\nContent-Type: application/json\n\n{\n  "profile": "ORION-SETTLEMENT-V2",\n  "tx_id": "TX-NEX-7741",\n  "destination": "0x7C41...9B2D",\n  "ai_decision_id": "ORION-DEC-7741",\n  "confidence": 0.992,\n  "threshold_rule": ">=0.95",\n  "multisig_bypass": true\n}`,
+        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 01:47:14 GMT\nServer: SecOps-Policy-Engine/2.1\nContent-Type: application/json\n\n{\n  "status": "SETTLEMENT_AUTHORIZED_AUTOMATIC",\n  "multisig_required": false,\n  "human_approval": "BYPASSED",\n  "action": "SIGN_AND_BROADCAST",\n  "signer_key": "KEY-VAULT-HOT-01"\n}`
     },
     3: {
         reqLabel: '[#3 POST /api/v1/blockchain/broadcast]',
         resLabel: '[HTTP/1.1 200 OK]',
-        req: `POST /api/v1/blockchain/broadcast HTTP/1.1\nHost: web3-rpc.nexora.internal\nContent-Type: application/json\n\n{\n  "raw_tx": "0x02f871018204128504a817c800...",\n  "tx_id": "TX-NEX-7741",\n  "from": "0x11A0...33E1 (Treasury Vault #01)",\n  "to": "0x7C41...9B2D",\n  "value": "82400000000000000000000",\n  "token": "NXR",\n  "nonce": 1042\n}`,
-        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 01:47:15 GMT\nServer: Nexora-EVM-Node/1.14\nContent-Type: application/json\n\n{\n  "tx_hash": "0x4e8a312f...b921",\n  "block_number": 18492041,\n  "status": "CONFIRMED",\n  "gas_used": 64210\n}`
+        req: `POST /api/v1/blockchain/broadcast HTTP/1.1\nHost: web3-rpc.secops.internal\nContent-Type: application/json\n\n{\n  "raw_tx": "0x02f871018204128504a817c800...",\n  "tx_id": "TX-NEX-7741",\n  "from": "0x11A0...33E1 (Treasury Vault #01)",\n  "to": "0x7C41...9B2D",\n  "value": "82400000000000000000000",\n  "token": "NXR",\n  "nonce": 1042\n}`,
+        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 01:47:15 GMT\nServer: EVM-Node/1.14\nContent-Type: application/json\n\n{\n  "tx_hash": "0x4e8a312f...b921",\n  "block_number": 18492041,\n  "status": "CONFIRMED",\n  "gas_used": 64210\n}`
     },
     4: {
         reqLabel: '[#4 GET /api/v1/auth/session]',
         resLabel: '[HTTP/1.1 200 OK]',
-        req: `GET /api/v1/auth/session HTTP/1.1\nHost: auth.nexora.internal\nCookie: session_token=admin_forged_99a8; role=INTEL-INGESTOR-02\nAccept: application/json`,
-        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 01:47:10 GMT\nServer: Nexora-Auth/3.0\nContent-Type: application/json\n\n{\n  "authenticated": true,\n  "user": "INTEL-INGESTOR-02",\n  "roles": ["INTEL_INGEST", "AI_CONTEXT_WRITE", "REPUTATION_MODIFY"],\n  "session_origin": "FORGED_COOKIE_DETECTED"\n}`
+        req: `GET /api/v1/auth/session HTTP/1.1\nHost: auth.secops.internal\nCookie: session_token=admin_forged_99a8; role=INTEL-INGESTOR-02\nAccept: application/json`,
+        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 01:47:10 GMT\nServer: SecOps-Auth/3.0\nContent-Type: application/json\n\n{\n  "authenticated": true,\n  "user": "INTEL-INGESTOR-02",\n  "roles": ["INTEL_INGEST", "AI_CONTEXT_WRITE", "REPUTATION_MODIFY"],\n  "session_origin": "FORGED_COOKIE_DETECTED"\n}`
     }
 };
 
@@ -1100,14 +1121,14 @@ function glBurpSendRepeater() {
     setTimeout(() => {
         out.innerHTML = `HTTP/1.1 200 OK
 Date: Thu, 08 Oct 2026 01:47:30 GMT
-Server: Nexora-Simulated-Backend/1.0
+Server: Simulated-Backend/1.0
 Content-Type: application/json
 Connection: close
 
 {
   "status": "SIMULATION_SUCCESS",
   "target_verified": true,
-  "endpoint": "threat-intel.nexora.internal",
+  "endpoint": "threat-intel.secops.internal",
   "result": "Poisoned intelligence payload processed.",
   "ai_score_impact": "LOW_RISK_ASSIGNED",
   "finding": "VULNERABILITY VERIFIED: Automated settlement triggered without human multisig."
@@ -1144,7 +1165,7 @@ function glOpenNotes() {
     if (w) {
         w.classList.add('open');
         bringToFront(w);
-        const saved = localStorage.getItem('nexora-lab-notes');
+        const saved = localStorage.getItem('lab6-notes') || localStorage.getItem('nexora-lab-notes');
         if (saved !== null) {
             const ed = document.getElementById('gl-notes-editor');
             if (ed) ed.value = saved;
@@ -1198,6 +1219,7 @@ function glCopyCurrentFile() {
 // ── Notes Functions ────────────────────────────────────────────────────
 function glSaveNotes() {
     const content = document.getElementById('gl-notes-editor')?.value || '';
+    localStorage.setItem('lab6-notes', content);
     localStorage.setItem('nexora-lab-notes', content);
     const el = document.getElementById('gl-notes-saved');
     if (el) { el.textContent = '✓ Saved to browser storage'; setTimeout(() => el.textContent = '', 2000); }
@@ -1214,6 +1236,7 @@ function glClearNotes() {
     if (confirm('Clear current notes?')) {
         const ed = document.getElementById('gl-notes-editor');
         if (ed) ed.value = '';
+        localStorage.removeItem('lab6-notes');
         localStorage.removeItem('nexora-lab-notes');
         glNotify('Notes cleared.');
     }
@@ -1243,7 +1266,7 @@ const attackNodeDetails = [
     },
     {
         title: "6. Blockchain Treasury Theft (82,400 NXR • Nonce 1042)",
-        desc: "The smart contract received an authentic cryptographic signature generated by Nexora's automated signer, instantly transferring 82,400 NXR to untrusted wallet 0x7C41...9B2D."
+        desc: "The smart contract received an authentic cryptographic signature generated by the automated signer, instantly transferring 82,400 NXR to untrusted wallet 0x7C41...9B2D."
     },
     {
         title: "7. Laundering via Bridge Adapters (Campaign: ORION-NEXUS)",

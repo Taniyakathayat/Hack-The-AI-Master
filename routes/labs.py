@@ -40,7 +40,7 @@ def labs():
     
     lab_meta = {
         'lab6': {
-            'description': 'A simulated enterprise AI-blockchain breach investigation at Nexora Intelligence Systems. Uncover unauthorized fund transfers, investigate poisoned AI context, trace compromised RBAC permissions, and contain a sophisticated cross-chain adversary.',
+            'description': 'A simulated enterprise AI-blockchain breach investigation. Uncover unauthorized fund transfers, investigate poisoned AI context, trace compromised RBAC permissions, and contain a sophisticated cross-chain adversary.',
             'xp': 250,
             'case_id': 'NEX-042',
             'pro_num': 'PRO 01'

@@ -5,7 +5,7 @@ const CASE_NEX_042_STORY = {
   opening: {
     title: "THE GHOST IN THE LEDGER",
     text: [
-      "01:47 AM. Nexora's SOC is almost silent when a Priority-0 alert appears.",
+      "01:47 AM. The SOC is almost silent when a Priority-0 alert appears.",
       "82,400 NXR has been transferred from the company treasury to an unknown wallet.",
       "The blockchain confirms the transaction is valid, and ORION AI has marked the wallet as TRUSTED with 99.2% confidence.",
       "But Finance has no record of approving the transfer.",
@@ -26,7 +26,7 @@ const CASE_NEX_042_STORY = {
         },
         {
           character: "Mehak",
-          text: "I checked the destination wallet. It's extremely young, has almost no legitimate history, and there's no known Nexora relationship. For a treasury transaction this large, that's a serious anomaly."
+          text: "I checked the destination wallet. It's extremely young, has almost no legitimate history, and there's no known internal relationship. For a treasury transaction this large, that's a serious anomaly."
         },
         {
           character: "Shanu",
@@ -42,10 +42,10 @@ const CASE_NEX_042_STORY = {
         },
         {
           character: "Lakshay",
-          text: "Then we need to know one thing before anything else: if Nexora never trusted this wallet, who told ORION that it was trusted?"
+          text: "Then we need to know one thing before anything else: if our systems never trusted this wallet, who told ORION that it was trusted?"
         }
       ],
-      hook: "The wallet was unknown to Nexora. But somehow, the AI already knew exactly what to think about it.",
+      hook: "The wallet was unknown to the organization. But somehow, the AI already knew exactly what to think about it.",
       evidence: [
         "WEB3-E01",
         "TX-NEX-7741",
@@ -105,7 +105,7 @@ const CASE_NEX_042_STORY = {
         },
         {
           character: "Mehak",
-          text: "That's the problem. It isn't in the approved registry, and there are no previous records showing this source being trusted by Nexora."
+          text: "That's the problem. It isn't in the approved registry, and there are no previous records showing this source being trusted internally."
         },
         {
           character: "Shivam",
@@ -337,9 +337,9 @@ const attackChainNodes = [
         name: "11. SMART CONTRACT",
         layer: "web3",
         layerName: "Smart Contract",
-        subtitle: "Nexora Liquidity Pool Contract",
+        subtitle: "Internal Liquidity Pool Contract",
         desc: "The on-chain contract received a perfectly valid cryptographically signed transaction. It executed the transfer according to bytecode.",
-        evidence: "Contract: 0x4f12...e88a (Nexora Core Settlement)",
+        evidence: "Contract: 0x4f12...e88a (Core Settlement)",
         mitigation: "On-chain rate limiting, treasury timelocks, and recipient allowlist verification inside contract state."
     },
     {

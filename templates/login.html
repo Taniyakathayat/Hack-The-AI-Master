@@ -30,6 +30,18 @@
             <form action="{{ url_for('auth.login') }}" method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 
+                <!-- Demo Login Instruction Box -->
+                <div class="demo-login-box" style="margin-bottom: var(--space-4); padding: 12px 14px; background: rgba(16, 185, 129, 0.08); border: 1px dashed rgba(16, 185, 129, 0.35); border-radius: 6px; font-family: var(--font-mono, monospace); font-size: 0.85rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; color: var(--success, #10b981); font-weight: 700; font-size: 0.75rem; letter-spacing: 0.05em;">
+                        <span>🔐 DEMO LOGIN</span>
+                        <span style="font-size: 0.7rem; color: #64748b;">PRE-CONFIGURED</span>
+                    </div>
+                    <div style="color: var(--text-secondary, #94a3b8); line-height: 1.5; font-size: 0.8rem;">
+                        <div>Username: <strong style="color: var(--text-primary, #f1f5f9); font-weight: 600;">admin</strong></div>
+                        <div>Password: <strong style="color: var(--text-primary, #f1f5f9); font-weight: 600;">admin123</strong></div>
+                    </div>
+                </div>
+                
                 <div class="form-group">
                     <label class="form-label" for="username">Username</label>
                     <input type="text" class="form-control" id="username" name="username" required autofocus placeholder="student_01">

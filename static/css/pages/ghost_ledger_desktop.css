@@ -404,12 +404,13 @@
 .gl-window.open { display: flex; }
 
 /* Window positions */
-#gl-browser-window { top: 20px; left: 120px; width: calc(100% - 170px); height: calc(100% - 75px); }
-#gl-terminal-window { top: 35px; left: 135px; width: calc(100% - 190px); height: calc(100% - 90px); }
-#gl-filemanager-window { top: 30px; left: 130px; width: calc(100% - 180px); height: calc(100% - 85px); }
-#gl-notes-window { top: 45px; left: 145px; width: calc(100% - 200px); height: calc(100% - 100px); }
-#gl-attackgraph-window { top: 20px; left: 120px; width: calc(100% - 170px); height: calc(100% - 75px); }
-#gl-evidence-window { top: 30px; left: 130px; width: calc(100% - 180px); height: calc(100% - 85px); }
+#gl-browser-window { top: 16px; left: 110px; width: calc(100% - 145px); height: calc(100% - 60px); max-width: calc(100% - 120px); max-height: calc(100% - 50px); }
+#gl-burpsuite-window { top: 20px; left: 115px; width: calc(100% - 150px); height: calc(100% - 65px); max-width: calc(100% - 125px); max-height: calc(100% - 55px); }
+#gl-terminal-window { top: 26px; left: 120px; width: calc(100% - 160px); height: calc(100% - 75px); max-width: calc(100% - 130px); max-height: calc(100% - 65px); }
+#gl-filemanager-window { top: 22px; left: 118px; width: calc(100% - 155px); height: calc(100% - 70px); }
+#gl-notes-window { top: 30px; left: 125px; width: calc(100% - 170px); height: calc(100% - 80px); }
+#gl-attackgraph-window { top: 16px; left: 110px; width: calc(100% - 145px); height: calc(100% - 60px); }
+#gl-evidence-window { top: 22px; left: 118px; width: calc(100% - 155px); height: calc(100% - 70px); }
 
 /* Window title bar */
 .gl-window-titlebar {
@@ -1176,8 +1177,8 @@
 
   .gl-desktop-pane {
     width: 100%;
-    height: calc(100vh - 120px);
-    min-height: 540px;
+    height: calc(100vh - 110px);
+    min-height: 520px;
     flex: none;
   }
 
@@ -1208,19 +1209,22 @@
     display: none;
   }
 
-  /* Full screen window overlays on mobile */
+  /* Full screen window overlays on mobile & tablet */
   #gl-browser-window,
   #gl-terminal-window,
   #gl-filemanager-window,
   #gl-attackgraph-window,
   #gl-evidence-window,
-  #gl-notes-window {
+  #gl-notes-window,
+  #gl-burpsuite-window {
     top: 0 !important;
     left: 0 !important;
     width: 100% !important;
-    height: calc(100% - 38px) !important;
-    border-radius: 0;
-    border: none;
+    height: calc(100% - 40px) !important;
+    max-width: 100% !important;
+    max-height: calc(100% - 40px) !important;
+    border-radius: 0 !important;
+    border: none !important;
   }
 
   .gl-subtask-pills {
@@ -1238,16 +1242,75 @@
   }
 }
 
+@media (max-width: 768px) {
+  .burp-dual-pane {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+
+  .burp-table-container {
+    max-height: 160px;
+  }
+
+  .gl-dt-dual-pane {
+    grid-template-columns: 1fr;
+  }
+
+  .gl-filemanager-body {
+    flex-direction: column;
+  }
+
+  .gl-file-grid {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-right: none;
+    border-bottom: 1px solid rgba(0, 240, 255, 0.15);
+    padding: 6px;
+    gap: 6px;
+  }
+
+  .gl-file-item {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .gl-evidence-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gl-desktop-icons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    width: calc(100% - 16px);
+    gap: 6px;
+    left: 8px;
+    top: 8px;
+  }
+
+  .gl-desktop-icon {
+    width: 100%;
+    min-height: 52px;
+  }
+}
+
 @media (max-width: 640px) {
   .gl-taskbar-tabs {
     overflow-x: auto;
-    max-width: calc(100vw - 110px);
+    -webkit-overflow-scrolling: touch;
+    max-width: calc(100vw - 90px);
+    display: flex;
+    gap: 4px;
   }
 
   .gl-taskbar-tab {
     font-size: 10px;
-    padding: 3px 6px;
+    padding: 4px 8px;
     white-space: nowrap;
+    flex-shrink: 0;
+    min-height: 32px;
   }
 
   .gl-room-title {
@@ -1261,6 +1324,12 @@
   .gl-pill-btn {
     padding: 6px 10px;
     font-size: 11px;
+    min-height: 36px;
+  }
+
+  .gl-mobile-tab-btn {
+    min-height: 40px;
+    font-size: 12px;
   }
 
   .gl-dialogue-line {
@@ -1275,11 +1344,19 @@
 
   .gl-quiz-btn {
     width: 100%;
+    min-height: 38px;
   }
 
   .gl-hint-btn {
     width: 100%;
     text-align: center;
+    min-height: 36px;
+  }
+
+  .gl-answer-input,
+  .gl-quiz-input,
+  .gl-term-input {
+    font-size: 14px;
   }
 }
 
