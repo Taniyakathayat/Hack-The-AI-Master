@@ -2,12 +2,12 @@
 Seed script for PRO Lab 02: THE VANISHING CONSENSUS
 Case NEX-071 — Nexora Intelligence Systems
 
-Category: WEB3 × AI × BLOCKCHAIN × IoT
+Category: WEB3 × AI × CYBERSECURITY × IoT
 
 Seeds 5 Chapters with 6 hands-on investigation questions each (Total 30 Questions)
 covering the complete Cross-Layer Trust-Chain Attack:
 IoT Device / Telemetry Layer -> Data Aggregation -> Web3 Oracle ->
-AI Model Poisoning -> Blockchain State -> Validator Divergence -> Consensus Risk.
+AI Model Poisoning -> Blockchain State (as part of Web3) -> Validator Divergence -> Consensus Risk.
 """
 
 from extensions import db
@@ -23,14 +23,14 @@ def seed_vanishing_consensus():
         lab = Lab(
             id='lab7',
             name='The Vanishing Consensus',
-            topic='WEB3 × AI × BLOCKCHAIN × IoT',
+            topic='WEB3 × AI × CYBERSECURITY × IoT',
             difficulty='Pro',
         )
         db.session.add(lab)
         db.session.commit()
     else:
         lab.name = 'The Vanishing Consensus'
-        lab.topic = 'WEB3 × AI × BLOCKCHAIN × IoT'
+        lab.topic = 'WEB3 × AI × CYBERSECURITY × IoT'
         lab.difficulty = 'Pro'
         db.session.commit()
 

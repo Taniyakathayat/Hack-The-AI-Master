@@ -1283,5 +1283,120 @@
   }
 }
 
-
-
+/* ═══════════════════════════════════════════════════════════════════════
+   BURP SUITE SIMULATED PROXY & INSPECTOR STYLES
+   ═══════════════════════════════════════════════════════════════════════ */
+.burp-window-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #0f172a;
+  color: #e2e8f0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.burp-top-tabs {
+  display: flex;
+  background: #090e1a;
+  border-bottom: 1px solid rgba(255, 136, 0, 0.3);
+  padding: 0 8px;
+}
+.burp-tab {
+  padding: 8px 16px;
+  cursor: pointer;
+  color: #94a3b8;
+  border-bottom: 2px solid transparent;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.burp-tab:hover {
+  color: #fdba74;
+}
+.burp-tab.active {
+  color: #ff8800;
+  border-bottom-color: #ff8800;
+  background: rgba(255, 136, 0, 0.08);
+}
+.burp-subbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 6px 12px;
+  background: rgba(15, 23, 42, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.burp-table-container {
+  flex: 1;
+  max-height: 220px;
+  overflow-y: auto;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.burp-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 11.5px;
+}
+.burp-table th {
+  position: sticky;
+  top: 0;
+  background: #090e1a;
+  padding: 6px 10px;
+  color: #ff8800;
+  border-bottom: 1px solid rgba(255, 136, 0, 0.3);
+}
+.burp-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+}
+.burp-table tr:hover {
+  background: rgba(255, 136, 0, 0.06);
+}
+.burp-table tr.selected {
+  background: rgba(255, 136, 0, 0.15);
+  color: #fff;
+  font-weight: 600;
+}
+.burp-dual-pane {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  flex: 1;
+  min-height: 240px;
+  overflow: hidden;
+  background: #0b1120;
+}
+.burp-pane {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.burp-pane:last-child {
+  border-right: none;
+}
+.burp-pane-header {
+  padding: 6px 12px;
+  background: #090e1a;
+  color: #ff8800;
+  font-size: 11px;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-between;
+}
+.burp-pane-content {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: #cbd5e1;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.burp-method-get { color: #38bdf8; font-weight: 700; }
+.burp-method-post { color: #34d399; font-weight: 700; }
+.burp-status-200 { color: #34d399; font-weight: 700; }
+.burp-status-403 { color: #f87171; font-weight: 700; }

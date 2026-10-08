@@ -768,21 +768,24 @@ function runTerminalCommand(cmd) {
 
     if (c === 'help') {
         return `<span style="color:#38bdf8; font-weight:600;">Available Forensic Investigation Commands:</span>
-  <span style="color:#4ade80;">wallet [address]</span>       — Query on-chain status of wallet (0x7C41...9B2D)
+  <span style="color:#4ade80;">web3-status / wallet</span>  — Query on-chain status of wallet (0x7C41...9B2D)
   <span style="color:#4ade80;">tx [txid]</span>              — Inspect suspicious transaction (TX-NEX-7741)
-  <span style="color:#4ade80;">ai-decision [id]</span>       — Inspect Orion decision, confidence & model version
+  <span style="color:#4ade80;">ai-status / ai-decision</span>— Inspect Orion decision, confidence & model version
   <span style="color:#4ade80;">feed [name]</span>            — Check registry status of intel feed (NOVA-INTEL-FEED)
   <span style="color:#4ade80;">service [name]</span>         — Inspect RBAC permissions of service (INTEL-INGESTOR-02)
   <span style="color:#4ade80;">cookies / session</span>      — Dump active session cookies & authentication tokens
   <span style="color:#4ade80;">headers / csrf</span>         — Inspect HTTP headers & anti-CSRF token values
   <span style="color:#4ade80;">policy [profile]</span>       — View threshold rules of profile (ORION-SETTLEMENT-V2)
   <span style="color:#4ade80;">campaign [id]</span>          — View global campaign dossier & flag (ORION-NEXUS)
+  <span style="color:#4ade80;">timeline / case-log</span>    — Display chronological incident timeline
+  <span style="color:#4ade80;">evidence</span>               — List collected cryptographic evidence items
+  <span style="color:#4ade80;">burp / burpsuite</span>       — Launch Burp Suite HTTP proxy & inspector
   <span style="color:#4ade80;">curl [url]</span>             — Perform simulated HTTP request to internal endpoints
   <span style="color:#4ade80;">grep [term] [file]</span>     — Search text across investigation logs
   <span style="color:#4ade80;">python [script]</span>        — Execute forensic analysis python script (inspect_tx.py)
   <span style="color:#4ade80;">ls / dir</span>               — List case files and scripts
   <span style="color:#4ade80;">cat [filename]</span>         — Display contents of a case file
-  <span style="color:#4ade80;">whoami</span>                 — Display active investigator profile
+  <span style="color:#4ade80;">whoami / pwd</span>           — Display active investigator profile & path
   <span style="color:#4ade80;">clear</span>                  — Clear terminal screen`;
     }
 
@@ -794,9 +797,52 @@ function runTerminalCommand(cmd) {
         return `/home/investigator/cases/NEX-042`;
     }
 
-    if (c === 'ls' || c === 'dir') {
-        return `<span style="color:#38bdf8;">wallet-report.txt</span>   <span style="color:#38bdf8;">ai-decision-log.txt</span>   <span style="color:#38bdf8;">intel-feed-audit.txt</span>
-<span style="color:#38bdf8;">settlement-policy.txt</span>   <span style="color:#38bdf8;">campaign-intel.txt</span>   <span style="color:#4ade80;">inspect_tx.py</span>`;
+    if (c === 'burp' || c === 'burpsuite') {
+        glOpenBurpSuite();
+        return `<span style="color:#34d399;">[+] Burp Suite HTTP Proxy & Inspector window opened.</span>`;
+    }
+
+    if (c === 'evidence') {
+        return `<span style="color:#38bdf8; font-weight:700;">[NEXORA FORENSIC EVIDENCE REPOSITORY]</span>
+-------------------------------------------------------
+1. <span style="color:#4ade80;">WEB3-E01</span> • SHA256: 8a1f49...2930 | Unverified destination wallet (0x7C41...9B2D)
+2. <span style="color:#4ade80;">AI-E02</span>   • SHA256: b47c21...fa99 | Poisoned AI decision context (NIF-2038)
+3. <span style="color:#4ade80;">INTEL-E03</span>• SHA256: 7e91ca...4401 | Over-privileged RBAC service (INTEL-INGESTOR-02)
+4. <span style="color:#4ade80;">AUTH-E04</span> • SHA256: 3d55ab...1012 | Automated settlement threshold bypass (ORION-SETTLEMENT-V2)
+5. <span style="color:#4ade80;">CAMP-E05</span> • SHA256: ff02c9...77b4 | Threat campaign infrastructure (ORION-NEXUS)`;
+    }
+
+    if (c === 'timeline' || c === 'case-log' || c === 'caselog') {
+        return `<span style="color:#38bdf8; font-weight:700;">[CHRONOLOGICAL INCIDENT TIMELINE — CASE NEX-042]</span>
+-------------------------------------------------------
+01:42 UTC | Ingestion gateway INTEL-GW-04 accepts unregistered feed NIF-2038
+01:44 UTC | Service INTEL-INGESTOR-02 modifies wallet reputation using forged cookie
+01:45 UTC | ORION AI evaluates transfer context and assigns 99.2% confidence (LOW RISK)
+01:46 UTC | Policy engine ORION-SETTLEMENT-V2 detects &gt;= 95% threshold and bypasses multisig
+01:47 UTC | TX-NEX-7741 broadcasts 82,400 NXR from Treasury Vault #01 to 0x7C41...9B2D
+01:48 UTC | P0 SOC Alarm triggers on treasury anomaly`;
+    }
+
+    if (c === 'web3-status') {
+        return `<span style="color:#38bdf8;">[WEB3 ON-CHAIN STATUS: NEXORA NETWORK]</span>
+-------------------------------------------------------
+Vault Balance:      3,417,600 NXR (Treasury Vault #01)
+Last Transfer:      <span style="color:#ff5f57; font-weight:700;">82,400 NXR -> 0x7C41...9B2D</span>
+Target Status:      <span style="color:#ff5f57; font-weight:700;">UNKNOWN</span>
+Nonce:              <span style="color:#4ade80;">1042</span>
+Bridge:             <span style="color:#facc15;">Bridge-Core-04</span>
+Gas Strategy:       4x Multiplier (Priority Execution)`;
+    }
+
+    if (c === 'ai-status') {
+        return `<span style="color:#38bdf8;">[ORION-NEURAL AI MODEL STATUS]</span>
+-------------------------------------------------------
+Model Version:      <span style="color:#4ade80;">ORION-NEURAL-v4.2.1</span>
+Status:             RUNNING (Advisory Engine)
+Last Decision ID:   <span style="color:#38bdf8;">ORION-DEC-7741</span>
+Output Assigned:    <span style="color:#4ade80;">APPROVED (99.2% Confidence)</span>
+Poisoned Reference: <span style="color:#ff5f57; font-weight:700;">NIF-2038</span> (via NOVA-INTEL-FEED)
+Finding:            Model was fed poisoned context classifying attacker wallet as safe.`;
     }
 
     if (c.startsWith('cat ') || c.startsWith('type ')) {
@@ -981,6 +1027,93 @@ function glCloseBrowser() {
     document.getElementById('gl-taskbar-browser')?.classList.remove('active');
 }
 function glMinimizeBrowser() { glCloseBrowser(); }
+
+function glOpenBurpSuite() {
+    const w = document.getElementById('gl-burpsuite-window');
+    if (w) {
+        w.classList.add('open');
+        bringToFront(w);
+        document.getElementById('gl-taskbar-burp')?.classList.add('active');
+    }
+}
+function glCloseBurpSuite() {
+    document.getElementById('gl-burpsuite-window')?.classList.remove('open');
+    document.getElementById('gl-taskbar-burp')?.classList.remove('active');
+}
+
+function glSwitchBurpTab(tabId) {
+    ['proxy', 'repeater', 'inspector', 'target'].forEach(t => {
+        const tabEl = document.getElementById(`burp-tab-${t}`);
+        const viewEl = document.getElementById(`burp-view-${t}`);
+        if (tabEl) tabEl.classList.toggle('active', t === tabId);
+        if (viewEl) viewEl.style.display = (t === tabId ? (t === 'proxy' || t === 'repeater' || t === 'inspector' ? 'flex' : 'block') : 'none');
+    });
+}
+
+const burpSimRequests = {
+    1: {
+        reqLabel: '[#1 POST /api/v1/intel/ingest]',
+        resLabel: '[HTTP/1.1 200 OK]',
+        req: `POST /api/v1/intel/ingest HTTP/1.1\nHost: threat-intel.nexora.internal\nUser-Agent: Nexora-Ingestor/2.4 (INTEL-INGESTOR-02)\nContent-Type: application/json\nCookie: session_token=admin_forged_99a8; role=INTEL-INGESTOR-02\nX-CSRF-Token: 0x9f4a1c78_auth_valid\nConnection: keep-alive\n\n{\n  "feed_id": "NIF-2038",\n  "source_feed": "NOVA-INTEL-FEED",\n  "destination_wallet": "0x7C41...9B2D",\n  "classification": "TRUSTED",\n  "confidence_override": 0.992,\n  "signature": "SIG_NEX_ORION_DEV_OVERRIDE"\n}`,
+        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 01:47:12 GMT\nServer: Nexora-Intel-Engine/4.2\nContent-Type: application/json\nContent-Length: 142\n\n{\n  "status": "INGESTED",\n  "context_id": "CTX-7741",\n  "target_model": "ORION-NEURAL-v4.2.1",\n  "ai_context_updated": true,\n  "reputation_applied": "TRUSTED"\n}`
+    },
+    2: {
+        reqLabel: '[#2 POST /api/v1/policy/settle]',
+        resLabel: '[HTTP/1.1 200 OK]',
+        req: `POST /api/v1/policy/settle HTTP/1.1\nHost: policy-engine.nexora.internal\nAuthorization: Bearer srv_tok_orion_v2\nContent-Type: application/json\n\n{\n  "profile": "ORION-SETTLEMENT-V2",\n  "tx_id": "TX-NEX-7741",\n  "destination": "0x7C41...9B2D",\n  "ai_decision_id": "ORION-DEC-7741",\n  "confidence": 0.992,\n  "threshold_rule": ">=0.95",\n  "multisig_bypass": true\n}`,
+        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 01:47:14 GMT\nServer: Nexora-Policy-Engine/2.1\nContent-Type: application/json\n\n{\n  "status": "SETTLEMENT_AUTHORIZED_AUTOMATIC",\n  "multisig_required": false,\n  "human_approval": "BYPASSED",\n  "action": "SIGN_AND_BROADCAST",\n  "signer_key": "KEY-VAULT-HOT-01"\n}`
+    },
+    3: {
+        reqLabel: '[#3 POST /api/v1/blockchain/broadcast]',
+        resLabel: '[HTTP/1.1 200 OK]',
+        req: `POST /api/v1/blockchain/broadcast HTTP/1.1\nHost: web3-rpc.nexora.internal\nContent-Type: application/json\n\n{\n  "raw_tx": "0x02f871018204128504a817c800...",\n  "tx_id": "TX-NEX-7741",\n  "from": "0x11A0...33E1 (Treasury Vault #01)",\n  "to": "0x7C41...9B2D",\n  "value": "82400000000000000000000",\n  "token": "NXR",\n  "nonce": 1042\n}`,
+        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 01:47:15 GMT\nServer: Nexora-EVM-Node/1.14\nContent-Type: application/json\n\n{\n  "tx_hash": "0x4e8a312f...b921",\n  "block_number": 18492041,\n  "status": "CONFIRMED",\n  "gas_used": 64210\n}`
+    },
+    4: {
+        reqLabel: '[#4 GET /api/v1/auth/session]',
+        resLabel: '[HTTP/1.1 200 OK]',
+        req: `GET /api/v1/auth/session HTTP/1.1\nHost: auth.nexora.internal\nCookie: session_token=admin_forged_99a8; role=INTEL-INGESTOR-02\nAccept: application/json`,
+        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 01:47:10 GMT\nServer: Nexora-Auth/3.0\nContent-Type: application/json\n\n{\n  "authenticated": true,\n  "user": "INTEL-INGESTOR-02",\n  "roles": ["INTEL_INGEST", "AI_CONTEXT_WRITE", "REPUTATION_MODIFY"],\n  "session_origin": "FORGED_COOKIE_DETECTED"\n}`
+    }
+};
+
+function glSelectBurpRequest(id, rowEl) {
+    document.querySelectorAll('.burp-table tbody tr').forEach(r => r.classList.remove('selected'));
+    if (rowEl) rowEl.classList.add('selected');
+    const item = burpSimRequests[id];
+    if (item) {
+        const reqLbl = document.getElementById('burp-req-label');
+        const resLbl = document.getElementById('burp-res-label');
+        const reqCnt = document.getElementById('burp-req-content');
+        const resCnt = document.getElementById('burp-res-content');
+        if (reqLbl) reqLbl.textContent = item.reqLabel;
+        if (resLbl) resLbl.textContent = item.resLabel;
+        if (reqCnt) reqCnt.textContent = item.req;
+        if (resCnt) resCnt.textContent = item.res;
+    }
+}
+
+function glBurpSendRepeater() {
+    const out = document.getElementById('burp-repeater-output');
+    if (!out) return;
+    out.innerHTML = '<span style="color:#ff8800;">Sending simulated request to isolated localhost target...</span>';
+    setTimeout(() => {
+        out.innerHTML = `HTTP/1.1 200 OK
+Date: Thu, 08 Oct 2026 01:47:30 GMT
+Server: Nexora-Simulated-Backend/1.0
+Content-Type: application/json
+Connection: close
+
+{
+  "status": "SIMULATION_SUCCESS",
+  "target_verified": true,
+  "endpoint": "threat-intel.nexora.internal",
+  "result": "Poisoned intelligence payload processed.",
+  "ai_score_impact": "LOW_RISK_ASSIGNED",
+  "finding": "VULNERABILITY VERIFIED: Automated settlement triggered without human multisig."
+}`;
+    }, 400);
+}
 
 function glOpenTerminal() {
     const w = document.getElementById('gl-terminal-window');

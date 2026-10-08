@@ -35,7 +35,7 @@
                 <span>🏢 Nexora Consensus Net</span>
                 <span>⚡ PRO (300 XP)</span>
                 <span>⏱ 55-65 min</span>
-                <span>🔬 WEB3 × AI × BLOCKCHAIN × IoT</span>
+                <span>🔬 WEB3 × AI × CYBERSECURITY × IoT</span>
             </div>
             <div class="gl-control-row">
                 <button class="gl-pill-btn primary" id="gl-start-lab-btn" onclick="startInvestigation()">🔍 Start Investigation</button>
@@ -499,6 +499,10 @@
                     <div class="gl-icon-glyph">🌐</div>
                     <div class="gl-icon-label">Consensus<br>Monitor</div>
                 </div>
+                <div class="gl-desktop-icon" tabindex="0" onclick="glOpenBurpSuite()">
+                    <div class="gl-icon-glyph">🛡️</div>
+                    <div class="gl-icon-label">Burp Suite<br>Proxy</div>
+                </div>
                 <div class="gl-desktop-icon" tabindex="0" onclick="glOpenTerminal()">
                     <div class="gl-icon-glyph">>_</div>
                     <div class="gl-icon-label">Terminal</div>
@@ -524,6 +528,7 @@
             <!-- Side Dock -->
             <div class="gl-side-dock">
                 <div class="gl-dock-icon" title="Consensus Monitor" onclick="glOpenBrowser()">🌐</div>
+                <div class="gl-dock-icon" title="Burp Suite" onclick="glOpenBurpSuite()">🛡️</div>
                 <div class="gl-dock-icon" title="Terminal" onclick="glOpenTerminal()">⌨</div>
                 <div class="gl-dock-icon" title="Case Files" onclick="glOpenFileManager()">📁</div>
                 <div class="gl-dock-icon" title="Attack Graph" onclick="glOpenAttackGraph()">🕸</div>
@@ -920,6 +925,194 @@
             </div>
 
             <!-- ══════════════════════════════════════════════════════════ -->
+            <!-- WINDOW 7: BURP SUITE PROXY & INSPECTOR                      -->
+            <!-- ══════════════════════════════════════════════════════════ -->
+            <div class="gl-window" id="gl-burpsuite-window" style="width: 860px; height: 580px; max-width: 95%;">
+                <div class="gl-window-titlebar" style="background: #111827; border-bottom: 1px solid rgba(255, 136, 0, 0.4);">
+                    <div class="gl-traffic-lights">
+                        <span class="gl-tl-close" onclick="glCloseBurpSuite()"></span>
+                        <span class="gl-tl-min" onclick="glCloseBurpSuite()"></span>
+                        <span class="gl-tl-max"></span>
+                    </div>
+                    <div class="gl-title-text" style="color: #ff8800; display: flex; align-items: center; gap: 8px;">
+                        <span>🛡️</span> Burp Suite Community Edition [Nexora Consensus Forensics]
+                    </div>
+                </div>
+
+                <div class="burp-window-shell">
+                    <div class="burp-top-tabs">
+                        <div class="burp-tab active" id="burp-tab-proxy" onclick="glSwitchBurpTab('proxy')">Proxy (HTTP History)</div>
+                        <div class="burp-tab" id="burp-tab-repeater" onclick="glSwitchBurpTab('repeater')">Repeater</div>
+                        <div class="burp-tab" id="burp-tab-inspector" onclick="glSwitchBurpTab('inspector')">Inspector (Telemetry &amp; State)</div>
+                        <div class="burp-tab" id="burp-tab-target" onclick="glSwitchBurpTab('target')">Target Scope</div>
+                    </div>
+
+                    <!-- VIEW 1: PROXY HTTP HISTORY -->
+                    <div id="burp-view-proxy" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+                        <div class="burp-subbar">
+                            <span style="color: #34d399; font-weight: 700;">● Intercept is off</span>
+                            <span style="color: #64748b;">|</span>
+                            <span style="color: #94a3b8;">Filter: <strong style="color: #fff;">IoT, Oracle &amp; Consensus APIs</strong></span>
+                            <span style="margin-left: auto; font-size: 11px; color: #ff8800;">4 Requests Captured</span>
+                        </div>
+
+                        <div class="burp-table-container">
+                            <table class="burp-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 35px;">#</th>
+                                        <th style="width: 70px;">Method</th>
+                                        <th>Host / Endpoint</th>
+                                        <th style="width: 70px;">Status</th>
+                                        <th style="width: 70px;">Length</th>
+                                        <th style="width: 110px;">MIME</th>
+                                        <th>Comment / Note</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="selected" onclick="glSelectBurpRequest(1, this)">
+                                        <td>1</td>
+                                        <td><span class="burp-method-post">POST</span></td>
+                                        <td><code>iot-gateway.nexora.internal/api/v1/iot/telemetry/gateway-184</code></td>
+                                        <td><span class="burp-status-200">200 OK</span></td>
+                                        <td>386 B</td>
+                                        <td>JSON</td>
+                                        <td>Synchronized 184 sensor telemetry ingestion</td>
+                                    </tr>
+                                    <tr onclick="glSelectBurpRequest(2, this)">
+                                        <td>2</td>
+                                        <td><span class="burp-method-post">POST</span></td>
+                                        <td><code>oracle.nexora.internal/api/v1/oracle/aggregate</code></td>
+                                        <td><span class="burp-status-200">200 OK</span></td>
+                                        <td>442 B</td>
+                                        <td>JSON</td>
+                                        <td>NOVA-PRICE-ORACLE consuming GW-184 stream</td>
+                                    </tr>
+                                    <tr onclick="glSelectBurpRequest(3, this)">
+                                        <td>3</td>
+                                        <td><span class="burp-method-post">POST</span></td>
+                                        <td><code>ai-sentinel.nexora.internal/api/v1/ai/sentinel/evaluate</code></td>
+                                        <td><span class="burp-status-200">200 OK</span></td>
+                                        <td>528 B</td>
+                                        <td>JSON</td>
+                                        <td>MODEL-ORION suppressed anomaly alarm (98.7%)</td>
+                                    </tr>
+                                    <tr onclick="glSelectBurpRequest(4, this)">
+                                        <td>4</td>
+                                        <td><span class="burp-method-get">GET</span></td>
+                                        <td><code>consensus.nexora.internal/api/v1/consensus/validators</code></td>
+                                        <td><span class="burp-status-200">200 OK</span></td>
+                                        <td>614 B</td>
+                                        <td>JSON</td>
+                                        <td>3:2 Validator state root divergence query</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="burp-dual-pane">
+                            <div class="burp-pane">
+                                <div class="burp-pane-header">
+                                    <span>REQUEST <span id="burp-req-label">[#1 POST /api/v1/iot/telemetry/gateway-184]</span></span>
+                                    <span style="color: #64748b;">Raw / Headers / Body</span>
+                                </div>
+                                <div class="burp-pane-content" id="burp-req-content">POST /api/v1/iot/telemetry/gateway-184 HTTP/1.1
+Host: iot-gateway.nexora.internal
+User-Agent: Nexora-IoT-Gateway-Daemon/1.8 (GATEWAY-GW-184)
+X-Gateway-ID: GATEWAY-GW-184
+Content-Type: application/json
+Connection: keep-alive
+
+{
+  "gateway_id": "GATEWAY-GW-184",
+  "active_devices": 184,
+  "reported_temperature_c": 21.40,
+  "reported_power_w": 412.00,
+  "observed_jitter_percent": 0.00,
+  "sequence_hash": "0x7a8b1102e4d91c28f731"
+}</div>
+                            </div>
+                            <div class="burp-pane">
+                                <div class="burp-pane-header">
+                                    <span>RESPONSE <span id="burp-res-label">[HTTP/1.1 200 OK]</span></span>
+                                    <span style="color: #34d399;">200 OK</span>
+                                </div>
+                                <div class="burp-pane-content" id="burp-res-content">HTTP/1.1 200 OK
+Date: Thu, 08 Oct 2026 03:12:05 GMT
+Server: Nexora-IoT-Ingest/3.0
+Content-Type: application/json
+Content-Length: 124
+
+{
+  "status": "RELAYED_TO_ORACLE",
+  "upstream_target": "NOVA-PRICE-ORACLE",
+  "data_integrity_check": "BYPASSED_BY_AI_RULE"
+}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VIEW 2: REPEATER -->
+                    <div id="burp-view-repeater" style="display: none; flex-direction: column; flex: 1; padding: 12px; background: #070d18;">
+                        <div style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center;">
+                            <button class="gl-pill-btn primary" onclick="glBurpSendRepeater()" style="padding: 6px 14px; font-weight: 700;">▶ SEND REQUEST</button>
+                            <span style="font-family: var(--font-mono); font-size: 11px; color: #94a3b8;">Target: <strong>https://oracle.nexora.internal/api/v1/oracle/aggregate</strong></span>
+                        </div>
+                        <div class="burp-dual-pane" style="border: 1px solid rgba(255,136,0,0.2); border-radius: 4px;">
+                            <div class="burp-pane">
+                                <div class="burp-pane-header"><span>REPEATER REQUEST</span></div>
+                                <textarea id="burp-repeater-input" style="flex: 1; width: 100%; background: #0b1120; color: #38bdf8; border: none; padding: 10px; font-family: var(--font-mono); font-size: 11.5px; resize: none;" spellcheck="false">POST /api/v1/oracle/aggregate HTTP/1.1
+Host: oracle.nexora.internal
+X-Oracle-Feed: NOVA-PRICE-ORACLE
+Content-Type: application/json
+
+{
+  "source_gateway": "GATEWAY-GW-184",
+  "upstream_weight": 1.0,
+  "derived_price": 412.00,
+  "providers_reporting": 4,
+  "shared_source": "GW-184"
+}</textarea>
+                            </div>
+                            <div class="burp-pane">
+                                <div class="burp-pane-header"><span>REPEATER RESPONSE</span></div>
+                                <div class="burp-pane-content" id="burp-repeater-output" style="color: #34d399;">Click 'SEND REQUEST' to test simulated oracle aggregator response...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VIEW 3: INSPECTOR -->
+                    <div id="burp-view-inspector" style="display: none; flex-direction: column; flex: 1; padding: 16px; overflow-y: auto; background: #070d18;">
+                        <h4 style="color: #ff8800; font-size: 13px; margin-bottom: 12px;">🔍 CROSS-LAYER TELEMETRY &amp; CONSENSUS INSPECTOR</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 11.5px;">
+                            <div style="background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 12px;">
+                                <div style="color: #38bdf8; font-weight: 700; margin-bottom: 6px;">📡 IoT Ingestion Anomaly</div>
+                                <p style="margin:0 0 4px;"><code>Gateway ID = GATEWAY-GW-184</code></p>
+                                <p style="margin:0 0 4px;"><code>184 Sensors = 0.00% physical jitter</code></p>
+                                <p style="margin:0; color: #f87171;">⚠️ Upstream gateway injected synthetic telemetry into NOVA-PRICE-ORACLE.</p>
+                            </div>
+                            <div style="background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 12px;">
+                                <div style="color: #38bdf8; font-weight: 700; margin-bottom: 6px;">⚖️ 3:2 Validator State Mismatch</div>
+                                <p style="margin:0 0 4px;"><code>VAL-01..03 Root = 0x3f8a...11 (Accepted)</code></p>
+                                <p style="margin:0 0 4px;"><code>VAL-04..05 Root = 0x9c2e...77 (Rejected)</code></p>
+                                <p style="margin:0; color: #f87171;">⚠️ Network split into non-deterministic consensus partition.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VIEW 4: TARGET SCOPE -->
+                    <div id="burp-view-target" style="display: none; flex: 1; padding: 16px; background: #070d18; color: #94a3b8;">
+                        <h4 style="color: #ff8800; font-size: 13px; margin-bottom: 10px;">🎯 Target Scope Definition</h4>
+                        <p>Simulated Lab Scope: <code>*.nexora.internal</code> (Isolated Localhost Simulation)</p>
+                        <p style="color: #34d399;">✓ <code>iot-gateway.nexora.internal</code></p>
+                        <p style="color: #34d399;">✓ <code>oracle.nexora.internal</code></p>
+                        <p style="color: #34d399;">✓ <code>ai-sentinel.nexora.internal</code></p>
+                        <p style="color: #34d399;">✓ <code>consensus.nexora.internal</code></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════════ -->
             <!-- WINDOW 6: NOTES SCRATCHPAD                                 -->
             <!-- ══════════════════════════════════════════════════════════ -->
             <div class="gl-window" id="gl-notes-window">
@@ -943,11 +1136,15 @@
             <div class="gl-taskbar-start" onclick="startInvestigation()">🚀 Start</div>
             <div class="gl-taskbar-tabs">
                 <button class="gl-taskbar-tab active" id="tab-btn-browser" onclick="glToggleWindow('gl-browser-window')">🌐 Consensus Monitor</button>
+                <button class="gl-taskbar-tab" id="tab-btn-burp" onclick="glToggleWindow('gl-burpsuite-window')">🛡️ Burp Suite</button>
                 <button class="gl-taskbar-tab" id="tab-btn-terminal" onclick="glToggleWindow('gl-terminal-window')">⌨ Terminal</button>
                 <button class="gl-taskbar-tab" id="tab-btn-files" onclick="glToggleWindow('gl-filemanager-window')">📁 Case Files</button>
                 <button class="gl-taskbar-tab" id="tab-btn-graph" onclick="glToggleWindow('gl-attackgraph-window')">🕸 Attack Graph</button>
                 <button class="gl-taskbar-tab" id="tab-btn-evidence" onclick="glToggleWindow('gl-evidence-window')">🔍 Evidence Vault</button>
                 <button class="gl-taskbar-tab" id="tab-btn-notes" onclick="glToggleWindow('gl-notes-window')">📝 Notes</button>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 11px; color: #64748b; margin-left: auto; padding-right: 14px;">
+                Designed &amp; Developed by Lakshay Soni
             </div>
             <div class="gl-taskbar-clock" id="gl-taskbar-clock">00:00</div>
         </div>

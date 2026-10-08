@@ -677,6 +677,10 @@
                     <div class="gl-icon-glyph">🌐</div>
                     <div class="gl-icon-label">Blockchain<br>Monitor</div>
                 </div>
+                <div class="gl-desktop-icon" tabindex="0" onclick="glOpenBurpSuite()">
+                    <div class="gl-icon-glyph">🛡️</div>
+                    <div class="gl-icon-label">Burp Suite<br>Proxy</div>
+                </div>
                 <div class="gl-desktop-icon" tabindex="0" onclick="glOpenTerminal()">
                     <div class="gl-icon-glyph">>_</div>
                     <div class="gl-icon-label">Terminal</div>
@@ -702,11 +706,12 @@
             <!-- Side Dock -->
             <div class="gl-side-dock">
                 <div class="gl-dock-icon" title="Blockchain Monitor" onclick="glOpenBrowser()">🌐</div>
+                <div class="gl-dock-icon" title="Burp Suite" onclick="glOpenBurpSuite()">🛡️</div>
                 <div class="gl-dock-icon" title="Terminal" onclick="glOpenTerminal()">⌨</div>
                 <div class="gl-dock-icon" title="Case Files" onclick="glOpenFileManager()">📁</div>
                 <div class="gl-dock-icon" title="Notes" onclick="glOpenNotes()">📝</div>
-                <div class="gl-dock-icon" title="Burp Suite" onclick="glNotify('Burp Suite — use your own installed copy for real HTTP interception.')">🔧</div>
-                <div class="gl-dock-icon" title="OWASP ZAP" onclick="glNotify('OWASP ZAP — not required for this investigation.')">🛡</div>
+                <div class="gl-dock-icon" title="Attack Graph" onclick="glOpenAttackGraph()">🕸</div>
+                <div class="gl-dock-icon" title="Evidence Viewer" onclick="glOpenEvidenceViewer()">🔍</div>
             </div>
 
             <!-- ══════════════════════════════════════════════════════════ -->
@@ -1183,6 +1188,197 @@
                 </div>
             </div>
 
+            <!-- ══════════════════════════════════════════════════════════ -->
+            <!-- BURP SUITE WINDOW — Simulated HTTP Traffic & Inspector     -->
+            <!-- ══════════════════════════════════════════════════════════ -->
+            <div class="gl-window" id="gl-burpsuite-window" style="width: 860px; height: 580px; max-width: 95%;">
+                <div class="gl-window-titlebar" style="background: #111827; border-bottom: 1px solid rgba(255, 136, 0, 0.4);">
+                    <div class="gl-traffic-lights">
+                        <span class="gl-tl-close" onclick="glCloseBurpSuite()"></span>
+                        <span class="gl-tl-min" onclick="glCloseBurpSuite()"></span>
+                        <span class="gl-tl-max"></span>
+                    </div>
+                    <div class="gl-title-text" style="color: #ff8800; display: flex; align-items: center; gap: 8px;">
+                        <span>🛡️</span> Burp Suite Community Edition [Nexora Security Suite v2026]
+                    </div>
+                </div>
+
+                <div class="burp-window-shell">
+                    <div class="burp-top-tabs">
+                        <div class="burp-tab active" id="burp-tab-proxy" onclick="glSwitchBurpTab('proxy')">Proxy (HTTP History)</div>
+                        <div class="burp-tab" id="burp-tab-repeater" onclick="glSwitchBurpTab('repeater')">Repeater</div>
+                        <div class="burp-tab" id="burp-tab-inspector" onclick="glSwitchBurpTab('inspector')">Inspector (Tokens &amp; Headers)</div>
+                        <div class="burp-tab" id="burp-tab-target" onclick="glSwitchBurpTab('target')">Target Scope</div>
+                    </div>
+
+                    <!-- VIEW 1: PROXY HTTP HISTORY -->
+                    <div id="burp-view-proxy" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+                        <div class="burp-subbar">
+                            <span style="color: #34d399; font-weight: 700;">● Intercept is off</span>
+                            <span style="color: #64748b;">|</span>
+                            <span style="color: #94a3b8;">Filter: <strong style="color: #fff;">Showing all simulated lab endpoints</strong></span>
+                            <span style="margin-left: auto; font-size: 11px; color: #ff8800;">4 Requests Captured</span>
+                        </div>
+
+                        <div class="burp-table-container">
+                            <table class="burp-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 35px;">#</th>
+                                        <th style="width: 70px;">Method</th>
+                                        <th>Host / Endpoint</th>
+                                        <th style="width: 70px;">Status</th>
+                                        <th style="width: 70px;">Length</th>
+                                        <th style="width: 110px;">MIME</th>
+                                        <th>Comment / Note</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="selected" onclick="glSelectBurpRequest(1, this)">
+                                        <td>1</td>
+                                        <td><span class="burp-method-post">POST</span></td>
+                                        <td><code>threat-intel.nexora.internal/api/v1/intel/ingest</code></td>
+                                        <td><span class="burp-status-200">200 OK</span></td>
+                                        <td>418 B</td>
+                                        <td>JSON</td>
+                                        <td>Poisoned NIF-2038 context injection</td>
+                                    </tr>
+                                    <tr onclick="glSelectBurpRequest(2, this)">
+                                        <td>2</td>
+                                        <td><span class="burp-method-post">POST</span></td>
+                                        <td><code>policy-engine.nexora.internal/api/v1/policy/settle</code></td>
+                                        <td><span class="burp-status-200">200 OK</span></td>
+                                        <td>512 B</td>
+                                        <td>JSON</td>
+                                        <td>ORION-SETTLEMENT-V2 automated execution</td>
+                                    </tr>
+                                    <tr onclick="glSelectBurpRequest(3, this)">
+                                        <td>3</td>
+                                        <td><span class="burp-method-post">POST</span></td>
+                                        <td><code>web3-rpc.nexora.internal/api/v1/blockchain/broadcast</code></td>
+                                        <td><span class="burp-status-200">200 OK</span></td>
+                                        <td>684 B</td>
+                                        <td>JSON</td>
+                                        <td>TX-NEX-7741 on-chain transfer to 0x7C41...9B2D</td>
+                                    </tr>
+                                    <tr onclick="glSelectBurpRequest(4, this)">
+                                        <td>4</td>
+                                        <td><span class="burp-method-get">GET</span></td>
+                                        <td><code>auth.nexora.internal/api/v1/auth/session</code></td>
+                                        <td><span class="burp-status-200">200 OK</span></td>
+                                        <td>340 B</td>
+                                        <td>JSON</td>
+                                        <td>Session cookie &amp; forged RBAC validation</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="burp-dual-pane">
+                            <div class="burp-pane">
+                                <div class="burp-pane-header">
+                                    <span>REQUEST <span id="burp-req-label">[#1 POST /api/v1/intel/ingest]</span></span>
+                                    <span style="color: #64748b;">Raw / Headers / Body</span>
+                                </div>
+                                <div class="burp-pane-content" id="burp-req-content">POST /api/v1/intel/ingest HTTP/1.1
+Host: threat-intel.nexora.internal
+User-Agent: Nexora-Ingestor/2.4 (INTEL-INGESTOR-02)
+Content-Type: application/json
+Cookie: session_token=admin_forged_99a8; role=INTEL-INGESTOR-02
+X-CSRF-Token: 0x9f4a1c78_auth_valid
+Connection: keep-alive
+
+{
+  "feed_id": "NIF-2038",
+  "source_feed": "NOVA-INTEL-FEED",
+  "destination_wallet": "0x7C41...9B2D",
+  "classification": "TRUSTED",
+  "confidence_override": 0.992,
+  "signature": "SIG_NEX_ORION_DEV_OVERRIDE"
+}</div>
+                            </div>
+                            <div class="burp-pane">
+                                <div class="burp-pane-header">
+                                    <span>RESPONSE <span id="burp-res-label">[HTTP/1.1 200 OK]</span></span>
+                                    <span style="color: #34d399;">200 OK</span>
+                                </div>
+                                <div class="burp-pane-content" id="burp-res-content">HTTP/1.1 200 OK
+Date: Thu, 08 Oct 2026 01:47:12 GMT
+Server: Nexora-Intel-Engine/4.2
+Content-Type: application/json
+Content-Length: 142
+
+{
+  "status": "INGESTED",
+  "context_id": "CTX-7741",
+  "target_model": "ORION-NEURAL-v4.2.1",
+  "ai_context_updated": true,
+  "reputation_applied": "TRUSTED"
+}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VIEW 2: REPEATER -->
+                    <div id="burp-view-repeater" style="display: none; flex-direction: column; flex: 1; padding: 12px; background: #070d18;">
+                        <div style="display: flex; gap: 8px; margin-bottom: 8px; align-items: center;">
+                            <button class="gl-pill-btn primary" onclick="glBurpSendRepeater()" style="padding: 6px 14px; font-weight: 700;">▶ SEND REQUEST</button>
+                            <span style="font-family: var(--font-mono); font-size: 11px; color: #94a3b8;">Target: <strong>https://threat-intel.nexora.internal/api/v1/intel/ingest</strong></span>
+                        </div>
+                        <div class="burp-dual-pane" style="border: 1px solid rgba(255,136,0,0.2); border-radius: 4px;">
+                            <div class="burp-pane">
+                                <div class="burp-pane-header"><span>REPEATER REQUEST</span></div>
+                                <textarea id="burp-repeater-input" style="flex: 1; width: 100%; background: #0b1120; color: #38bdf8; border: none; padding: 10px; font-family: var(--font-mono); font-size: 11.5px; resize: none;" spellcheck="false">POST /api/v1/intel/ingest HTTP/1.1
+Host: threat-intel.nexora.internal
+Cookie: session_token=admin_forged_99a8; role=INTEL-INGESTOR-02
+X-CSRF-Token: 0x9f4a1c78_auth_valid
+Content-Type: application/json
+
+{
+  "feed_id": "NIF-2038",
+  "destination_wallet": "0x7C41...9B2D",
+  "classification": "TRUSTED",
+  "confidence_override": 0.992
+}</textarea>
+                            </div>
+                            <div class="burp-pane">
+                                <div class="burp-pane-header"><span>REPEATER RESPONSE</span></div>
+                                <div class="burp-pane-content" id="burp-repeater-output" style="color: #34d399;">Click 'SEND REQUEST' to test simulated API endpoint execution...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VIEW 3: INSPECTOR -->
+                    <div id="burp-view-inspector" style="display: none; flex-direction: column; flex: 1; padding: 16px; overflow-y: auto; background: #070d18;">
+                        <h4 style="color: #ff8800; font-size: 13px; margin-bottom: 12px;">🔍 FORENSIC TOKEN &amp; HEADER INSPECTOR</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 11.5px;">
+                            <div style="background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 12px;">
+                                <div style="color: #38bdf8; font-weight: 700; margin-bottom: 6px;">🍪 Session Cookies (Captured in Ingestion API)</div>
+                                <p style="margin:0 0 4px;"><code>session_token = admin_forged_99a8</code> (Forged Admin Token)</p>
+                                <p style="margin:0 0 4px;"><code>role = INTEL-INGESTOR-02</code> (Service Account)</p>
+                                <p style="margin:0; color: #f87171;">⚠️ Forged cookie allowed unauthorized context injection into ORION AI.</p>
+                            </div>
+                            <div style="background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 12px;">
+                                <div style="color: #38bdf8; font-weight: 700; margin-bottom: 6px;">🛡️ Anti-CSRF Token &amp; Policy Bypass</div>
+                                <p style="margin:0 0 4px;"><code>X-CSRF-Token = 0x9f4a1c78_auth_valid</code></p>
+                                <p style="margin:0 0 4px;"><code>Authorization = Bearer srv_tok_orion_v2</code></p>
+                                <p style="margin:0; color: #f87171;">⚠️ Valid CSRF token allowed backend pipeline to execute without human approval.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VIEW 4: TARGET SCOPE -->
+                    <div id="burp-view-target" style="display: none; flex: 1; padding: 16px; background: #070d18; color: #94a3b8;">
+                        <h4 style="color: #ff8800; font-size: 13px; margin-bottom: 10px;">🎯 Target Scope Definition</h4>
+                        <p>Simulated Lab Scope: <code>*.nexora.internal</code> (Isolated Localhost Simulation)</p>
+                        <p style="color: #34d399;">✓ <code>threat-intel.nexora.internal</code></p>
+                        <p style="color: #34d399;">✓ <code>policy-engine.nexora.internal</code></p>
+                        <p style="color: #34d399;">✓ <code>web3-rpc.nexora.internal</code></p>
+                        <p style="color: #34d399;">✓ <code>auth.nexora.internal</code></p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Desktop Toast -->
             <div class="gl-toast" id="gl-toast"></div>
         </div>
@@ -1192,8 +1388,12 @@
             <div class="gl-start-orb" title="Nexora">N</div>
             <div class="gl-taskbar-apps">
                 <div class="gl-taskbar-app" id="gl-taskbar-browser" onclick="glOpenBrowser()">🌐 Monitor</div>
+                <div class="gl-taskbar-app" id="gl-taskbar-burp" onclick="glOpenBurpSuite()">🛡️ Burp Suite</div>
                 <div class="gl-taskbar-app" id="gl-taskbar-terminal" onclick="glOpenTerminal()">⌨ Terminal</div>
                 <div class="gl-taskbar-app" id="gl-taskbar-files" onclick="glOpenFileManager()">📁 Files</div>
+            </div>
+            <div style="font-family: var(--font-mono); font-size: 11px; color: #64748b; margin-left: auto; padding-right: 14px;">
+                Designed &amp; Developed by Lakshay Soni
             </div>
             <div class="gl-taskbar-clock" id="gl-taskbar-clock">--:--</div>
         </div>

@@ -71,8 +71,23 @@ def labs():
 def lab_detail(lab_id):
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
-    lab = Lab.query.get(lab_id)
-    return render_template('lab_detail.html', lab=lab, lab_id=lab_id)
+    user_id = session['user_id']
+    lab = db.session.get(Lab, lab_id)
+    if not lab:
+        return redirect(url_for('labs.labs'))
+    
+    # Get missions for this lab
+    missions_data = db.session.query(
+        Mission.id, Mission.mission_number, Mission.title, Mission.description, MissionProgress.status
+    ).outerjoin(
+        MissionProgress, (Mission.id == MissionProgress.mission_id) & (MissionProgress.user_id == user_id)
+    ).filter(
+        Mission.lab_id == lab_id
+    ).order_by(Mission.mission_number.asc()).all()
+    
+    missions = [{'id': m.id, 'mission_number': m.mission_number, 'title': m.title, 'description': m.description, 'status': m.status or ('AVAILABLE' if m.mission_number == 1 else 'LOCKED')} for m in missions_data]
+    
+    return render_template('lab_detail.html', lab=lab, lab_id=lab_id, missions=missions)
 
 @labs_bp.route('/manual-labs')
 def manual_labs():

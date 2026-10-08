@@ -162,6 +162,82 @@ function glOpenBrowser() { glBringToFront('gl-browser-window'); }
 function glCloseBrowser() { glCloseWindow('gl-browser-window'); }
 function glMinimizeBrowser() { glMinimizeWindow('gl-browser-window'); }
 
+function glOpenBurpSuite() { glBringToFront('gl-burpsuite-window'); }
+function glCloseBurpSuite() { glCloseWindow('gl-burpsuite-window'); }
+
+function glSwitchBurpTab(tabId) {
+    ['proxy', 'repeater', 'inspector', 'target'].forEach(t => {
+        const tabEl = document.getElementById(`burp-tab-${t}`);
+        const viewEl = document.getElementById(`burp-view-${t}`);
+        if (tabEl) tabEl.classList.toggle('active', t === tabId);
+        if (viewEl) viewEl.style.display = (t === tabId ? (t === 'proxy' || t === 'repeater' || t === 'inspector' ? 'flex' : 'block') : 'none');
+    });
+}
+
+const burpSimRequestsVC = {
+    1: {
+        reqLabel: '[#1 POST /api/v1/iot/telemetry/gateway-184]',
+        resLabel: '[HTTP/1.1 200 OK]',
+        req: `POST /api/v1/iot/telemetry/gateway-184 HTTP/1.1\nHost: iot-gateway.nexora.internal\nUser-Agent: Nexora-IoT-Gateway-Daemon/1.8 (GATEWAY-GW-184)\nX-Gateway-ID: GATEWAY-GW-184\nContent-Type: application/json\nConnection: keep-alive\n\n{\n  "gateway_id": "GATEWAY-GW-184",\n  "active_devices": 184,\n  "reported_temperature_c": 21.40,\n  "reported_power_w": 412.00,\n  "observed_jitter_percent": 0.00,\n  "sequence_hash": "0x7a8b1102e4d91c28f731"\n}`,
+        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 03:12:05 GMT\nServer: Nexora-IoT-Ingest/3.0\nContent-Type: application/json\nContent-Length: 124\n\n{\n  "status": "RELAYED_TO_ORACLE",\n  "upstream_target": "NOVA-PRICE-ORACLE",\n  "data_integrity_check": "BYPASSED_BY_AI_RULE"\n}`
+    },
+    2: {
+        reqLabel: '[#2 POST /api/v1/oracle/aggregate]',
+        resLabel: '[HTTP/1.1 200 OK]',
+        req: `POST /api/v1/oracle/aggregate HTTP/1.1\nHost: oracle.nexora.internal\nX-Oracle-Feed: NOVA-PRICE-ORACLE\nContent-Type: application/json\n\n{\n  "source_gateway": "GATEWAY-GW-184",\n  "upstream_weight": 1.0,\n  "derived_price": 412.00,\n  "providers_reporting": 4,\n  "shared_source": "GW-184"\n}`,
+        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 03:12:08 GMT\nServer: Nexora-Oracle-Core/2.5\nContent-Type: application/json\n\n{\n  "consensus_price": 412.00,\n  "ai_validation": "BYPASSED",\n  "feed_status": "COMMITTED_TO_SMART_CONTRACT"\n}`
+    },
+    3: {
+        reqLabel: '[#3 POST /api/v1/ai/sentinel/evaluate]',
+        resLabel: '[HTTP/1.1 200 OK]',
+        req: `POST /api/v1/ai/sentinel/evaluate HTTP/1.1\nHost: ai-sentinel.nexora.internal\nContent-Type: application/json\n\n{\n  "model": "MODEL-ORION",\n  "input_stream": "NOVA-PRICE-ORACLE",\n  "anomaly_score": 0.013,\n  "label": "NORMAL_NETWORK_VARIANCE"\n}`,
+        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 03:12:10 GMT\nServer: Nexora-AI-Sentinel/4.0\nContent-Type: application/json\n\n{\n  "confidence": 0.987,\n  "suppress_alert": true,\n  "poisoned_baseline_matched": "EMB-IOT-9041"\n}`
+    },
+    4: {
+        reqLabel: '[#4 GET /api/v1/consensus/validators]',
+        resLabel: '[HTTP/1.1 200 OK]',
+        req: `GET /api/v1/consensus/validators HTTP/1.1\nHost: consensus.nexora.internal\nAccept: application/json`,
+        res: `HTTP/1.1 200 OK\nDate: Thu, 08 Oct 2026 03:12:12 GMT\nServer: Nexora-Consensus/1.2\nContent-Type: application/json\n\n{\n  "validators": [\n    {"id": "VAL-01", "state_root": "0x3f8a...11", "status": "ACCEPTED"},\n    {"id": "VAL-02", "state_root": "0x3f8a...11", "status": "ACCEPTED"},\n    {"id": "VAL-03", "state_root": "0x3f8a...11", "status": "ACCEPTED"},\n    {"id": "VAL-04", "state_root": "0x9c2e...77", "status": "REJECTED"},\n    {"id": "VAL-05", "state_root": "0x9c2e...77", "status": "REJECTED"}\n  ],\n  "consensus_status": "DIVERGENCE_3_2"\n}`
+    }
+};
+
+function glSelectBurpRequest(id, rowEl) {
+    document.querySelectorAll('.burp-table tbody tr').forEach(r => r.classList.remove('selected'));
+    if (rowEl) rowEl.classList.add('selected');
+    const item = burpSimRequestsVC[id];
+    if (item) {
+        const reqLbl = document.getElementById('burp-req-label');
+        const resLbl = document.getElementById('burp-res-label');
+        const reqCnt = document.getElementById('burp-req-content');
+        const resCnt = document.getElementById('burp-res-content');
+        if (reqLbl) reqLbl.textContent = item.reqLabel;
+        if (resLbl) resLbl.textContent = item.resLabel;
+        if (reqCnt) reqCnt.textContent = item.req;
+        if (resCnt) resCnt.textContent = item.res;
+    }
+}
+
+function glBurpSendRepeater() {
+    const out = document.getElementById('burp-repeater-output');
+    if (!out) return;
+    out.innerHTML = '<span style="color:#ff8800;">Sending simulated request to isolated oracle endpoint...</span>';
+    setTimeout(() => {
+        out.innerHTML = `HTTP/1.1 200 OK
+Date: Thu, 08 Oct 2026 03:12:30 GMT
+Server: Nexora-Oracle-Aggregator/2.5
+Content-Type: application/json
+Connection: close
+
+{
+  "status": "ORACLE_AGGREGATION_SUCCESS",
+  "source_gateway": "GATEWAY-GW-184",
+  "providers_aligned": 4,
+  "oracle_derived_state": "0x3f8a11bc9042",
+  "finding": "VULNERABILITY CONFIRMED: Upstream IoT manipulation propagated directly into Web3 oracle state."
+}`;
+    }, 400);
+}
+
 function glOpenTerminal() { glBringToFront('gl-terminal-window'); }
 function glCloseTerminal() { glCloseWindow('gl-terminal-window'); }
 function glMinimizeTerminal() { glMinimizeWindow('gl-terminal-window'); }
@@ -673,35 +749,81 @@ function handleTerminalCommand(cmdStr, termBody) {
 
     switch (cmd) {
         case 'help':
-            out.innerHTML = `Available Forensic Commands:
-  iot-inspect &lt;gw&gt;       - Inspect IoT gateway sensor telemetry (e.g. iot-inspect GW-184)
-  oracle &lt;id&gt;            - Query Web3 oracle aggregation telemetry (e.g. oracle NOVA-PRICE-ORACLE)
-  ai-audit &lt;model&gt;        - Audit AI sentinel training feedback & weights (e.g. ai-audit MODEL-ORION)
-  validator &lt;id&gt;         - Inspect validator derived state roots (e.g. validator VALIDATOR-V05)
-  trust-chain             - Reconstruct full cross-layer attack path
-  evidence                - List secured cryptographic evidence
-  cat &lt;filename&gt;          - Read case file (e.g. cat trust-chain-analysis.txt)
-  python &lt;script&gt;         - Run script (e.g. python inspect_attack_chain.py)
-  flag                    - Print confirmed case flag
-  clear                   - Clear terminal display`;
+            out.innerHTML = `Available Forensic Investigation Commands:
+  iot-status / iot-inspect  - Check IoT gateway GW-184 status & 184 active devices
+  iot-telemetry             - Dump synchronized sensor telemetry across sites
+  iot-devices               - List connected sensor hardware & flash memory check
+  iot-gateway-log           - Display raw gateway ingestion stream sequence
+  oracle-status / oracle    - Inspect Web3 oracle feed & aggregated price data
+  ai-status / ai-audit      - Audit AI sentinel (MODEL-ORION) & poisoned feedback EMB-IOT-9041
+  validator-status          - Display 3:2 validator consensus partition & state roots
+  web3-status               - Show Web3 state roots & block execution trace
+  timeline / case-log       - Show chronological cross-layer attack timeline
+  evidence                  - List secured cryptographic case evidence
+  burp / burpsuite          - Open Burp Suite HTTP proxy & inspector
+  cat <filename>            - Read case file (e.g. cat trust-chain-analysis.txt)
+  grep <term> <file>        - Search keyword in case logs
+  python <script>           - Run analysis script (e.g. python inspect_attack_chain.py)
+  whoami / pwd              - Display current investigator identity & path
+  flag                      - Print confirmed case flag
+  clear                     - Clear terminal display`;
             break;
 
         case 'clear':
             termBody.innerHTML = '';
             return;
 
+        case 'whoami':
+            out.innerHTML = `<span style="color:#38bdf8; font-weight:bold;">Lakshay</span> — Senior Distributed Systems Forensics Investigator (Nexora SOC)`;
+            break;
+
+        case 'pwd':
+            out.innerHTML = `/home/investigator/cases/NEX-071`;
+            break;
+
+        case 'burp':
+        case 'burpsuite':
+            glOpenBurpSuite();
+            out.innerHTML = `<span style="color:#34d399;">[+] Burp Suite Proxy &amp; Inspector window opened.</span>`;
+            break;
+
+        case 'iot-status':
         case 'iot-inspect':
         case 'iot':
             out.innerHTML = `[INDUSTRIAL IOT GATEWAY: GATEWAY-GW-184]
 Connected Sensors: 184 Industrial Devices (14 Geographical Sites)
-Temperature Telemetry: 21.40 °C (All 184 Sensors Identical)
-Power Draw Telemetry:  412.00 W (All 184 Sensors Identical)
-Entropy / Jitter:      0.00% (SYNTHETIC SYNCHRONIZATION DETECTED)
-Flash Comparison:      Local device flash logs show normal physical variation.
-Ingestion Diagnosis:   TAMPERED AT GATEWAY BEFORE WEB3 AGGREGATION.`;
+Reported Status:   <span style="color:#f87171; font-weight:bold;">ANOMALOUS SYNCHRONIZATION</span>
+Temperature:       21.40 °C (All 184 Sensors Identical)
+Power Draw:        412.00 W (All 184 Sensors Identical)
+Observed Jitter:   0.00% (SYNTHETIC PATTERN DETECTED)
+Flash Comparison:  Device memory contains natural jitter; gateway output is synthesized.`;
+            break;
+
+        case 'iot-telemetry':
+            out.innerHTML = `[RAW SENSOR TELEMETRY COMPARISON]
+Sensor SENSOR-SITE-A-01 (Frankfurt)  -> Flash: 18.2°C, 395W | Gateway Stream: 21.4°C, 412W [TAMPERED]
+Sensor SENSOR-SITE-B-42 (Singapore)  -> Flash: 29.1°C, 440W | Gateway Stream: 21.4°C, 412W [TAMPERED]
+Sensor SENSOR-SITE-C-99 (New York)   -> Flash: 20.8°C, 405W | Gateway Stream: 21.4°C, 412W [TAMPERED]
+Sensor SENSOR-SITE-D-184 (Tokyo)     -> Flash: 16.5°C, 388W | Gateway Stream: 21.4°C, 412W [TAMPERED]`;
+            break;
+
+        case 'iot-devices':
+            out.innerHTML = `[CONNECTED IOT DEVICES AUDIT]
+Total Devices:     184 Industrial Sensors (Sites A through N)
+Hardware Status:   Online, Uncompromised physically
+Firmware:          Nexora-IoT-RTOS v2.4 (Signed)
+Vulnerability:     Tampering occurs in aggregation pipeline on GATEWAY-GW-184.`;
+            break;
+
+        case 'iot-gateway-log':
+            out.innerHTML = `[GATEWAY-GW-184 INGESTION LOG]
+03:10:44 UTC [INGEST] Received 184 discrete sensor payloads (Valid checksums)
+03:10:48 UTC [RELAY]  Override filter applied: SYNTH_HARMONIC_V4
+03:10:52 UTC [ORACLE] Broadcasted synthetic telemetry to NOVA-PRICE-ORACLE`;
             break;
 
         case 'oracle':
+        case 'oracle-status':
             out.innerHTML = `[WEB3 ORACLE FEED: NOVA-PRICE-ORACLE]
 Upstream Source:       GATEWAY-GW-184 (IoT Telemetry Stream)
 Oracle Providers:      4 Nodes (Provider Alpha, Beta, Gamma, Delta)
@@ -711,6 +833,7 @@ Vulnerability:         Multi-node agreement failed to guarantee external truth.`
             break;
 
         case 'ai-audit':
+        case 'ai-status':
         case 'ai':
             out.innerHTML = `[AI SENTINEL AUDIT: MODEL-ORION v3.8.4]
 Classification:        NORMAL_NETWORK_VARIANCE
@@ -721,6 +844,7 @@ Root Cause:            Model learned attacker's definition of normal.`;
             break;
 
         case 'validator':
+        case 'validator-status':
             out.innerHTML = `[VALIDATOR CLUSTER TOPOLOGY]
 Consensus Ratio:       3 Accept : 2 Reject (Derived State Root Divergence)
 Proposing Group:       VALIDATOR-V01..V03 -> Computed 0x4f8e39b2 from poisoned oracle
@@ -728,6 +852,18 @@ Dissenting Group:      VALIDATOR-V04..V05 -> Computed 0x98a2e71c (Execution Halt
 Protocol Status:       No validator compromised; divergent execution inputs.`;
             break;
 
+        case 'web3-status':
+        case 'consensus-status':
+            out.innerHTML = `[WEB3 CONSENSUS & DISTRIBUTED STATE]
+Block Height:          #982741 (Under Diagnostic Lock)
+State Root Match:      FAILED (3:2 Partition)
+Oracle Input:          NOVA-PRICE-ORACLE ($4,820.50)
+Dispute Resolution:    Emergency Proposal GOV-NEX-071 required to restore single root.`;
+            break;
+
+        case 'timeline':
+        case 'case-log':
+        case 'caselog':
         case 'trust-chain':
             out.innerHTML = `[CROSS-LAYER TRUST-CHAIN RECONSTRUCTION]
 1. IoT SENSORS      -> Gateway GW-184 injects synthetic synchronized telemetry
@@ -735,6 +871,19 @@ Protocol Status:       No validator compromised; divergent execution inputs.`;
 3. AI SENTINEL      -> MODEL-ORION suppresses alerts (trained on synthetic data)
 4. BLOCKCHAIN       -> 3:2 Validator divergence on derived state root
 5. RECOVERY         -> GOV-NEX-071 isolates gateway & restores unified consensus.`;
+            break;
+
+        case 'evidence':
+            out.innerHTML = `Secured Case Evidence:
+  • IOT-E11: Synchronized IoT Telemetry Log (GATEWAY-GW-184)
+  • ORACLE-E12: Aggregated Oracle Data Feed (NOVA-PRICE-ORACLE)
+  • AI-E13: Poisoned AI Training Feedback (EMB-IOT-9041)
+  • CONSENSUS-E14: Validator State Root Divergence Trace (VAL-STATE-071)
+  • GOV-E15: Unified Cross-Layer Containment Proposal (GOV-NEX-071)`;
+            break;
+
+        case 'flag':
+            out.innerHTML = `<span style="color:#4ade80; font-weight:bold; font-size:13px;">NEXORA{v4n1sh1ng_c0ns3nsus_n3x071}</span>`;
             break;
 
         case 'python':
@@ -760,17 +909,26 @@ Protocol Status:       No validator compromised; divergent execution inputs.`;
             }
             break;
 
-        case 'evidence':
-            out.innerHTML = `Secured Case Evidence:
-  • IOT-E11: Synchronized IoT Telemetry Log (GATEWAY-GW-184)
-  • ORACLE-E12: Aggregated Oracle Data Feed (NOVA-PRICE-ORACLE)
-  • AI-E13: Poisoned AI Training Feedback (EMB-IOT-9041)
-  • CONSENSUS-E14: Validator State Root Divergence Trace (VAL-STATE-071)
-  • GOV-E15: Unified Cross-Layer Containment Proposal (GOV-NEX-071)`;
+        case 'ls':
+        case 'dir':
+            out.innerHTML = `iot-telemetry-gw184.log   oracle-feed-dump.json   ai-training-baseline.log
+validator-state-roots.txt   trust-chain-analysis.txt   inspect_attack_chain.py`;
             break;
 
-        case 'flag':
-            out.innerHTML = `<span style="color:#4ade80; font-weight:bold; font-size:13px;">NEXORA{v4n1sh1ng_c0ns3nsus_n3x071}</span>`;
+        case 'grep':
+            const gParts = arg.split(' ');
+            const term = gParts[0]?.toLowerCase();
+            if (!term) {
+                out.innerHTML = `Usage: grep <term> <file>`;
+                break;
+            }
+            let matches = [];
+            for (const [fName, content] of Object.entries(caseFiles)) {
+                if (content.toLowerCase().includes(term)) {
+                    matches.push(`<span style="color:#38bdf8;">${fName}</span>: matched '${escapeHtml(term)}'`);
+                }
+            }
+            out.innerHTML = matches.length > 0 ? matches.join('<br>') : `No matches found for '${escapeHtml(term)}'.`;
             break;
 
         default:
